@@ -1,0 +1,147 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@keyframes bounce-slow {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+/* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
+All colors MUST be HSL.
+*/
+
+@layer base {
+  :root {
+    /* Amil Brand Colors */
+    --background: 0 0% 98%;
+    --foreground: 215 20% 20%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 215 20% 20%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 215 20% 20%;
+
+    /* Primary: Amil Blue */
+    --primary: 211 100% 40%;
+    --primary-foreground: 0 0% 100%;
+    --primary-light: 211 100% 95%;
+    --primary-dark: 211 100% 28%;
+
+    /* Secondary: Health Green */
+    --secondary: 142 70% 45%;
+    --secondary-foreground: 0 0% 100%;
+    --secondary-light: 142 70% 95%;
+
+    /* Accent: Warm accent for CTAs */
+    --accent: 340 82% 52%;
+    --accent-foreground: 0 0% 100%;
+
+    /* Success: Positive health indicators */
+    --success: 142 70% 45%;
+    --success-foreground: 0 0% 100%;
+
+    /* Warning */
+    --warning: 45 93% 47%;
+    --warning-foreground: 0 0% 100%;
+
+    /* Muted */
+    --muted: 210 20% 96%;
+    --muted-foreground: 215 16% 47%;
+
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 214 32% 91%;
+    --input: 214 32% 91%;
+    --ring: 211 100% 40%;
+
+    --radius: 0.75rem;
+
+    /* Gradients */
+    --gradient-primary: linear-gradient(135deg, hsl(211, 100%, 40%) 0%, hsl(211, 100%, 28%) 100%);
+    --gradient-health: linear-gradient(135deg, hsl(211, 100%, 40%) 0%, hsl(142, 70%, 45%) 100%);
+    --gradient-subtle: linear-gradient(180deg, hsl(0, 0%, 100%) 0%, hsl(210, 20%, 98%) 100%);
+
+    /* Shadows */
+    --shadow-soft: 0 2px 8px hsla(211, 100%, 40%, 0.08);
+    --shadow-medium: 0 4px 16px hsla(211, 100%, 40%, 0.12);
+    --shadow-strong: 0 8px 24px hsla(211, 100%, 40%, 0.16);
+
+    /* Transitions */
+    --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-bounce: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  }
+
+  .dark {
+    --background: 215 25% 12%;
+    --foreground: 0 0% 98%;
+
+    --card: 215 25% 15%;
+    --card-foreground: 0 0% 98%;
+
+    --popover: 215 25% 15%;
+    --popover-foreground: 0 0% 98%;
+
+    --primary: 211 100% 50%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 142 70% 50%;
+    --secondary-foreground: 0 0% 100%;
+
+    --muted: 215 25% 20%;
+    --muted-foreground: 215 10% 60%;
+
+    --accent: 340 82% 52%;
+    --accent-foreground: 0 0% 100%;
+
+    --destructive: 0 62% 50%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 215 25% 25%;
+    --input: 215 25% 25%;
+    --ring: 211 100% 50%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+  }
+
+  /* Custom scrollbar */
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: hsl(var(--muted));
+    border-radius: 10px;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: hsl(var(--primary) / 0.3);
+    border-radius: 10px;
+    transition: background 0.2s ease;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: hsl(var(--primary) / 0.5);
+  }
+
+  /* Firefox scrollbar */
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: hsl(var(--primary) / 0.3) hsl(var(--muted));
+  }
+}
