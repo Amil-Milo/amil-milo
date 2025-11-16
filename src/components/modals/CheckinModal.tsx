@@ -1,215 +1,146 @@
-import { useState } from "react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { useState, useEffect } from "react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { Progress } from "@/components/ui/progress";
 import { MiloAssistant } from "@/components/MiloAssistant";
 import { toast } from "sonner";
+import { checkinApi } from "@/lib/api";
 
 interface CheckinModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }
 
-const cardiologyQuestions = [
-  {
-    id: "cardio-1",
-    question: "Nos últimos 15 dias, com que frequência sentiu falta de ar ao realizar atividades simples como vestir-se ou caminhar dentro de casa?",
-    options: [
-      "Nunca",
-      "Raramente (1-2 vezes)",
-      "Às vezes (3-5 vezes)",
-      "Frequentemente (quase todo dia)"
-    ]
-  },
-  {
-    id: "cardio-2",
-    question: "Notou inchaço nos tornozelos ou pés que piora ao final do dia?",
-    options: [
-      "Não",
-      "Leve (só nota ao apertar)",
-      "Moderado (visível sem apertar)",
-      "Acentuado (dificulta usar sapatos)"
-    ]
-  },
-  {
-    id: "cardio-3",
-    question: "Teve palpitações ou sensação de coração acelerado sem motivo aparente?",
-    options: [
-      "Não",
-      "Sim, mas passageiro",
-      "Sim, durou vários minutos",
-      "Sim, com tontura ou mal-estar"
-    ]
-  },
-  {
-    id: "cardio-4",
-    question: "Acordou à noite com falta de ar ou precisou usar mais travesseiros para dormir?",
-    options: [
-      "Nunca",
-      "1-2 vezes",
-      "3-5 vezes",
-      "Quase toda noite"
-    ]
-  },
-  {
-    id: "cardio-5",
-    question: "Tem sentido dores de cabeça frequentes, tonturas ou visão turva?",
-    options: [
-      "Nenhum desses",
-      "1 desses sintomas",
-      "2 desses sintomas",
-      "Todos esses sintomas"
-    ]
-  }
-];
+interface AnswerOption {
+  id: number;
+  text: string;
+  value: number;
+}
 
-const orthopedicsQuestions = [
-  {
-    id: "ortho-1",
-    question: "Tem sentido dores nas costas, pescoço ou articulações que limitam suas atividades?",
-    options: [
-      "Nenhuma dor",
-      "Dor leve (não limita atividades)",
-      "Dor moderada (limita algumas atividades)",
-      "Dor intensa (limita muitas atividades)"
-    ]
-  },
-  {
-    id: "ortho-2",
-    question: "Essa dor irradia para braços, pernas ou outras regiões do corpo?",
-    options: [
-      "Não",
-      "Sim, mas só próximo à área",
-      "Sim, irradia para membros",
-      "Sim, com formigamento ou dormência"
-    ]
-  },
-  {
-    id: "ortho-3",
-    question: "Tem dificuldade para se movimentar ao acordar ou após ficar muito tempo parado na mesma posição?",
-    options: [
-      "Nenhuma dificuldade",
-      "Rigidez leve (<30 min)",
-      "Rigidez moderada (30-60 min)",
-      "Rigidez grave (>60 min)"
-    ]
-  },
-  {
-    id: "ortho-4",
-    question: "A dor tem atrapalhado seu sono ou acorda você durante a noite?",
-    options: [
-      "Nunca",
-      "Raramente",
-      "Algumas vezes por semana",
-      "Quase toda noite"
-    ]
-  },
-  {
-    id: "ortho-5",
-    question: "Tem dificuldade para realizar tarefas simples como calçar sapatos, alcançar objetos no alto ou subir escadas?",
-    options: [
-      "Nenhuma dificuldade",
-      "Dificuldade leve",
-      "Dificuldade moderada",
-      "Dificuldade grave"
-    ]
-  }
-];
+interface Question {
+  id: number;
+  text: string;
+  order: number;
+  answerOptions: AnswerOption[];
+}
 
-const mentalHealthQuestions = [
-  {
-    id: "mental-1",
-    question: "Nos últimos 15 dias, com que frequência se sentiu desanimado, triste ou sem esperança?",
-    options: [
-      "Quase nunca",
-      "Alguns dias",
-      "Mais da metade dos dias",
-      "Quase todos os dias"
-    ]
-  },
-  {
-    id: "mental-2",
-    question: "Teve pouco interesse ou prazer em fazer coisas que normalmente gostaria?",
-    options: [
-      "Nenhuma redução",
-      "Leve redução",
-      "Redução moderada",
-      "Quase nenhum interesse"
-    ]
-  },
-  {
-    id: "mental-3",
-    question: "Esses sentimentos têm atrapalhado seu trabalho, atividades domésticas ou relacionamentos?",
-    options: [
-      "Nada",
-      "Um pouco",
-      "Moderadamente",
-      "Muito"
-    ]
-  },
-  {
-    id: "mental-4",
-    question: "Tem tido dificuldade para dormir (insônia) ou está dormindo mais que o habitual?",
-    options: [
-      "Sono normal",
-      "Leve alteração",
-      "Alteração moderada",
-      "Alteração grave"
-    ]
-  },
-  {
-    id: "mental-5",
-    question: "Sente-se nervoso, ansioso ou muito preocupado sem conseguir relaxar?",
-    options: [
-      "Nunca",
-      "Às vezes",
-      "Frequentemente",
-      "Quase constantemente"
-    ]
-  }
-];
+interface Questionnaire {
+  id: number;
+  name: string;
+  specialtyId: number;
+  questions: Question[];
+  eligible: true;
+}
 
-const allQuestions = [
-  ...cardiologyQuestions.map(q => ({ ...q, category: "Cardiologia" })),
-  ...orthopedicsQuestions.map(q => ({ ...q, category: "Ortopedia" })),
-  ...mentalHealthQuestions.map(q => ({ ...q, category: "Saúde Mental" }))
-];
+interface CheckinNotAvailable {
+  eligible: false;
+  nextCheckinAvailableOn?: string;
+  message: string;
+}
+
+type CheckinResponse = Questionnaire | CheckinNotAvailable;
 
 export const CheckinModal = ({ open, onOpenChange }: CheckinModalProps) => {
+  const [questionnaire, setQuestionnaire] = useState<Questionnaire | null>(null);
+  const [checkinStatus, setCheckinStatus] = useState<CheckinNotAvailable | null>(null);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
-  const [answers, setAnswers] = useState<Record<string, string>>({});
-  const [currentCategory, setCurrentCategory] = useState("Cardiologia");
+  const [answers, setAnswers] = useState<Record<number, number>>({}); // questionId -> chosenAnswerId
+  const [loading, setLoading] = useState(false);
+  const [loadingQuestionnaire, setLoadingQuestionnaire] = useState(false);
 
-  const currentQuestion = allQuestions[currentQuestionIndex];
-  const progress = ((currentQuestionIndex + 1) / allQuestions.length) * 100;
+  useEffect(() => {
+    if (open) {
+      loadQuestionnaire();
+    } else {
+      setQuestionnaire(null);
+      setCheckinStatus(null);
+      setCurrentQuestionIndex(0);
+      setAnswers({});
+    }
+  }, [open]);
 
-  // Update category when moving to a new section
-  if (currentQuestion && currentQuestion.category !== currentCategory) {
-    setCurrentCategory(currentQuestion.category);
-  }
-
-  const handleAnswer = (value: string) => {
-    setAnswers({ ...answers, [currentQuestion.id]: value });
+  const loadQuestionnaire = async () => {
+    setLoadingQuestionnaire(true);
+    try {
+      const data = await checkinApi.getNextCheckin();
+      
+      if (data.eligible === false) {
+        setCheckinStatus(data as CheckinNotAvailable);
+        setQuestionnaire(null);
+      } else {
+        setQuestionnaire(data as Questionnaire);
+        setCheckinStatus(null);
+      setCurrentQuestionIndex(0);
+      setAnswers({});
+      }
+    } catch (error: any) {
+      console.error("Error loading questionnaire:", error);
+      const errorMessage = error.response?.data?.message || error.response?.data?.description || "Não foi possível carregar o questionário. Tente novamente.";
+      toast.error(errorMessage);
+      onOpenChange(false);
+    } finally {
+      setLoadingQuestionnaire(false);
+    }
   };
 
-  const handleNext = () => {
+  const currentQuestion = questionnaire?.questions[currentQuestionIndex];
+  const progress = questionnaire 
+    ? ((currentQuestionIndex + 1) / questionnaire.questions.length) * 100 
+    : 0;
+
+  const handleAnswer = (answerOptionId: string) => {
+    if (!currentQuestion) return;
+    const chosenAnswerId = parseInt(answerOptionId, 10);
+    setAnswers({ ...answers, [currentQuestion.id]: chosenAnswerId });
+  };
+
+  const handleNext = async () => {
+    if (!currentQuestion) return;
+
     if (!answers[currentQuestion.id]) {
-      toast.error("Por favor, selecione uma resposta");
+      toast.error("Selecione uma resposta para continuar");
       return;
     }
 
-    if (currentQuestionIndex < allQuestions.length - 1) {
+    if (currentQuestionIndex < (questionnaire?.questions.length || 0) - 1) {
       setCurrentQuestionIndex(currentQuestionIndex + 1);
     } else {
       // Submit check-in
-      console.log("Check-in responses:", answers);
-      toast.success("Check-in realizado com sucesso!");
+      await submitCheckin();
+    }
+  };
+
+  const submitCheckin = async () => {
+    if (!questionnaire) return;
+
+    setLoading(true);
+    try {
+      // Mapear respostas para o formato esperado pelo backend
+      const formattedAnswers = Object.entries(answers).map(([questionId, chosenAnswerId]) => ({
+        questionId: parseInt(questionId, 10),
+        chosenAnswerId: chosenAnswerId,
+      }));
+
+      await checkinApi.submitCheckin({
+        questionnaireId: questionnaire.id,
+        answers: formattedAnswers,
+      });
+
+      toast.success("Check-in concluído! Suas respostas foram registradas.");
       onOpenChange(false);
+      
       // Reset
       setCurrentQuestionIndex(0);
       setAnswers({});
+      setQuestionnaire(null);
+    } catch (error: any) {
+      console.error("Error submitting check-in:", error);
+      const errorMessage = error.response?.data?.message || error.response?.data?.description || "Erro ao salvar check-in. Tente novamente.";
+      toast.error(errorMessage);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -219,11 +150,90 @@ export const CheckinModal = ({ open, onOpenChange }: CheckinModalProps) => {
     }
   };
 
+  // Mostrar loading enquanto carrega o questionário
+  if (loadingQuestionnaire) {
+    return (
+      <Dialog open={open} onOpenChange={onOpenChange}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle className="text-2xl">Check-in Periódico</DialogTitle>
+            <DialogDescription>Carregando questionário...</DialogDescription>
+          </DialogHeader>
+          <div className="flex items-center justify-center py-8">
+            <p className="text-muted-foreground">Carregando questionário...</p>
+          </div>
+        </DialogContent>
+      </Dialog>
+    );
+  }
+
+  if (checkinStatus) {
+    const formatDate = (dateString?: string) => {
+      if (!dateString) return "";
+      const date = new Date(dateString);
+      return date.toLocaleDateString("pt-BR", {
+        day: "2-digit",
+        month: "2-digit",
+        year: "numeric",
+      });
+    };
+
+    return (
+      <Dialog open={open} onOpenChange={onOpenChange}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle className="text-2xl">Check-in Periódico</DialogTitle>
+            <DialogDescription>
+              {checkinStatus.nextCheckinAvailableOn
+                ? `Próximo check-in disponível em ${formatDate(checkinStatus.nextCheckinAvailableOn)}`
+                : "Você completou todos os check-ins disponíveis"}
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-8">
+            <MiloAssistant
+              message={checkinStatus.message}
+              size="sm"
+            />
+            {checkinStatus.nextCheckinAvailableOn && (
+              <div className="bg-primary/10 border border-primary/20 rounded-lg p-4">
+                <p className="text-sm text-muted-foreground text-center">
+                  Seu próximo check-in estará disponível em{" "}
+                  <span className="font-semibold text-foreground">
+                    {formatDate(checkinStatus.nextCheckinAvailableOn)}
+                  </span>
+                </p>
+              </div>
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
+    );
+  }
+
+  if (!questionnaire || !currentQuestion) {
+    return (
+      <Dialog open={open} onOpenChange={onOpenChange}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle className="text-2xl">Check-in Periódico</DialogTitle>
+            <DialogDescription>Nenhum questionário disponível no momento.</DialogDescription>
+          </DialogHeader>
+          <div className="flex items-center justify-center py-8">
+            <p className="text-muted-foreground">Nenhum questionário disponível no momento.</p>
+          </div>
+        </DialogContent>
+      </Dialog>
+    );
+  }
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="text-2xl">Check-in Periódico</DialogTitle>
+          <DialogDescription>
+            Responda as perguntas para completar seu check-in periódico
+          </DialogDescription>
         </DialogHeader>
 
         <MiloAssistant
@@ -232,17 +242,10 @@ export const CheckinModal = ({ open, onOpenChange }: CheckinModalProps) => {
         />
 
         <div className="space-y-6">
-          {/* Category indicator */}
-          <div className="text-center">
-            <span className="inline-block px-4 py-1 bg-primary/10 text-primary rounded-full text-sm font-medium">
-              {currentCategory}
-            </span>
-          </div>
-
           {/* Progress */}
           <div>
             <div className="flex justify-between text-sm text-muted-foreground mb-2">
-              <span>Pergunta {currentQuestionIndex + 1} de {allQuestions.length}</span>
+              <span>Pergunta {currentQuestionIndex + 1} de {questionnaire.questions.length}</span>
               <span>{Math.round(progress)}%</span>
             </div>
             <Progress value={progress} />
@@ -251,21 +254,31 @@ export const CheckinModal = ({ open, onOpenChange }: CheckinModalProps) => {
           {/* Question */}
           <div className="space-y-4">
             <h3 className="text-lg font-semibold text-foreground">
-              {currentQuestion?.question}
+              {currentQuestion.text}
             </h3>
 
             <RadioGroup
-              value={answers[currentQuestion?.id]}
+              value={answers[currentQuestion.id]?.toString() || ""}
               onValueChange={handleAnswer}
             >
-              {currentQuestion?.options.map((option, index) => (
-                <div key={index} className="flex items-center space-x-2 p-3 rounded-lg hover:bg-accent transition-colors">
-                  <RadioGroupItem value={option} id={`option-${index}`} />
-                  <Label htmlFor={`option-${index}`} className="flex-1 cursor-pointer">
-                    {option}
-                  </Label>
-                </div>
-              ))}
+              {currentQuestion.answerOptions.map((option) => {
+                const isSelected = answers[currentQuestion.id] === option.id;
+                return (
+                  <div 
+                    key={option.id} 
+                    className={`flex items-center space-x-2 p-3 rounded-lg transition-colors ${
+                      isSelected 
+                        ? 'bg-primary/10 border border-primary/20' 
+                        : 'hover:bg-primary/10'
+                    }`}
+                  >
+                    <RadioGroupItem value={option.id.toString()} id={`option-${option.id}`} />
+                    <Label htmlFor={`option-${option.id}`} className="flex-1 cursor-pointer">
+                      {option.text}
+                    </Label>
+                  </div>
+                );
+              })}
             </RadioGroup>
           </div>
 
@@ -278,8 +291,12 @@ export const CheckinModal = ({ open, onOpenChange }: CheckinModalProps) => {
             >
               Anterior
             </Button>
-            <Button onClick={handleNext} className="bg-gradient-primary">
-              {currentQuestionIndex === allQuestions.length - 1 ? "Finalizar" : "Próxima"}
+            <Button onClick={handleNext} className="bg-gradient-primary" loading={loading}>
+              {loading 
+                ? "Salvando..." 
+                : currentQuestionIndex === questionnaire.questions.length - 1 
+                  ? "Finalizar" 
+                  : "Próxima"}
             </Button>
           </div>
         </div>
