@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card } from "@/components/ui/card";
-import { Heart } from "lucide-react";
+import { Heart, Eye, EyeOff } from "lucide-react";
 import miloFront from "@/assets/milo-front.jpg";
 import { toast } from "sonner";
 import { useAuth } from "@/contexts/AuthContext";
@@ -13,23 +13,33 @@ export default function Login() {
   const navigate = useNavigate();
   const { login } = useAuth();
   const [formData, setFormData] = useState({
-    cpf: "",
-    dataNascimento: "",
+    email: "",
+    password: "",
   });
+  const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (formData.cpf && formData.dataNascimento) {
-      const result = await login(formData.cpf, formData.dataNascimento);
-      if (result.success) {
-        toast.success("Login realizado com sucesso!");
-        navigate(result.redirectTo || "/agenda");
-      } else {
-        toast.error("CPF não encontrado. Tente cadastrar-se!");
+    if (formData.email && formData.password) {
+      setLoading(true);
+      try {
+        const result = await login(formData.email, formData.password);
+        if (result.success) {
+          toast.success("Login realizado com sucesso!");
+          navigate(result.redirectTo || "/agenda");
+        } else {
+          toast.error(result.error || "E-mail ou senha incorretos. Verifique e tente novamente.");
+        }
+      } catch (error: any) {
+        const errorMessage = error.response?.data?.message || "Erro ao fazer login. Tente novamente.";
+        toast.error(errorMessage);
+      } finally {
+        setLoading(false);
       }
     } else {
-      toast.error("Por favor, preencha todos os campos");
+      toast.error("Preencha todos os campos para continuar");
     }
   };
 
@@ -56,34 +66,50 @@ export default function Login() {
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="cpf">CPF</Label>
+            <Label htmlFor="email">E-mail</Label>
             <Input
-              id="cpf"
-              type="text"
-              placeholder="000.000.000-00"
-              value={formData.cpf}
+              id="email"
+              type="email"
+              placeholder="seu@email.com"
+              value={formData.email}
               onChange={(e) =>
-                setFormData({ ...formData, cpf: e.target.value })
+                setFormData({ ...formData, email: e.target.value })
               }
               required
             />
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="dataNascimento">Data de Nascimento</Label>
-            <Input
-              id="dataNascimento"
-              type="date"
-              value={formData.dataNascimento}
-              onChange={(e) =>
-                setFormData({ ...formData, dataNascimento: e.target.value })
-              }
-              required
-            />
+            <Label htmlFor="password">Senha</Label>
+            <div className="relative">
+              <Input
+                id="password"
+                type={showPassword ? "text" : "password"}
+                placeholder="Digite sua senha"
+                value={formData.password}
+                onChange={(e) =>
+                  setFormData({ ...formData, password: e.target.value })
+                }
+                required
+                className="pr-10"
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                aria-label={showPassword ? "Ocultar senha" : "Mostrar senha"}
+              >
+                {showPassword ? (
+                  <EyeOff className="h-5 w-5" />
+                ) : (
+                  <Eye className="h-5 w-5" />
+                )}
+              </button>
+            </div>
           </div>
 
-          <Button type="submit" className="w-full bg-gradient-primary">
-            Entrar
+          <Button type="submit" className="w-full bg-gradient-primary" loading={loading}>
+            {loading ? "Entrando..." : "Entrar"}
           </Button>
         </form>
 

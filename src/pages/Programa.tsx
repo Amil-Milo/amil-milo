@@ -12,6 +12,7 @@ import {
   Award,
   Flame,
   Target,
+  ClipboardList,
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
@@ -19,17 +20,18 @@ import { useAuth } from "@/contexts/AuthContext";
 export default function Programa() {
   const { user } = useAuth();
 
+  // Dados vazios - serão preenchidos quando houver integração com backend
   const userData = {
     nome: user?.name || "Paciente",
-    nivel: 2,
-    pontos: 450,
-    streak: 15,
-    proximaConsulta: "23/11/2024 às 14:00",
+    nivel: 0,
+    pontos: 0,
+    streak: 0,
+    proximaConsulta: null as string | null,
     metasSemana: {
-      interacoes: { atual: 5, meta: 7 },
-      conteudos: { atual: 3, meta: 5 },
+      interacoes: { atual: 0, meta: 0 },
+      conteudos: { atual: 0, meta: 0 },
     },
-    conquistas: ["Constância Prata", "Primeira Semana", "Explorador"],
+    conquistas: [] as string[],
   };
 
   return (
@@ -124,7 +126,7 @@ export default function Programa() {
               </div>
             </div>
             <p className="text-sm text-foreground mb-4">
-              {userData.proximaConsulta}
+              {userData.proximaConsulta || "Nenhuma consulta agendada"}
             </p>
             <Link to="/agenda">
               <Button variant="outline" className="w-full">
@@ -205,17 +207,31 @@ export default function Programa() {
 
         {/* Quick Actions */}
         <div className="grid md:grid-cols-3 gap-4">
-          <Link to="/agenda">
-            <Card className="p-6 hover:shadow-medium transition-shadow cursor-pointer">
-              <Calendar className="h-8 w-8 text-secondary mb-3" />
-              <h3 className="font-semibold text-foreground mb-2">
-                Minha Agenda
-              </h3>
-              <p className="text-sm text-muted-foreground">
-                Veja suas consultas e compromissos
-              </p>
-            </Card>
-          </Link>
+          {user?.assignedLineId ? (
+            <Link to="/agenda">
+              <Card className="p-6 hover:shadow-medium transition-shadow cursor-pointer">
+                <Calendar className="h-8 w-8 text-secondary mb-3" />
+                <h3 className="font-semibold text-foreground mb-2">
+                  Minha Agenda
+                </h3>
+                <p className="text-sm text-muted-foreground">
+                  Veja suas consultas e compromissos
+                </p>
+              </Card>
+            </Link>
+          ) : (
+            <Link to="/check-in-periodico">
+              <Card className="p-6 hover:shadow-medium transition-shadow cursor-pointer">
+                <Activity className="h-8 w-8 text-primary mb-3" />
+                <h3 className="font-semibold text-foreground mb-2">
+                  Check-In Periódico
+                </h3>
+                <p className="text-sm text-muted-foreground">
+                  Faça seu check-in e monitore sua saúde
+                </p>
+              </Card>
+            </Link>
+          )}
 
           <Link to="/diario">
             <Card className="p-6 hover:shadow-medium transition-shadow cursor-pointer">
