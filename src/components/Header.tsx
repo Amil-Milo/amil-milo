@@ -1,15 +1,22 @@
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Heart, Menu } from "lucide-react";
+import { Heart, Menu, Bell } from "lucide-react";
 import { useState } from "react";
+import { useAuth } from "@/contexts/AuthContext";
+import { UserProfileMenu } from "@/components/UserProfileMenu";
+import { useNavigate } from "react-router-dom";
+import { NotificationsPopup } from "@/components/NotificationsPopup";
 
-interface HeaderProps {
-  isAuthenticated?: boolean;
-  onLogout?: () => void;
-}
-
-export const Header = ({ isAuthenticated = false, onLogout }: HeaderProps) => {
+export const Header = () => {
+  const { isAuthenticated, user } = useAuth();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const navigate = useNavigate();
+  const location = useLocation();
+  const isLandingPage = location.pathname === "/";
+
+  const handleNotifications = () => {
+    navigate("/notificacoes");
+  };
 
   return (
     <header className="sticky top-0 z-40 w-full bg-card/95 backdrop-blur supports-[backdrop-filter]:bg-card/60 border-b border-border shadow-soft">
@@ -50,14 +57,27 @@ export const Header = ({ isAuthenticated = false, onLogout }: HeaderProps) => {
 
           {/* Actions */}
           <div className="flex items-center gap-3">
-            {isAuthenticated ? (
+            {isAuthenticated && user ? (
               <>
-                <Link to="/agenda">
-                  <Button variant="outline">Minha Agenda</Button>
-                </Link>
-                <Button variant="destructive" onClick={onLogout}>
-                  Sair
-                </Button>
+                {user.role !== "ADMIN" && !user.isInLine && !user.profileData && (
+                  <Link to="/agenda">
+                    <Button variant="outline">Minha Agenda</Button>
+                  </Link>
+                )}
+                {isLandingPage ? (
+                  <NotificationsPopup />
+                ) : (
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="rounded-full"
+                    onClick={handleNotifications}
+                    title="Notificações"
+                  >
+                    <Bell className="h-5 w-5" />
+                  </Button>
+                )}
+                <UserProfileMenu />
               </>
             ) : (
               <>
