@@ -36,13 +36,13 @@ export const Header = () => {
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center gap-6">
             <Link
-              to="/planos"
+              to="/nossos-planos"
               className="text-sm font-medium text-foreground hover:text-primary transition-colors"
             >
               Nossos Planos
             </Link>
             <Link
-              to="/sobre"
+              to="/sobre-o-programa"
               className="text-sm font-medium text-foreground hover:text-primary transition-colors"
             >
               Sobre o Programa
@@ -85,7 +85,7 @@ export const Header = () => {
                   <Button variant="outline">Entrar</Button>
                 </Link>
                 <Link to="/cadastro">
-                  <Button className="bg-gradient-primary">Começar Agora</Button>
+                  <Button className="bg-gradient-primary text-white">Começar Agora</Button>
                 </Link>
               </>
             )}
@@ -105,13 +105,13 @@ export const Header = () => {
           <div className="md:hidden py-4 border-t border-border">
             <nav className="flex flex-col gap-3">
               <Link
-                to="/planos"
+                to="/nossos-planos"
                 className="text-sm font-medium text-foreground hover:text-primary transition-colors"
               >
                 Nossos Planos
               </Link>
               <Link
-                to="/sobre"
+                to="/sobre-o-programa"
                 className="text-sm font-medium text-foreground hover:text-primary transition-colors"
               >
                 Sobre o Programa
