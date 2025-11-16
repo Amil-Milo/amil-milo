@@ -58,7 +58,7 @@ export default function CheckinPeriodico() {
 
           <Button
             size="lg"
-            className="bg-gradient-primary text-lg px-8"
+            className="bg-gradient-primary text-white text-lg px-8"
             onClick={() => setCheckinOpen(true)}
           >
             Fazer Check-in Agora

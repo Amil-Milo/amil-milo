@@ -456,7 +456,7 @@ export default function CompletarPerfil() {
 
           <Button 
             type="submit" 
-            className="w-full bg-gradient-primary"
+            className="w-full bg-gradient-primary text-white"
             loading={loading}
           >
             {loading ? "Salvando..." : "Completar Perfil"}

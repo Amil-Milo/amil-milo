@@ -61,7 +61,7 @@ export function GoogleCalendarConnectModal({
 
           <Button
             onClick={handleConnect}
-            className="w-full rounded-lg bg-gradient-primary h-11"
+            className="w-full rounded-lg bg-gradient-primary text-white h-11"
             size="lg"
           >
             <svg className="w-5 h-5 mr-2" viewBox="0 0 24 24">

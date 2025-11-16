@@ -281,7 +281,7 @@ export default function Cadastro() {
             </div>
           </div>
 
-          <Button type="submit" className="w-full bg-gradient-primary" loading={loading}>
+          <Button type="submit" className="w-full bg-gradient-primary text-white" loading={loading}>
             {loading ? "Cadastrando..." : "Cadastrar"}
           </Button>
         </form>

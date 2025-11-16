@@ -100,7 +100,7 @@ export default function Tour() {
           </Button>
           <Button
             onClick={handleNext}
-            className="flex-1 bg-gradient-primary"
+            className="flex-1 bg-gradient-primary text-white"
           >
             {currentStep < tourSteps.length - 1 ? "Próximo" : "Começar!"}
           </Button>

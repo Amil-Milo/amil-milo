@@ -291,7 +291,7 @@ export const CheckinModal = ({ open, onOpenChange }: CheckinModalProps) => {
             >
               Anterior
             </Button>
-            <Button onClick={handleNext} className="bg-gradient-primary" loading={loading}>
+            <Button onClick={handleNext} className="bg-gradient-primary text-white" loading={loading}>
               {loading 
                 ? "Salvando..." 
                 : currentQuestionIndex === questionnaire.questions.length - 1 

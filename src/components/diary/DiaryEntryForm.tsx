@@ -205,7 +205,7 @@ export function DiaryEntryForm({ onSuccess }: DiaryEntryFormProps) {
 
         <Button
           type="submit"
-          className="w-full bg-gradient-primary"
+          className="w-full bg-gradient-primary text-white"
           disabled={isLoading}
         >
           {isLoading ? (

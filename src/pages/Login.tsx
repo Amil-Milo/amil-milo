@@ -108,7 +108,7 @@ export default function Login() {
             </div>
           </div>
 
-          <Button type="submit" className="w-full bg-gradient-primary" loading={loading}>
+          <Button type="submit" className="w-full bg-gradient-primary text-white" loading={loading}>
             {loading ? "Entrando..." : "Entrar"}
           </Button>
         </form>
