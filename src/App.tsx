@@ -20,6 +20,9 @@ import AdminPanel from "./pages/AdminPanel";
 import Perfil from "./pages/perfil";
 import Notificacoes from "./pages/notificacoes";
 import NotFound from "./pages/NotFound";
+import SobrePrograma from "./pages/sobre-o-programa";
+import NossosPlanos from "./pages/nossos-planos";
+import Contato from "./pages/contato";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 
 const queryClient = new QueryClient();
@@ -107,6 +110,9 @@ const App = () => (
                 </ProtectedRoute>
               } 
             />
+            <Route path="/sobre-o-programa" element={<SobrePrograma />} />
+            <Route path="/nossos-planos" element={<NossosPlanos />} />
+            <Route path="/contato" element={<Contato />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
