@@ -25,6 +25,16 @@ export function useCalendar(startDate?: Date, endDate?: Date) {
       nextWeek.setDate(nextWeek.getDate() + 7);
       nextWeek.setHours(10, 30, 0, 0);
 
+      const medicationDate1 = new Date(tomorrow);
+      medicationDate1.setHours(8, 0, 0, 0);
+      const medicationDate1End = new Date(medicationDate1);
+      medicationDate1End.setHours(8, 30, 0, 0);
+
+      const medicationDate2 = new Date(tomorrow);
+      medicationDate2.setHours(20, 0, 0, 0);
+      const medicationDate2End = new Date(medicationDate2);
+      medicationDate2End.setHours(20, 30, 0, 0);
+
       const events: CalendarEvent[] = [
         {
           id: 1,
@@ -51,8 +61,8 @@ export function useCalendar(startDate?: Date, endDate?: Date) {
           userId: 1,
           title: "Losartana 50mg",
           description: "Tomar com água",
-          startDate: new Date(tomorrow.setHours(8, 0, 0, 0)),
-          endDate: new Date(tomorrow.setHours(8, 30, 0, 0)),
+          startDate: medicationDate1,
+          endDate: medicationDate1End,
           type: 'MEDICATION',
           location: null,
         },
@@ -61,8 +71,8 @@ export function useCalendar(startDate?: Date, endDate?: Date) {
           userId: 1,
           title: "AAS 100mg",
           description: "Após o jantar",
-          startDate: new Date(tomorrow.setHours(20, 0, 0, 0)),
-          endDate: new Date(tomorrow.setHours(20, 30, 0, 0)),
+          startDate: medicationDate2,
+          endDate: medicationDate2End,
           type: 'MEDICATION',
           location: null,
         },
