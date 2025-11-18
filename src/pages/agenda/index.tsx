@@ -187,8 +187,8 @@ export default function Agenda() {
           </p>
         </div>
 
-        <div className="grid md:grid-cols-3 gap-6">
-          <div className="md:col-span-2 space-y-6">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 w-full">
+          <div className="lg:col-span-2 space-y-6 min-w-0">
             <AgendaList
               consultations={consultations}
               onViewChecklist={handleViewChecklist}
@@ -200,7 +200,7 @@ export default function Agenda() {
             />
           </div>
 
-          <div className="space-y-6">
+          <div className="space-y-6 min-w-0">
             <MedicationCard medications={medications} />
           </div>
         </div>
