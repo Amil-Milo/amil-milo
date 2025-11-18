@@ -75,7 +75,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     // MODO DEMO - BYPASS DE VALIDAÇÃO
     const storedUser = localStorage.getItem("currentUser");
     const token = localStorage.getItem("authToken");
-    
+
     if (token && storedUser) {
       try {
         const parsedUser = JSON.parse(storedUser);
@@ -87,7 +87,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         return false;
       }
     }
-    
+
     return false;
 
     // CÓDIGO ORIGINAL COMENTADO - DESCOMENTE QUANDO O BACK-END ESTIVER FUNCIONANDO
