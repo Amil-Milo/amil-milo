@@ -51,47 +51,40 @@ export function useUserProfile() {
   const fetchProfile = async () => {
     setLoading(true);
     try {
-      // MODO DEMO - DADOS MOCKADOS
-      await new Promise((resolve) => setTimeout(resolve, 300));
+      const [userData, profileData] = await Promise.all([
+        usersApi.getCurrentUser(),
+        patientProfileApi.getProfile().catch(() => null),
+      ]);
 
-      const mockUserData = {
-        id: 1,
-        fullName: "Admin Mockado",
-        email: "admin@mock.com",
-        cpf: "123.456.789-00",
-      };
+      if (userData) {
+        const user: UserData = {
+          id: userData.id,
+          fullName: userData.fullName,
+          email: userData.email,
+          cpf: userData.cpf,
+        };
 
-      const mockProfile: PatientProfileData = {
-        dateOfBirth: "1990-05-15",
-        bloodType: "O+",
-        height: 175,
-        weight: 70,
-        diseases: "Hipertensão arterial",
-        medications: "Losartana 50mg, AAS 100mg",
-        familyHistory: "Histórico de diabetes na família",
-        specialConditions: "Nenhuma condição especial",
-        address: {
-          id: 1,
-          street: "Rua das Flores",
-          number: "123",
-          complement: "Apto 45",
-          neighborhood: "Centro",
-          city: "São Paulo",
-          state: "SP",
-          zipCode: "01234-567",
-        },
-        assignedLineId: 1,
-        assignedLine: {
-          id: 1,
-          name: "Cardiologia",
-          description: "Linha de cuidados cardiológicos",
-        },
-      };
+        const profile: PatientProfileData = profileData
+          ? {
+              dateOfBirth: profileData.dateOfBirth,
+              bloodType: profileData.bloodType,
+              height: profileData.height,
+              weight: profileData.weight,
+              diseases: profileData.diseases,
+              medications: profileData.medications,
+              familyHistory: profileData.familyHistory,
+              specialConditions: profileData.specialConditions,
+              address: profileData.address,
+              assignedLineId: profileData.assignedLineId,
+              assignedLine: profileData.assignedLine,
+            }
+          : {};
 
-      setProfileData({
-        user: mockUserData,
-        profile: mockProfile,
-      });
+        setProfileData({
+          user,
+          profile,
+        });
+      }
     } catch (error: any) {
       toast.error("Erro ao carregar perfil. Tente novamente.");
     } finally {
@@ -109,26 +102,19 @@ export function useUserProfile() {
   ) => {
     setUpdating(true);
     try {
-      // MODO DEMO - SIMULA ATUALIZAÇÃO
-      await new Promise((resolve) => setTimeout(resolve, 500));
+      const promises = [];
 
-      if (profileData && setProfileData) {
-        setProfileData((prev) => {
-          if (!prev) return prev;
-          return {
-            ...prev,
-            user: {
-              ...prev.user,
-              ...(userData?.fullName && { fullName: userData.fullName }),
-              ...(userData?.email && { email: userData.email }),
-            },
-            profile: {
-              ...prev.profile,
-              ...profileData,
-            },
-          };
-        });
+      if (userData && (userData.fullName || userData.email)) {
+        promises.push(usersApi.updateUser(userData));
       }
+
+      if (profileData && Object.keys(profileData).length > 0) {
+        promises.push(patientProfileApi.updateProfile(profileData));
+      }
+
+      await Promise.all(promises);
+
+      await fetchProfile();
 
       toast.success("Perfil atualizado com sucesso!");
       return true;
