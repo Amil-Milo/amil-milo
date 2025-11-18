@@ -138,15 +138,10 @@ export default function Agenda() {
               onViewChecklist={handleViewChecklist}
             />
 
-            {googleConnected?.connected ? (
-              <GoogleCalendarWrapper />
-            ) : (
-              <CustomCalendar
-                onEventClick={handleEventClick}
-                onConnectGoogle={handleConnectGoogleCalendar}
-                showConnectButton={true}
-              />
-            )}
+            <CustomCalendar
+              onEventClick={handleEventClick}
+              showConnectButton={false}
+            />
           </div>
 
           <div className="space-y-6">

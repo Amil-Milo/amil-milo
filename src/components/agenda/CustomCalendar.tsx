@@ -139,18 +139,6 @@ export function CustomCalendar({ onEventClick, onConnectGoogle, showConnectButto
             </div>
           </div>
           <div className="flex items-center gap-2">
-            {showConnectButton && onConnectGoogle && (
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={onConnectGoogle}
-                className="rounded-lg border-primary/30 hover:bg-primary/10"
-                title="Conectar Google Calendar"
-              >
-                <Link2 className="h-4 w-4 mr-1" />
-                <span className="text-xs">Google</span>
-              </Button>
-            )}
             <Button
               variant="outline"
               size="sm"
