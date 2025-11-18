@@ -284,14 +284,12 @@ export const Sidebar = () => {
             />
           )}
 
-          {(hasAssignedLine || isAdmin) && (
-            <SidebarSection
-              title="Programa Cuidadomil"
-              subtitle={assignedLineName || "Cardiologia"}
-              items={programNavItems}
-              location={location}
-            />
-          )}
+          <SidebarSection
+            title="Programa Cuidadomil"
+            subtitle={assignedLineName || (isAdmin ? "Cardiologia" : "")}
+            items={programNavItems}
+            location={location}
+          />
 
           {isAdmin && (
             <SidebarSection
