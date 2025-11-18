@@ -196,6 +196,26 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const login = async (email: string, password: string) => {
+    // MODO MOCKADO - BYPASS DE BACK-END
+    // Aceita qualquer email e senha, simula login como ADMIN
+    const mockUser: User = {
+      id: 1,
+      name: "Admin Mockado",
+      email: email,
+      role: "ADMIN",
+    };
+
+    const mockToken = "mock-token-123";
+
+    localStorage.setItem("authToken", mockToken);
+    setUser(mockUser);
+    localStorage.setItem("currentUser", JSON.stringify(mockUser));
+    localStorage.setItem("isAuthenticated", "true");
+
+    return { success: true, redirectTo: "/admin" };
+
+    // CÓDIGO ORIGINAL COMENTADO - DESCOMENTE QUANDO O BACK-END ESTIVER FUNCIONANDO
+    /*
     try {
       const response = await authApi.login(email, password);
       
@@ -259,6 +279,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       const errorMessage = error.response?.data?.message || error.message || "Erro ao fazer login";
       return { success: false, error: errorMessage };
     }
+    */
   };
 
   const register = async (data: { fullName: string; cpf: string; email: string; passwordHash: string }) => {
