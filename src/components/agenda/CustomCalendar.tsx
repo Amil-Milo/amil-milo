@@ -9,11 +9,10 @@ import { cn } from "@/lib/utils";
 
 interface CustomCalendarProps {
   onEventClick?: (event: CalendarEvent) => void;
-  onConnectGoogle?: () => void;
   showConnectButton?: boolean;
 }
 
-export function CustomCalendar({ onEventClick, onConnectGoogle, showConnectButton = true }: CustomCalendarProps) {
+export function CustomCalendar({ onEventClick, showConnectButton = false }: CustomCalendarProps) {
   const [currentDate, setCurrentDate] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
 
