@@ -200,7 +200,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     // Aceita qualquer email e senha, simula login como ADMIN
     const mockUser: User = {
       id: 1,
-      name: "Admin Mockado",
+      name: "Admin",
       email: email,
       role: "ADMIN",
     };
