@@ -265,7 +265,7 @@ export const Sidebar = () => {
   const shouldMarkGeneralAsCompleted = !isAdmin && hasAssignedLine && isInProgramGroup;
 
   return (
-    <aside className="fixed left-0 top-0 h-screen w-64 bg-gradient-to-b from-background via-background to-muted/20 border-r border-border flex flex-col shadow-soft">
+    <aside className="fixed left-0 top-0 h-screen w-64 bg-gradient-to-b from-background via-background to-muted/20 border-r border-border flex flex-col shadow-soft z-50 overflow-hidden will-change-transform">
       <Link to="/" className="p-6 border-b border-border/50">
         <div className="flex items-center gap-3 cursor-pointer hover:opacity-80 transition-opacity">
           <Heart className="h-8 w-8 text-primary fill-primary" />
