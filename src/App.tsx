@@ -4,7 +4,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/contexts/AuthContext";
-import { FAQButton } from "@/components/FAQButton";
+import { GlobalNotificationWrapper } from "@/components/layout/GlobalNotificationWrapper";
 import Landing from "./pages/Landing";
 import Login from "./pages/Login";
 import Cadastro from "./pages/Cadastro";
@@ -116,7 +116,7 @@ const App = () => (
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
-          <FAQButton />
+          <GlobalNotificationWrapper />
         </BrowserRouter>
       </TooltipProvider>
     </AuthProvider>
