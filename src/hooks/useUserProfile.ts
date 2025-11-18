@@ -53,7 +53,12 @@ export function useUserProfile() {
     try {
       const [userData, profileData] = await Promise.all([
         usersApi.getCurrentUser(),
-        patientProfileApi.getProfile().catch(() => null),
+        patientProfileApi.getProfile().catch((error: any) => {
+          if (error.response?.status === 404) {
+            return null;
+          }
+          throw error;
+        }),
       ]);
 
       if (userData) {

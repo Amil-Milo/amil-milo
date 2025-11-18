@@ -43,6 +43,18 @@ api.interceptors.response.use(
         window.location.href = '/login';
       }
     }
+    
+    if (error.response?.status === 404) {
+      const url = error.config?.url || '';
+      if (url.includes('/patient-profile/me') && error.config?.method === 'get') {
+        return Promise.reject(error);
+      }
+    }
+    
+    if (error.code === 'ERR_NETWORK' || error.response?.status === 502) {
+      return Promise.reject(error);
+    }
+    
     return Promise.reject(error);
   }
 );

@@ -34,7 +34,13 @@ export function useNotifications() {
         setNotifications([]);
         return;
       }
-      console.error("Erro ao buscar notificações:", error);
+      if (axiosError.code === 'ERR_NETWORK' || axiosError.response?.status === 502) {
+        setNotifications([]);
+        return;
+      }
+      if (axiosError.response?.status !== 403 && axiosError.response?.status !== 404) {
+        console.error("Erro ao buscar notificações:", error);
+      }
       setNotifications([]);
     } finally {
       setLoading(false);

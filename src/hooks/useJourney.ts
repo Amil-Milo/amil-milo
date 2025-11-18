@@ -1,5 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { journeyApi } from '@/lib/api';
+import { useAuth } from '@/contexts/AuthContext';
+import { AxiosError } from 'axios';
 
 export interface JourneyData {
   level: string;
@@ -27,10 +29,20 @@ export interface JourneyData {
 }
 
 export function useJourney() {
+  const { user, isAuthenticated, loading: authLoading } = useAuth();
+  
   return useQuery<JourneyData>({
     queryKey: ['journey'],
     queryFn: async () => {
       return await journeyApi.getJourneyData();
+    },
+    enabled: isAuthenticated && !authLoading && (user?.assignedLineId || user?.role === 'ADMIN'),
+    retry: (failureCount, error) => {
+      const axiosError = error as AxiosError;
+      if (axiosError.response?.status === 403 || axiosError.response?.status === 404 || axiosError.code === 'ERR_NETWORK') {
+        return false;
+      }
+      return failureCount < 3;
     },
   });
 }

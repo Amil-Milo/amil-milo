@@ -99,7 +99,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
               formattedUser.careLine = profile.assignedLine?.name;
               formattedUser.assignedLineId = profile.assignedLineId || null;
             }
-          } catch (error: any) {}
+          } catch (error: any) {
+            if (error.response?.status !== 404) {
+              console.error("Error fetching profile:", error);
+            }
+          }
         }
 
         setUser(formattedUser);
@@ -210,7 +214,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
               formattedUser.careLine = profile.assignedLine?.name;
               formattedUser.assignedLineId = profile.assignedLineId || null;
             }
-          } catch (error) {}
+          } catch (error: any) {
+            if (error.response?.status !== 404) {
+              console.error("Error fetching profile during login:", error);
+            }
+          }
         }
         
         setUser(formattedUser);
@@ -229,7 +237,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
               return { success: true, redirectTo: "/agenda" };
             }
             return { success: true, redirectTo: "/completar-perfil" };
-          } catch (error) {
+          } catch (error: any) {
+            if (error.response?.status !== 404) {
+              console.error("Error fetching profile for redirect:", error);
+            }
             return { success: true, redirectTo: "/check-in-periodico" };
           }
         }
