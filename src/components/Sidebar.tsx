@@ -280,14 +280,22 @@ export const Sidebar = () => {
   useEffect(() => {
     const sidebarWidth = isCollapsed ? '80px' : '256px';
     document.documentElement.style.setProperty('--sidebar-width', sidebarWidth);
+    
+    return () => {
+      document.documentElement.style.setProperty('--sidebar-width', '256px');
+    };
   }, [isCollapsed]);
+
+  useEffect(() => {
+    document.documentElement.style.setProperty('--sidebar-width', '256px');
+  }, []);
 
   return (
     <aside className={cn(
       "fixed left-0 top-0 h-screen bg-gradient-to-b from-background via-background to-muted/20 border-r border-border flex flex-col shadow-soft z-50 overflow-hidden will-change-transform transition-all duration-300",
       isCollapsed ? "w-20" : "w-64"
     )}>
-      <div className="flex items-center justify-between p-6 border-b border-border/50">
+      <div className={cn("flex items-center justify-between border-b border-border/50", isCollapsed ? "p-4" : "p-6")}>
         <Link to="/" className={cn("flex items-center gap-3 cursor-pointer hover:opacity-80 transition-opacity", isCollapsed && "justify-center")}>
           <Heart className="h-8 w-8 text-primary fill-primary flex-shrink-0" />
           {!isCollapsed && (
@@ -308,7 +316,7 @@ export const Sidebar = () => {
         </Button>
       </div>
 
-      <nav className="flex-1 p-6 relative overflow-y-auto">
+      <nav className={cn("flex-1 relative overflow-y-auto", isCollapsed ? "p-2" : "p-6")}>
         <div className="space-y-6 relative">
           {!isAdmin && (
             <SidebarSection
@@ -339,7 +347,7 @@ export const Sidebar = () => {
         </div>
       </nav>
 
-      <div className="p-4 border-t border-border/50">
+      <div className={cn("border-t border-border/50", isCollapsed ? "p-2" : "p-4")}>
         <button
           onClick={logout}
           className={cn(
