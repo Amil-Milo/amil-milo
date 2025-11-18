@@ -72,7 +72,7 @@ export const MiloModal = ({ isOpen, onClose }: MiloModalProps) => {
         <div className="relative">
           <div className="bg-gradient-to-br from-primary/10 to-primary/5 p-6 border-b border-border">
             <div className="flex items-center gap-4">
-              <div className="w-16 h-16 rounded-full bg-primary flex items-center justify-center flex-shrink-0 shadow-medium">
+              <div className="w-16 h-16 flex items-center justify-center flex-shrink-0">
                 <img 
                   src={miloFaqHead} 
                   alt="Milo" 
@@ -80,8 +80,8 @@ export const MiloModal = ({ isOpen, onClose }: MiloModalProps) => {
                 />
               </div>
               <div className="flex-1">
-                <h2 className="text-2xl font-bold text-foreground">Olá! Eu sou o Milo</h2>
-                <p className="text-sm text-muted-foreground">Seu assistente virtual de saúde</p>
+                <h2 className="text-2xl font-bold text-foreground">Olá! Eu sou o Milo.</h2>
+                <p className="text-sm text-muted-foreground">Seu assistente virtual de saúde.</p>
               </div>
             </div>
           </div>
@@ -109,7 +109,7 @@ export const MiloModal = ({ isOpen, onClose }: MiloModalProps) => {
                   <Button
                     variant="outline"
                     className="h-auto p-4 flex flex-col items-start gap-2 hover:bg-primary/5 hover:border-primary/30"
-                    onClick={() => setCurrentView("faq")}
+                    onClick={() => navigate("/faq")}
                   >
                     <HelpCircle className="h-6 w-6 text-primary" />
                     <div className="text-left">
