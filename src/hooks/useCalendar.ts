@@ -1,5 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { calendarApi } from '@/lib/api';
+import { useAuth } from '@/contexts/AuthContext';
+import { AxiosError } from 'axios';
 
 export interface CalendarEvent {
   id: number;
@@ -24,10 +26,20 @@ export function useCalendar(startDate?: Date, endDate?: Date) {
 }
 
 export function useGoogleCalendarConnected() {
+  const { user, isAuthenticated, loading: authLoading } = useAuth();
+  
   return useQuery<{ connected: boolean }>({
     queryKey: ['calendar', 'google-connected'],
     queryFn: async () => {
       return await calendarApi.isGoogleConnected();
+    },
+    enabled: isAuthenticated && !authLoading && (user?.assignedLineId || user?.role === 'ADMIN'),
+    retry: (failureCount, error) => {
+      const axiosError = error as AxiosError;
+      if (axiosError.response?.status === 403 || axiosError.response?.status === 404) {
+        return false;
+      }
+      return failureCount < 3;
     },
   });
 }

@@ -114,6 +114,31 @@ export default function Agenda() {
   }
 
   if (error) {
+    const axiosError = error as any;
+    const isForbidden = axiosError?.response?.status === 403;
+    const isNotFound = axiosError?.response?.status === 404;
+    
+    if (isForbidden || isNotFound) {
+      return (
+        <div className="flex min-h-screen w-full bg-background">
+          <Sidebar />
+          <main
+            className="flex-1 p-8 transition-all duration-300"
+            style={{ marginLeft: "var(--content-margin-left, 256px)" }}
+          >
+            <Card className="p-6 text-center">
+              <p className="text-foreground font-semibold mb-2">
+                Linha de cuidado não atribuída
+              </p>
+              <p className="text-sm text-muted-foreground mt-2">
+                Você precisa ter uma linha de cuidado atribuída para acessar a agenda.
+              </p>
+            </Card>
+          </main>
+        </div>
+      );
+    }
+    
     return (
       <div className="flex min-h-screen w-full bg-background">
         <Sidebar />

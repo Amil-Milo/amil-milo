@@ -201,11 +201,33 @@ export default function AdminPanel() {
   const handleAssignCareLine = async (patientId: number, specialtyId: string) => {
     if (!specialtyId || specialtyId === "none" || specialtyId === "remove") return;
     
+    const patientIndex = patients.findIndex(p => p.id === patientId);
+    if (patientIndex === -1) return;
+
+    const previousPatient = patients[patientIndex];
+    const specialty = specialties.find(s => s.id === parseInt(specialtyId));
+    
+    setPatients(prev => prev.map(p => 
+      p.id === patientId 
+        ? {
+            ...p,
+            patientProfile: {
+              ...p.patientProfile!,
+              assignedLineId: parseInt(specialtyId),
+              assignedLine: specialty ? { id: specialty.id, name: specialty.name } : null,
+            }
+          }
+        : p
+    ));
+    
     try {
       await patientProfileAdminApi.assignLine(patientId, parseInt(specialtyId));
       toast.success("Linha de cuidado atribuída com sucesso!");
       await loadData();
     } catch (error: any) {
+      setPatients(prev => prev.map(p => 
+        p.id === patientId ? previousPatient : p
+      ));
       console.error("Error assigning care line:", error);
       const errorMessage = error.response?.data?.message || error.response?.data?.description || "Erro ao atribuir linha de cuidado. Tente novamente.";
       toast.error(errorMessage);
@@ -213,11 +235,32 @@ export default function AdminPanel() {
   };
 
   const handleRemoveCareLine = async (patientId: number) => {
+    const patientIndex = patients.findIndex(p => p.id === patientId);
+    if (patientIndex === -1) return;
+
+    const previousPatient = patients[patientIndex];
+    
+    setPatients(prev => prev.map(p => 
+      p.id === patientId 
+        ? {
+            ...p,
+            patientProfile: {
+              ...p.patientProfile!,
+              assignedLineId: null,
+              assignedLine: null,
+            }
+          }
+        : p
+    ));
+    
     try {
       await patientProfileAdminApi.removeLine(patientId);
       toast.success("Linha de cuidado removida com sucesso!");
       await loadData();
     } catch (error: any) {
+      setPatients(prev => prev.map(p => 
+        p.id === patientId ? previousPatient : p
+      ));
       console.error("Error removing care line:", error);
       const errorMessage = error.response?.data?.message || error.response?.data?.description || "Erro ao remover linha de cuidado. Tente novamente.";
       toast.error(errorMessage);
