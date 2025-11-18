@@ -147,9 +147,9 @@ const SidebarSection = ({ title, subtitle, items, location, markAllAsCompleted =
   };
   
   return (
-    <div ref={sectionRef} className="space-y-2 relative">
+    <div ref={sectionRef} className={cn("relative", isCollapsed ? "space-y-1" : "space-y-2")}>
       {!isCollapsed && (
-        <div className="px-3 mb-2">
+        <div className={cn("mb-2", isCollapsed ? "px-1" : "px-3")}>
           <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1">
             {title}
           </h3>
@@ -212,8 +212,8 @@ const SidebarSection = ({ title, subtitle, items, location, markAllAsCompleted =
             to={item.to}
             data-nav-item
             className={cn(
-              "flex items-center gap-4 px-3 py-3 rounded-lg text-muted-foreground hover:text-primary hover:bg-primary/5 transition-all duration-300 group relative",
-              isCollapsed && "justify-center"
+              "flex items-center rounded-lg text-muted-foreground hover:text-primary hover:bg-primary/5 transition-all duration-300 group relative",
+              isCollapsed ? "justify-center px-2 py-2" : "gap-4 px-3 py-3"
             )}
             title={isCollapsed ? item.label : undefined}
           >
