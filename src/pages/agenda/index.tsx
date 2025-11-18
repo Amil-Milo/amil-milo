@@ -120,12 +120,16 @@ export default function Agenda() {
     
     if (isForbidden || isNotFound) {
       return (
-        <div className="flex min-h-screen w-full bg-background">
-          <Sidebar />
-          <main
-            className="flex-1 p-8 transition-all duration-300 min-w-0 overflow-x-auto"
-            style={{ marginLeft: "var(--content-margin-left, 72px)" }}
-          >
+      <div className="flex min-h-screen w-full bg-background overflow-x-hidden">
+        <Sidebar />
+        <main
+          className="flex-1 p-8 transition-all duration-300"
+          style={{ 
+            marginLeft: "var(--content-margin-left, 72px)",
+            width: "calc(100% - var(--content-margin-left, 72px))",
+            maxWidth: "100%"
+          }}
+        >
             <Card className="p-6 text-center">
               <p className="text-foreground font-semibold mb-2">
                 Linha de cuidado não atribuída
@@ -162,12 +166,16 @@ export default function Agenda() {
   const medications = agendaData?.medicationReminders || [];
 
   return (
-    <div className="flex min-h-screen w-full bg-background">
+    <div className="flex min-h-screen w-full bg-background overflow-x-hidden">
       <Sidebar />
 
       <main
-        className="flex-1 p-8 transition-all duration-300 min-w-0 overflow-x-auto"
-        style={{ marginLeft: "var(--content-margin-left, 72px)" }}
+        className="flex-1 p-8 transition-all duration-300"
+        style={{ 
+          marginLeft: "var(--content-margin-left, 72px)",
+          width: "calc(100% - var(--content-margin-left, 72px))",
+          maxWidth: "100%"
+        }}
       >
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-foreground mb-2 flex items-center gap-3">

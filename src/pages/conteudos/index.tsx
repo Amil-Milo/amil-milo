@@ -48,10 +48,14 @@ export default function Conteudos() {
   };
 
   return (
-    <div className="flex min-h-screen w-full bg-background">
+    <div className="flex min-h-screen w-full bg-background overflow-x-hidden">
       <Sidebar />
       
-      <main className="flex-1 p-8 transition-all duration-300 min-w-0 overflow-x-auto" style={{ marginLeft: 'var(--content-margin-left, 72px)' }}>
+      <main className="flex-1 p-8 transition-all duration-300" style={{ 
+        marginLeft: 'var(--content-margin-left, 72px)',
+        width: 'calc(100% - var(--content-margin-left, 72px))',
+        maxWidth: '100%'
+      }}>
         <Card className="p-6 mb-6 border-2 border-primary/20 shadow-lg rounded-xl">
           <h1 className="text-3xl font-bold text-foreground mb-4 flex items-center gap-3">
             <BookOpen className="h-8 w-8 text-primary" />
