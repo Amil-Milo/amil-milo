@@ -186,15 +186,22 @@ export function ProtectedRoute({
   }
 
   if (requirePatientProfile && !hasProfile) {
-    return <Navigate to="/check-in-periodico" replace />;
+    const isAdmin = user?.role === "ADMIN";
+    if (!isAdmin) {
+      return <Navigate to="/check-in-periodico" replace />;
+    }
   }
 
   if (requireAssignedLine) {
+    const isAdmin = user?.role === "ADMIN";
+    if (isAdmin) {
+      return <>{children}</>;
+    }
+    
     if (!hasProfile || !hasAssignedLine) {
       return <Navigate to="/check-in-periodico" replace />;
     }
     
-    // Se tem linha mas não completou dados, redireciona para completar-perfil
     if (hasProfile && hasAssignedLine && !hasCompleteData) {
       return <Navigate to="/completar-perfil" replace />;
     }
