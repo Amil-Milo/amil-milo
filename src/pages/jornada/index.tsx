@@ -150,19 +150,7 @@ export default function Jornada() {
 
           <MilestoneTimeline milestones={data.milestones} />
 
-          <div className="grid md:grid-cols-3 gap-4 mt-6">
-            <Link to="/agenda">
-              <Card className="p-6 hover:scale-[1.02] transition-transform duration-200 cursor-pointer">
-                <Calendar className="h-8 w-8 text-secondary mb-3" />
-                <h3 className="font-semibold text-foreground mb-2">
-                  Minha Agenda
-                </h3>
-                <p className="text-sm text-muted-foreground">
-                  Veja suas consultas e compromissos
-                </p>
-              </Card>
-            </Link>
-
+          <div className="grid md:grid-cols-2 gap-4 mt-6">
             <Link to="/diario">
               <Card className="p-6 hover:scale-[1.02] transition-transform duration-200 cursor-pointer">
                 <Activity className="h-8 w-8 text-primary mb-3" />

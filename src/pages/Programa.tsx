@@ -207,19 +207,7 @@ export default function Programa() {
 
         {/* Quick Actions */}
         <div className="grid md:grid-cols-3 gap-4">
-          {user?.assignedLineId ? (
-            <Link to="/agenda">
-              <Card className="p-6 hover:shadow-medium transition-shadow cursor-pointer">
-                <Calendar className="h-8 w-8 text-secondary mb-3" />
-                <h3 className="font-semibold text-foreground mb-2">
-                  Minha Agenda
-                </h3>
-                <p className="text-sm text-muted-foreground">
-                  Veja suas consultas e compromissos
-                </p>
-              </Card>
-            </Link>
-          ) : (
+          {!user?.assignedLineId && (
             <Link to="/check-in-periodico">
               <Card className="p-6 hover:shadow-medium transition-shadow cursor-pointer">
                 <Activity className="h-8 w-8 text-primary mb-3" />

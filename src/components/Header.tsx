@@ -59,11 +59,6 @@ export const Header = () => {
           <div className="flex items-center gap-3">
             {isAuthenticated && user ? (
               <>
-                {user.role !== "ADMIN" && !user.isInLine && !user.profileData && (
-                  <Link to="/agenda">
-                    <Button variant="outline">Minha Agenda</Button>
-                  </Link>
-                )}
                 {isLandingPage ? (
                   <NotificationsPopup />
                 ) : (
