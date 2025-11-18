@@ -139,48 +139,20 @@ export function ProtectedRoute({
     );
   }
 
-  // Só redireciona para login se não estiver autenticado E não houver token
-  // Isso evita redirecionamento durante a inicialização
-  if (!isAuthenticated && !hasToken) {
+  if (!isAuthenticated && !hasToken && !loading) {
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
   
-  // Se ainda não está autenticado mas há token, aguarda um pouco mais
-  // Isso pode acontecer durante a validação do token
   if (!isAuthenticated && hasToken && !loading) {
-    // Aguarda um pouco para dar tempo da validação do token
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
-          <p className="mt-4 text-muted-foreground">Verificando autenticação...</p>
-        </div>
-      </div>
-    );
+    return <Navigate to="/login" state={{ from: location }} replace />;
   }
 
   if (requireAdmin) {
-    // Se houver token mas ainda não estiver autenticado, aguarda
-    // Isso evita redirecionamento durante a inicialização
-    if (hasToken && !isAuthenticated) {
-      return (
-        <div className="min-h-screen flex items-center justify-center">
-          <div className="text-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
-            <p className="mt-4 text-muted-foreground">Verificando autenticação...</p>
-          </div>
-        </div>
-      );
-    }
-    
-    // Só redireciona se realmente não for ADMIN e estiver autenticado
-    // Se não estiver autenticado e não houver token, já foi tratado acima
     if (isAuthenticated && user && user.role !== 'ADMIN') {
       return <Navigate to="/" replace />;
     }
     
-    // Se não estiver autenticado e não houver token, redireciona para login
-    if (!isAuthenticated && !hasToken) {
+    if (!isAuthenticated && !loading) {
       return <Navigate to="/login" replace />;
     }
   }
