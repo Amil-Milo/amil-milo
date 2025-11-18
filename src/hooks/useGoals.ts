@@ -20,10 +20,37 @@ export function useGoals() {
     setLoading(true);
     setError(null);
     try {
-      const response = await goalsApi.getGoals();
-      if (response.data) {
-        setGoals(response.data);
-      }
+      // MODO DEMO - DADOS MOCKADOS
+      await new Promise((resolve) => setTimeout(resolve, 300));
+
+      const mockGoals: Goal[] = [
+        {
+          id: 1,
+          title: "Beber 2L de água por dia",
+          description: "Meta de hidratação diária",
+          status: "COMPLETED",
+          endDate: null,
+          progress: 100,
+        },
+        {
+          id: 2,
+          title: "Caminhada de 30 minutos",
+          description: "Exercício físico regular",
+          status: "ACTIVE",
+          endDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
+          progress: 70,
+        },
+        {
+          id: 3,
+          title: "Evitar sal em excesso",
+          description: "Redução de sódio na alimentação",
+          status: "ACTIVE",
+          endDate: new Date(Date.now() + 60 * 24 * 60 * 60 * 1000).toISOString(),
+          progress: 45,
+        },
+      ];
+
+      setGoals(mockGoals);
     } catch (err: any) {
       const errorMessage = err.response?.data?.message || 'Erro ao carregar metas';
       setError(errorMessage);
@@ -37,12 +64,21 @@ export function useGoals() {
     setLoading(true);
     setError(null);
     try {
-      const response = await goalsApi.createGoal({ ...data, status: 'ACTIVE' });
-      if (response.data) {
-        setGoals(prev => [response.data, ...prev]);
-        toast.success('Meta criada com sucesso!');
-        return response.data;
-      }
+      // MODO DEMO - SIMULA CRIAÇÃO
+      await new Promise((resolve) => setTimeout(resolve, 300));
+
+      const newGoal: Goal = {
+        id: Date.now(),
+        title: data.title,
+        description: data.description || null,
+        status: 'ACTIVE',
+        endDate: data.endDate || null,
+        progress: 0,
+      };
+
+      setGoals(prev => [newGoal, ...prev]);
+      toast.success('Meta criada com sucesso!');
+      return newGoal;
     } catch (err: any) {
       const errorMessage = err.response?.data?.message || 'Erro ao criar meta';
       setError(errorMessage);
@@ -57,12 +93,26 @@ export function useGoals() {
     setLoading(true);
     setError(null);
     try {
-      const response = await goalsApi.updateGoal(id, data);
-      if (response.data) {
-        setGoals(prev => prev.map(goal => goal.id === id ? response.data : goal));
-        toast.success('Meta atualizada com sucesso!');
-        return response.data;
-      }
+      // MODO DEMO - SIMULA ATUALIZAÇÃO
+      await new Promise((resolve) => setTimeout(resolve, 300));
+
+      let updatedGoal: Goal | undefined;
+      setGoals(prev => prev.map(goal => {
+        if (goal.id === id) {
+          updatedGoal = {
+            ...goal,
+            ...(data.title && { title: data.title }),
+            ...(data.description !== undefined && { description: data.description }),
+            ...(data.endDate !== undefined && { endDate: data.endDate }),
+            ...(data.status && { status: data.status as 'ACTIVE' | 'COMPLETED' | 'CANCELLED' }),
+          };
+          return updatedGoal;
+        }
+        return goal;
+      }));
+
+      toast.success('Meta atualizada com sucesso!');
+      return updatedGoal;
     } catch (err: any) {
       const errorMessage = err.response?.data?.message || 'Erro ao atualizar meta';
       setError(errorMessage);
@@ -77,7 +127,9 @@ export function useGoals() {
     setLoading(true);
     setError(null);
     try {
-      await goalsApi.deleteGoal(id);
+      // MODO DEMO - SIMULA EXCLUSÃO
+      await new Promise((resolve) => setTimeout(resolve, 300));
+
       setGoals(prev => prev.filter(goal => goal.id !== id));
       toast.success('Meta excluída com sucesso!');
     } catch (err: any) {
