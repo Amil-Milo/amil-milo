@@ -20,37 +20,8 @@ export function useGoals() {
     setLoading(true);
     setError(null);
     try {
-      // MODO DEMO - DADOS MOCKADOS
-      await new Promise((resolve) => setTimeout(resolve, 300));
-
-      const mockGoals: Goal[] = [
-        {
-          id: 1,
-          title: "Beber 2L de água por dia",
-          description: "Meta de hidratação diária",
-          status: "COMPLETED",
-          endDate: null,
-          progress: 100,
-        },
-        {
-          id: 2,
-          title: "Caminhada de 30 minutos",
-          description: "Exercício físico regular",
-          status: "ACTIVE",
-          endDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
-          progress: 70,
-        },
-        {
-          id: 3,
-          title: "Evitar sal em excesso",
-          description: "Redução de sódio na alimentação",
-          status: "ACTIVE",
-          endDate: new Date(Date.now() + 60 * 24 * 60 * 60 * 1000).toISOString(),
-          progress: 45,
-        },
-      ];
-
-      setGoals(mockGoals);
+      const data = await goalsApi.getGoals();
+      setGoals(data);
     } catch (err: any) {
       const errorMessage = err.response?.data?.message || 'Erro ao carregar metas';
       setError(errorMessage);
@@ -64,18 +35,7 @@ export function useGoals() {
     setLoading(true);
     setError(null);
     try {
-      // MODO DEMO - SIMULA CRIAÇÃO
-      await new Promise((resolve) => setTimeout(resolve, 300));
-
-      const newGoal: Goal = {
-        id: Date.now(),
-        title: data.title,
-        description: data.description || null,
-        status: 'ACTIVE',
-        endDate: data.endDate || null,
-        progress: 0,
-      };
-
+      const newGoal = await goalsApi.createGoal(data);
       setGoals(prev => [newGoal, ...prev]);
       toast.success('Meta criada com sucesso!');
       return newGoal;
@@ -93,24 +53,8 @@ export function useGoals() {
     setLoading(true);
     setError(null);
     try {
-      // MODO DEMO - SIMULA ATUALIZAÇÃO
-      await new Promise((resolve) => setTimeout(resolve, 300));
-
-      let updatedGoal: Goal | undefined;
-      setGoals(prev => prev.map(goal => {
-        if (goal.id === id) {
-          updatedGoal = {
-            ...goal,
-            ...(data.title && { title: data.title }),
-            ...(data.description !== undefined && { description: data.description }),
-            ...(data.endDate !== undefined && { endDate: data.endDate }),
-            ...(data.status && { status: data.status as 'ACTIVE' | 'COMPLETED' | 'CANCELLED' }),
-          };
-          return updatedGoal;
-        }
-        return goal;
-      }));
-
+      const updatedGoal = await goalsApi.updateGoal(id, data);
+      setGoals(prev => prev.map(goal => goal.id === id ? updatedGoal : goal));
       toast.success('Meta atualizada com sucesso!');
       return updatedGoal;
     } catch (err: any) {
@@ -127,9 +71,7 @@ export function useGoals() {
     setLoading(true);
     setError(null);
     try {
-      // MODO DEMO - SIMULA EXCLUSÃO
-      await new Promise((resolve) => setTimeout(resolve, 300));
-
+      await goalsApi.deleteGoal(id);
       setGoals(prev => prev.filter(goal => goal.id !== id));
       toast.success('Meta excluída com sucesso!');
     } catch (err: any) {
