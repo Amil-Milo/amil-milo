@@ -50,6 +50,10 @@ export function ProtectedRoute({
       navigate('/check-in-periodico', { replace: true });
       return;
     }
+
+    if (isAdmin && requireAssignedLine) {
+      return;
+    }
   }, [isAuthenticated, user, loading, location.pathname, navigate, requireAssignedLine]);
 
   useEffect(() => {

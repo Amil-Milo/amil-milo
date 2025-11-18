@@ -215,12 +215,21 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const login = async (email: string, password: string) => {
     // MODO MOCKADO - BYPASS DE BACK-END
-    // Aceita qualquer email e senha, simula login como ADMIN
+    // Aceita qualquer email e senha, simula login como ADMIN com acesso total
     const mockUser: User = {
       id: 1,
       name: "Admin",
       email: email,
       role: "ADMIN",
+      isInLine: true,
+      careLine: "Linha de Cuidados Mockada",
+      assignedLineId: 1,
+      profileData: {
+        height: 175,
+        weight: 70,
+        bloodType: "O+",
+        age: 30,
+      },
     };
 
     const mockToken = "mock-token-123";
@@ -230,7 +239,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     localStorage.setItem("currentUser", JSON.stringify(mockUser));
     localStorage.setItem("isAuthenticated", "true");
 
-    return { success: true, redirectTo: "/admin" };
+    return { success: true, redirectTo: "/agenda" };
 
     // CÓDIGO ORIGINAL COMENTADO - DESCOMENTE QUANDO O BACK-END ESTIVER FUNCIONANDO
     /*
