@@ -1,5 +1,7 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import api from "@/lib/api";
+import { AxiosError } from "axios";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface Notification {
   id: number;
@@ -14,28 +16,52 @@ interface Notification {
 export function useNotifications() {
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [loading, setLoading] = useState(true);
+  const { isAuthenticated, loading: authLoading } = useAuth();
 
-  const fetchNotifications = async () => {
+  const fetchNotifications = useCallback(async () => {
+    if (!isAuthenticated || authLoading) {
+      setNotifications([]);
+      setLoading(false);
+      return;
+    }
+
     try {
       const response = await api.get("/notifications/me/unread");
       setNotifications(response.data);
     } catch (error) {
+      const axiosError = error as AxiosError;
+      if (axiosError.response?.status === 401) {
+        setNotifications([]);
+        return;
+      }
       console.error("Erro ao buscar notificações:", error);
       setNotifications([]);
     } finally {
       setLoading(false);
     }
-  };
+  }, [isAuthenticated, authLoading]);
 
   useEffect(() => {
+    if (authLoading) {
+      return;
+    }
+
+    if (!isAuthenticated) {
+      setNotifications([]);
+      setLoading(false);
+      return;
+    }
+
     fetchNotifications();
 
     const interval = setInterval(() => {
-      fetchNotifications();
+      if (isAuthenticated) {
+        fetchNotifications();
+      }
     }, 15000);
 
     return () => clearInterval(interval);
-  }, []);
+  }, [isAuthenticated, authLoading, fetchNotifications]);
 
   const markAsRead = async (notificationId: number) => {
     try {

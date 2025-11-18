@@ -30,9 +30,13 @@ api.interceptors.response.use(
   (response) => response,
   (error: AxiosError) => {
     if (error.response?.status === 401) {
-      // Unauthorized - clear token and redirect to login
-      // Só redireciona se não estiver já na página de login
-      if (window.location.pathname !== '/login') {
+      const currentPath = window.location.pathname;
+      const publicPaths = ['/login', '/cadastro', '/', '/sobre-o-programa', '/nossos-planos', '/contato'];
+      const isPublicPath = publicPaths.includes(currentPath) || currentPath.startsWith('/tour');
+      
+      const hasToken = !!localStorage.getItem('authToken');
+      
+      if (hasToken && !isPublicPath) {
         localStorage.removeItem('authToken');
         localStorage.removeItem('currentUser');
         localStorage.removeItem('isAuthenticated');
