@@ -50,12 +50,14 @@ export interface MedicalRecordData {
 export function useMedicalRecords() {
   const { isAuthenticated, loading: authLoading } = useAuth();
   
+  const shouldEnable = Boolean(isAuthenticated && !authLoading);
+  
   const query = useQuery<MedicalRecordData>({
     queryKey: ["medical-record", "me"],
     queryFn: async () => {
       return await medicalRecordApi.getMedicalRecord();
     },
-    enabled: isAuthenticated && !authLoading,
+    enabled: shouldEnable,
   });
 
   return {

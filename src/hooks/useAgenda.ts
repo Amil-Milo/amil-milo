@@ -28,12 +28,14 @@ export interface AgendaSummary {
 export function useAgenda() {
   const { user, isAuthenticated, loading: authLoading } = useAuth();
   
+  const shouldEnable = Boolean(isAuthenticated && !authLoading && (user?.assignedLineId || user?.role === 'ADMIN'));
+  
   return useQuery<AgendaSummary>({
     queryKey: ['agenda', 'summary'],
     queryFn: async () => {
       return await agendaApi.getSummary();
     },
-    enabled: isAuthenticated && !authLoading && (user?.assignedLineId || user?.role === 'ADMIN'),
+    enabled: shouldEnable,
     retry: (failureCount, error) => {
       const axiosError = error as AxiosError;
       if (axiosError.response?.status === 403 || axiosError.response?.status === 404 || axiosError.code === 'ERR_NETWORK' || axiosError.response?.status === 502) {

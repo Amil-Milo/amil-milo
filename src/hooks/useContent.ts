@@ -20,12 +20,14 @@ export interface Content {
 export function useContent() {
   const { isAuthenticated, loading: authLoading } = useAuth();
   
+  const shouldEnable = Boolean(isAuthenticated && !authLoading);
+  
   const recommendationsQuery = useQuery<Content[]>({
     queryKey: ["contents", "recommendations"],
     queryFn: async () => {
       return await contentApi.getRecommendations();
     },
-    enabled: isAuthenticated && !authLoading,
+    enabled: shouldEnable,
   });
 
   const allContentsQuery = useQuery<Content[]>({
@@ -33,7 +35,7 @@ export function useContent() {
     queryFn: async () => {
       return await contentApi.getAll();
     },
-    enabled: isAuthenticated && !authLoading,
+    enabled: shouldEnable,
   });
 
   return {
@@ -51,24 +53,28 @@ export function useContent() {
 export function useContentBySpecialty(specialtyId: number) {
   const { isAuthenticated, loading: authLoading } = useAuth();
   
+  const shouldEnable = Boolean(isAuthenticated && !authLoading && !!specialtyId);
+  
   return useQuery<Content[]>({
     queryKey: ["contents", "specialty", specialtyId],
     queryFn: async () => {
       return await contentApi.getBySpecialty(specialtyId);
     },
-    enabled: isAuthenticated && !authLoading && !!specialtyId,
+    enabled: shouldEnable,
   });
 }
 
 export function useContentByCategory(category: string) {
   const { isAuthenticated, loading: authLoading } = useAuth();
   
+  const shouldEnable = Boolean(isAuthenticated && !authLoading && !!category);
+  
   return useQuery<Content[]>({
     queryKey: ["contents", "category", category],
     queryFn: async () => {
       return await contentApi.getByCategory(category);
     },
-    enabled: isAuthenticated && !authLoading && !!category,
+    enabled: shouldEnable,
   });
 }
 

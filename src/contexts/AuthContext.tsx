@@ -295,6 +295,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
+  const isAuthenticated = !!user;
+  const isAuthLoading = loading;
+
   return (
     <AuthContext.Provider
       value={{
@@ -303,8 +306,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         register,
         logout,
         updateUser,
-        isAuthenticated: !!user,
-        loading,
+        isAuthenticated,
+        loading: isAuthLoading,
       }}
     >
       {children}

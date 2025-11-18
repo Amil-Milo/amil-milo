@@ -28,12 +28,14 @@ export function useCalendar(startDate?: Date, endDate?: Date) {
 export function useGoogleCalendarConnected() {
   const { user, isAuthenticated, loading: authLoading } = useAuth();
   
+  const shouldEnable = Boolean(isAuthenticated && !authLoading && (user?.assignedLineId || user?.role === 'ADMIN'));
+  
   return useQuery<{ connected: boolean }>({
     queryKey: ['calendar', 'google-connected'],
     queryFn: async () => {
       return await calendarApi.isGoogleConnected();
     },
-    enabled: isAuthenticated && !authLoading && (user?.assignedLineId || user?.role === 'ADMIN'),
+    enabled: shouldEnable,
     retry: (failureCount, error) => {
       const axiosError = error as AxiosError;
       if (axiosError.response?.status === 403 || axiosError.response?.status === 404 || axiosError.code === 'ERR_NETWORK' || axiosError.response?.status === 502) {

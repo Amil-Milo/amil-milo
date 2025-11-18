@@ -23,24 +23,28 @@ export interface DiaryEntriesResponse {
 export function useDiaryEntries(page: number = 1, limit: number = 20) {
   const { isAuthenticated, loading: authLoading } = useAuth();
   
+  const shouldEnable = Boolean(isAuthenticated && !authLoading);
+  
   return useQuery<DiaryEntriesResponse>({
     queryKey: ['diary', 'entries', page, limit],
     queryFn: async () => {
       return await diaryApi.getEntries(page, limit);
     },
-    enabled: isAuthenticated && !authLoading,
+    enabled: shouldEnable,
   });
 }
 
 export function useTodayEntry() {
   const { isAuthenticated, loading: authLoading } = useAuth();
   
+  const shouldEnable = Boolean(isAuthenticated && !authLoading);
+  
   return useQuery<{ entry: DiaryEntry | null }>({
     queryKey: ['diary', 'today'],
     queryFn: async () => {
       return await diaryApi.getTodayEntry();
     },
-    enabled: isAuthenticated && !authLoading,
+    enabled: shouldEnable,
   });
 }
 
@@ -97,12 +101,14 @@ export interface ShouldShowDiaryResponse {
 export function useShouldShowDiary() {
   const { isAuthenticated, loading: authLoading } = useAuth();
   
+  const shouldEnable = Boolean(isAuthenticated && !authLoading);
+  
   return useQuery<ShouldShowDiaryResponse>({
     queryKey: ['diary', 'should-show'],
     queryFn: async () => {
       return await diaryApi.shouldShowDiary();
     },
-    enabled: isAuthenticated && !authLoading,
+    enabled: shouldEnable,
   });
 }
 

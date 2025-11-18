@@ -31,12 +31,14 @@ export interface JourneyData {
 export function useJourney() {
   const { user, isAuthenticated, loading: authLoading } = useAuth();
   
+  const shouldEnable = Boolean(isAuthenticated && !authLoading && (user?.assignedLineId || user?.role === 'ADMIN'));
+  
   return useQuery<JourneyData>({
     queryKey: ['journey'],
     queryFn: async () => {
       return await journeyApi.getJourneyData();
     },
-    enabled: isAuthenticated && !authLoading && (user?.assignedLineId || user?.role === 'ADMIN'),
+    enabled: shouldEnable,
     retry: (failureCount, error) => {
       const axiosError = error as AxiosError;
       if (axiosError.response?.status === 403 || axiosError.response?.status === 404 || axiosError.code === 'ERR_NETWORK') {
