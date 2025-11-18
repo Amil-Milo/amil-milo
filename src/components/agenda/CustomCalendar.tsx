@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo } from "react";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { ChevronLeft, ChevronRight, Calendar as CalendarIcon, Clock, MapPin, Link2 } from "lucide-react";
+import { ChevronLeft, ChevronRight, Calendar as CalendarIcon, Clock, MapPin } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useCalendar } from "@/hooks/useCalendar";
 import { CalendarEvent } from "@/hooks/useCalendar";
