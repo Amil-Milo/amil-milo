@@ -223,7 +223,7 @@ export default function AdminPanel() {
     try {
       await patientProfileAdminApi.assignLine(patientId, parseInt(specialtyId));
       toast.success("Linha de cuidado atribuída com sucesso!");
-      await loadData();
+      loadData();
     } catch (error: any) {
       setPatients(prev => prev.map(p => 
         p.id === patientId ? previousPatient : p
