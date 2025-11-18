@@ -1,10 +1,10 @@
 import { NavLink } from "@/components/NavLink";
 import { useAuth } from "@/contexts/AuthContext";
-import {
-  Calendar,
-  BookOpen,
-  FileText,
-  Heart,
+import { 
+  Calendar, 
+  BookOpen, 
+  FileText, 
+  Heart, 
   Library,
   Users,
   LogOut,
@@ -177,9 +177,9 @@ const SidebarSection = ({
           </h3>
           {subtitle && (
             <p className="text-xs text-muted-foreground italic">{subtitle}</p>
-          )}
-        </div>
-      )}
+                )}
+              </div>
+            )}
 
       {/* Linhas verticais entre cada par de itens consecutivos */}
       {linePositions.map((linePos, index) => {
@@ -193,7 +193,7 @@ const SidebarSection = ({
           <div
             key={`line-${index}`}
             className="absolute w-0.5 overflow-hidden pointer-events-none z-0"
-            style={{
+                style={{ 
               left: `${linePos.left}px`,
               top: `${linePos.top}px`,
               height: `${linePos.height}px`,
@@ -201,23 +201,23 @@ const SidebarSection = ({
           >
             {lineIsActive ? (
               <div className="absolute left-1/2 -translate-x-1/2 w-full h-full bg-gradient-to-b from-primary/60 via-primary/50 to-primary/40 rounded-full transition-all duration-700 ease-out shadow-sm shadow-primary/20">
-                <div className="absolute inset-0 bg-gradient-to-b from-primary/40 via-primary/60 to-primary/40 rounded-full animate-pulse-wave" />
-                <div className="absolute inset-0 bg-gradient-to-b from-transparent via-white/30 to-transparent rounded-full animate-light-travel" />
-              </div>
-            ) : (
-              <>
+                    <div className="absolute inset-0 bg-gradient-to-b from-primary/40 via-primary/60 to-primary/40 rounded-full animate-pulse-wave" />
+                    <div className="absolute inset-0 bg-gradient-to-b from-transparent via-white/30 to-transparent rounded-full animate-light-travel" />
+                  </div>
+                ) : (
+                  <>
                 <div className="absolute left-1/2 -translate-x-1/2 w-full h-full bg-gradient-to-b from-primary/15 via-primary/10 to-primary/5 rounded-full transition-all duration-700 ease-out" />
-                <div
-                  className="absolute inset-0 rounded-full overflow-hidden"
-                  style={{
-                    background: `linear-gradient(to bottom, transparent 0%, hsl(var(--primary) / 0.5) 50%, transparent 100%)`,
+                    <div 
+                      className="absolute inset-0 rounded-full overflow-hidden"
+                      style={{
+                        background: `linear-gradient(to bottom, transparent 0%, hsl(var(--primary) / 0.5) 50%, transparent 100%)`,
                     height: "30%",
                     animation: "shimmer-sequential 2s ease-in-out infinite",
-                  }}
-                />
-              </>
-            )}
-          </div>
+                      }}
+                    />
+                  </>
+                )}
+              </div>
         );
       })}
 
@@ -225,11 +225,11 @@ const SidebarSection = ({
       {items.map((item, index) => {
         const itemIsActive = isItemActive(index);
         const itemIsCurrent = isItemCurrent(index);
-
-        return (
-          <NavLink
-            key={item.to}
-            to={item.to}
+                
+                return (
+                  <NavLink
+                    key={item.to}
+                    to={item.to}
             data-nav-item
             className={cn(
               "flex items-center rounded-lg text-muted-foreground hover:text-primary hover:bg-primary/5 transition-all duration-300 group relative",
@@ -237,28 +237,30 @@ const SidebarSection = ({
             )}
             title={isCollapsed ? item.label : undefined}
           >
-            <div className="relative z-10 flex items-center justify-center">
-              <div
-                data-nav-circle
-                className={cn(
-                  "w-5 h-5 rounded-full border-2 transition-all duration-300 relative z-20",
-                  itemIsCurrent
-                    ? "border-primary bg-primary scale-125 shadow-lg shadow-primary/50"
-                    : itemIsActive
-                    ? "border-primary bg-primary/80 scale-100"
-                    : "border-border bg-background group-hover:border-primary/60 group-hover:scale-110"
-                )}
-              >
-                {itemIsCurrent && (
-                  <div className="absolute inset-0 rounded-full bg-primary animate-ping opacity-75" />
-                )}
-                {itemIsActive && !itemIsCurrent && (
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <div className="w-2 h-2 rounded-full bg-background" />
-                  </div>
-                )}
-              </div>
-            </div>
+            {!isCollapsed && (
+                    <div className="relative z-10 flex items-center justify-center">
+                      <div 
+                  data-nav-circle
+                        className={cn(
+                    "w-5 h-5 rounded-full border-2 transition-all duration-300 relative z-20",
+                    itemIsCurrent
+                            ? "border-primary bg-primary scale-125 shadow-lg shadow-primary/50" 
+                      : itemIsActive
+                            ? "border-primary bg-primary/80 scale-100"
+                            : "border-border bg-background group-hover:border-primary/60 group-hover:scale-110"
+                        )}
+                      >
+                  {itemIsCurrent && (
+                          <div className="absolute inset-0 rounded-full bg-primary animate-ping opacity-75" />
+                        )}
+                  {itemIsActive && !itemIsCurrent && (
+                          <div className="absolute inset-0 flex items-center justify-center">
+                            <div className="w-2 h-2 rounded-full bg-background" />
+                          </div>
+                        )}
+                      </div>
+                    </div>
+            )}
             <item.icon
               className={cn(
                 "h-5 w-5 transition-all duration-300 flex-shrink-0",
@@ -272,7 +274,7 @@ const SidebarSection = ({
             {!isCollapsed && (
               <span
                 className={cn(
-                  "transition-all duration-300 text-sm",
+                      "transition-all duration-300 text-sm",
                   itemIsCurrent
                     ? "font-semibold text-primary scale-105"
                     : itemIsActive
@@ -280,16 +282,16 @@ const SidebarSection = ({
                     : "group-hover:text-foreground"
                 )}
               >
-                {item.label}
-              </span>
+                      {item.label}
+                    </span>
             )}
-            {itemIsCurrent && (
-              <div className="absolute right-0 top-1/2 -translate-y-1/2 w-1 h-8 bg-primary rounded-l-full animate-fade-in" />
-            )}
-          </NavLink>
-        );
-      })}
-    </div>
+            {itemIsCurrent && !isCollapsed && (
+                      <div className="absolute right-0 top-1/2 -translate-y-1/2 w-1 h-8 bg-primary rounded-l-full animate-fade-in" />
+                    )}
+                  </NavLink>
+                );
+              })}
+            </div>
   );
 };
 
@@ -325,16 +327,16 @@ export const Sidebar = () => {
   useEffect(() => {
     document.documentElement.style.setProperty("--sidebar-width", "256px");
   }, []);
-
-  return (
+                
+                return (
     <aside
       className={cn(
         "fixed left-0 top-0 h-screen bg-gradient-to-b from-background via-background to-muted/20 border-r border-border flex flex-col shadow-soft z-50 overflow-hidden will-change-transform transition-all duration-300",
         isCollapsed ? "w-20" : "w-64"
       )}
     >
-      <div
-        className={cn(
+                      <div 
+                        className={cn(
           "flex items-center justify-between border-b border-border/50",
           isCollapsed ? "p-4" : "p-6"
         )}
@@ -363,7 +365,7 @@ export const Sidebar = () => {
             <ChevronLeft className="h-4 w-4" />
           )}
         </Button>
-      </div>
+                      </div>
 
       <nav
         className={cn(
