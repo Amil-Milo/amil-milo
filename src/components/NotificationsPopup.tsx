@@ -6,22 +6,67 @@ import {
 } from "@/components/ui/popover";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Bell, Loader2, CheckCheck } from "lucide-react";
+import { Bell, Loader2, CheckCheck, Calendar, Target, Info, FileText } from "lucide-react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { notificationsApi } from "@/lib/api";
 import { toast } from "sonner";
-import { formatDistanceToNow } from "date-fns";
+import { formatDistanceToNow, format, isToday, isYesterday } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { cn } from "@/lib/utils";
-import { Link } from "react-router-dom";
 
 interface Notification {
   id: number;
-  title: string;
   message: string;
   type: string;
   isRead: boolean;
   createdAt: Date;
+}
+
+function formatNotificationDate(date: Date): string {
+  if (isToday(date)) {
+    const distance = formatDistanceToNow(date, { addSuffix: true, locale: ptBR });
+    return distance;
+  }
+  
+  if (isYesterday(date)) {
+    return `ontem às ${format(date, 'HH:mm', { locale: ptBR })}`;
+  }
+  
+  const daysDiff = Math.floor((Date.now() - date.getTime()) / (1000 * 60 * 60 * 24));
+  
+  if (daysDiff < 7) {
+    return format(date, "EEEE 'às' HH:mm", { locale: ptBR });
+  }
+  
+  return format(date, "dd/MM/yyyy 'às' HH:mm", { locale: ptBR });
+}
+
+function getNotificationTitle(type: string): { title: string; icon: React.ReactNode } {
+  if (type === 'CONSULTATION_REMINDER') {
+    return {
+      title: 'Lembrete de Consulta',
+      icon: <Calendar className="h-4 w-4 text-primary" />,
+    };
+  }
+  
+  if (type === 'GOAL_UPDATE') {
+    return {
+      title: 'Meta Completada',
+      icon: <Target className="h-4 w-4 text-secondary" />,
+    };
+  }
+  
+  if (type === 'NEW_MEDICAL_RECORD') {
+    return {
+      title: 'Novo Registro Médico',
+      icon: <FileText className="h-4 w-4 text-primary" />,
+    };
+  }
+  
+  return {
+    title: 'Informação',
+    icon: <Info className="h-4 w-4 text-primary" />,
+  };
 }
 
 export function NotificationsPopup() {
@@ -77,7 +122,7 @@ export function NotificationsPopup() {
     markAllAsReadMutation.mutate();
   };
 
-  const recentNotifications = notifications.slice(0, 5);
+  const recentNotifications = notifications.slice(0, 7);
   const unreadNotifications = notifications.filter((n) => !n.isRead);
   const hasUnread = unreadNotifications.length > 0;
 
@@ -137,72 +182,58 @@ export function NotificationsPopup() {
               </div>
             ) : (
               <div className="divide-y divide-border">
-                {recentNotifications.map((notification) => (
-                  <div
-                    key={notification.id}
-                    className={cn(
-                      "p-4 transition-colors cursor-pointer hover:bg-accent/50",
-                      !notification.isRead && "bg-primary/5"
-                    )}
-                    onClick={() => {
-                      if (!notification.isRead) {
-                        handleMarkAsRead(notification.id, {
-                          stopPropagation: () => {},
-                        } as React.MouseEvent);
-                      }
-                      setOpen(false);
-                    }}
-                  >
-                    <div className="flex items-start gap-3">
-                      {!notification.isRead && (
-                        <div className="w-2 h-2 rounded-full bg-primary flex-shrink-0 mt-2" />
+                {recentNotifications.map((notification) => {
+                  const { title, icon } = getNotificationTitle(notification.type);
+                  
+                  return (
+                    <div
+                      key={notification.id}
+                      className={cn(
+                        "p-4 transition-colors cursor-pointer hover:bg-muted/50",
+                        !notification.isRead && "bg-primary/5"
                       )}
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2 mb-1">
-                          <h4
-                            className={cn(
-                              "font-medium text-sm truncate",
+                      onClick={() => {
+                        if (!notification.isRead) {
+                          handleMarkAsRead(notification.id, {
+                            stopPropagation: () => {},
+                          } as React.MouseEvent);
+                        }
+                        setOpen(false);
+                      }}
+                    >
+                      <div className="flex items-start gap-3">
+                        {!notification.isRead && (
+                          <div className="w-2 h-2 rounded-full bg-primary flex-shrink-0 mt-2" />
+                        )}
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2 mb-1.5">
+                            {icon}
+                            <h4 className={cn(
+                              "text-xs font-semibold",
                               !notification.isRead && "text-primary"
+                            )}>
+                              {title}
+                            </h4>
+                          </div>
+                          <p
+                            className={cn(
+                              "text-sm leading-relaxed mb-2 text-foreground",
+                              !notification.isRead && "font-medium"
                             )}
                           >
-                            {notification.title}
-                          </h4>
-                        </div>
-                        <p className="text-xs text-muted-foreground line-clamp-2 mb-2">
-                          {notification.message}
-                        </p>
-                        <div className="flex items-center gap-2">
-                          <Badge variant="secondary" className="text-xs">
-                            {notification.type}
-                          </Badge>
+                            {notification.message}
+                          </p>
                           <span className="text-xs text-muted-foreground">
-                            {formatDistanceToNow(notification.createdAt, {
-                              addSuffix: true,
-                              locale: ptBR,
-                            })}
+                            {formatNotificationDate(notification.createdAt)}
                           </span>
                         </div>
                       </div>
                     </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             )}
           </div>
-
-          {recentNotifications.length > 0 && (
-            <div className="p-3 border-t border-border">
-              <Link
-                to="/notificacoes"
-                onClick={() => setOpen(false)}
-                className="w-full"
-              >
-                <Button variant="outline" size="sm" className="w-full">
-                  Ver todas as notificações
-                </Button>
-              </Link>
-            </div>
-          )}
         </div>
       </PopoverContent>
     </Popover>
