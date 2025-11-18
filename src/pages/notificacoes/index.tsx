@@ -64,7 +64,7 @@ export default function Notificacoes() {
     return (
       <div className="flex min-h-screen w-full bg-background">
         <Sidebar />
-        <main className="flex-1 p-8 transition-all duration-300" style={{ marginLeft: 'var(--sidebar-width, 256px)' }}>
+        <main className="flex-1 p-8 transition-all duration-300" style={{ marginLeft: 'var(--content-margin-left, 256px)' }}>
           <div className="flex items-center justify-center py-12">
             <Loader2 className="h-8 w-8 animate-spin text-primary" />
           </div>

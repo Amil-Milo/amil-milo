@@ -51,7 +51,7 @@ export default function Conteudos() {
     <div className="flex min-h-screen w-full bg-background">
       <Sidebar />
       
-      <main className="flex-1 p-8 transition-all duration-300" style={{ marginLeft: 'var(--sidebar-width, 256px)' }}>
+      <main className="flex-1 p-8 transition-all duration-300" style={{ marginLeft: 'var(--content-margin-left, 256px)' }}>
         <Card className="p-6 mb-6 border-2 border-primary/20 shadow-lg rounded-xl">
           <h1 className="text-3xl font-bold text-foreground mb-4 flex items-center gap-3">
             <BookOpen className="h-8 w-8 text-primary" />
