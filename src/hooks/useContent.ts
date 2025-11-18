@@ -1,5 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { contentApi } from "@/lib/api";
+import { useAuth } from "@/contexts/AuthContext";
 
 export interface Content {
   id: number;
@@ -17,11 +18,14 @@ export interface Content {
 }
 
 export function useContent() {
+  const { isAuthenticated, loading: authLoading } = useAuth();
+  
   const recommendationsQuery = useQuery<Content[]>({
     queryKey: ["contents", "recommendations"],
     queryFn: async () => {
       return await contentApi.getRecommendations();
     },
+    enabled: isAuthenticated && !authLoading,
   });
 
   const allContentsQuery = useQuery<Content[]>({
@@ -29,6 +33,7 @@ export function useContent() {
     queryFn: async () => {
       return await contentApi.getAll();
     },
+    enabled: isAuthenticated && !authLoading,
   });
 
   return {
@@ -44,22 +49,26 @@ export function useContent() {
 }
 
 export function useContentBySpecialty(specialtyId: number) {
+  const { isAuthenticated, loading: authLoading } = useAuth();
+  
   return useQuery<Content[]>({
     queryKey: ["contents", "specialty", specialtyId],
     queryFn: async () => {
       return await contentApi.getBySpecialty(specialtyId);
     },
-    enabled: !!specialtyId,
+    enabled: isAuthenticated && !authLoading && !!specialtyId,
   });
 }
 
 export function useContentByCategory(category: string) {
+  const { isAuthenticated, loading: authLoading } = useAuth();
+  
   return useQuery<Content[]>({
     queryKey: ["contents", "category", category],
     queryFn: async () => {
       return await contentApi.getByCategory(category);
     },
-    enabled: !!category,
+    enabled: isAuthenticated && !authLoading && !!category,
   });
 }
 

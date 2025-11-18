@@ -1,6 +1,7 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { goalsApi } from '@/lib/api';
 import { toast } from 'sonner';
+import { useAuth } from '@/contexts/AuthContext';
 
 export interface Goal {
   id: number;
@@ -15,8 +16,14 @@ export function useGoals() {
   const [goals, setGoals] = useState<Goal[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const { isAuthenticated, loading: authLoading } = useAuth();
 
   const fetchGoals = useCallback(async () => {
+    if (!isAuthenticated || authLoading) {
+      setGoals([]);
+      setLoading(false);
+      return;
+    }
     setLoading(true);
     setError(null);
     try {
@@ -29,7 +36,13 @@ export function useGoals() {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [isAuthenticated, authLoading]);
+
+  useEffect(() => {
+    if (isAuthenticated && !authLoading) {
+      fetchGoals();
+    }
+  }, [isAuthenticated, authLoading, fetchGoals]);
 
   const createGoal = useCallback(async (data: { title: string; description?: string; endDate?: string }) => {
     setLoading(true);

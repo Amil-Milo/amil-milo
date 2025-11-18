@@ -1,5 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { medicalRecordApi } from "@/lib/api";
+import { useAuth } from "@/contexts/AuthContext";
 
 export interface MedicalRecord {
   id: number;
@@ -47,11 +48,14 @@ export interface MedicalRecordData {
 }
 
 export function useMedicalRecords() {
+  const { isAuthenticated, loading: authLoading } = useAuth();
+  
   const query = useQuery<MedicalRecordData>({
     queryKey: ["medical-record", "me"],
     queryFn: async () => {
       return await medicalRecordApi.getMedicalRecord();
     },
+    enabled: isAuthenticated && !authLoading,
   });
 
   return {

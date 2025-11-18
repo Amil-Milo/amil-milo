@@ -1,5 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { diaryApi } from '@/lib/api';
+import { useAuth } from '@/contexts/AuthContext';
 
 export interface DiaryEntry {
   id: number;
@@ -20,20 +21,26 @@ export interface DiaryEntriesResponse {
 }
 
 export function useDiaryEntries(page: number = 1, limit: number = 20) {
+  const { isAuthenticated, loading: authLoading } = useAuth();
+  
   return useQuery<DiaryEntriesResponse>({
     queryKey: ['diary', 'entries', page, limit],
     queryFn: async () => {
       return await diaryApi.getEntries(page, limit);
     },
+    enabled: isAuthenticated && !authLoading,
   });
 }
 
 export function useTodayEntry() {
+  const { isAuthenticated, loading: authLoading } = useAuth();
+  
   return useQuery<{ entry: DiaryEntry | null }>({
     queryKey: ['diary', 'today'],
     queryFn: async () => {
       return await diaryApi.getTodayEntry();
     },
+    enabled: isAuthenticated && !authLoading,
   });
 }
 
@@ -88,11 +95,14 @@ export interface ShouldShowDiaryResponse {
 }
 
 export function useShouldShowDiary() {
+  const { isAuthenticated, loading: authLoading } = useAuth();
+  
   return useQuery<ShouldShowDiaryResponse>({
     queryKey: ['diary', 'should-show'],
     queryFn: async () => {
       return await diaryApi.shouldShowDiary();
     },
+    enabled: isAuthenticated && !authLoading,
   });
 }
 
