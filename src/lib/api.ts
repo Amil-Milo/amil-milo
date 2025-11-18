@@ -125,6 +125,40 @@ export const patientProfileApi = {
     const response = await api.patch('/patient-profile/me', { googleCalendarId: calendarId });
     return response.data;
   },
+  // Métodos para atualizar seções específicas
+  updatePersonalData: async (data: { fullName?: string; email?: string }) => {
+    const response = await api.patch('/patient-profile/me/personal-data', data);
+    return response.data;
+  },
+  updateHealthInfo: async (data: { dateOfBirth?: string; bloodType?: string; height?: number; weight?: number }) => {
+    const response = await api.patch('/patient-profile/me/health-info', data);
+    return response.data;
+  },
+  updateDiseasesMedications: async (data: { diseases?: string; medications?: string }) => {
+    const response = await api.patch('/patient-profile/me/diseases-medications', data);
+    return response.data;
+  },
+  updateFamilyHistory: async (data: { familyHistory?: string }) => {
+    const response = await api.patch('/patient-profile/me/family-history', data);
+    return response.data;
+  },
+  updateAllergies: async (data: { allergies?: string }) => {
+    const response = await api.patch('/patient-profile/me/allergies', data);
+    return response.data;
+  },
+  updateSpecialConditions: async (data: { specialConditions?: string }) => {
+    const response = await api.patch('/patient-profile/me/special-conditions', data);
+    return response.data;
+  },
+  // Métodos para gerenciar endereço
+  createAddress: async (data: any) => {
+    const response = await api.post('/patient-profile/me/address', data);
+    return response.data;
+  },
+  updateAddress: async (addressId: number, data: any) => {
+    const response = await api.patch(`/patient-profile/me/address/${addressId}`, data);
+    return response.data;
+  },
 };
 
 // Consultation API
@@ -195,12 +229,12 @@ export const goalsApi = {
     return response.data;
   },
   
-  createGoal: async (data: any) => {
+  createGoal: async (data: { title: string; description?: string; endDate?: string; status?: string }) => {
     const response = await api.post('/goals/me', data);
     return response.data;
   },
   
-  updateGoal: async (id: number, data: any) => {
+  updateGoal: async (id: number, data: { title?: string; description?: string; endDate?: string; status?: string }) => {
     const response = await api.patch(`/goals/me/${id}`, data);
     return response.data;
   },
@@ -211,7 +245,7 @@ export const goalsApi = {
   },
   
   deleteGoal: async (id: number) => {
-    const response = await api.delete(`/goals/${id}`);
+    const response = await api.delete(`/goals/me/${id}`);
     return response.data;
   },
 };
