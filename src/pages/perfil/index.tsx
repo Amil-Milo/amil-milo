@@ -6,7 +6,7 @@ export default function Perfil() {
   return (
     <div className="flex min-h-screen w-full bg-background">
       <Sidebar />
-      <main className="flex-1 ml-64 p-8">
+      <main className="flex-1 p-8 transition-all duration-300" style={{ marginLeft: 'var(--sidebar-width, 256px)' }}>
         <div className="max-w-4xl mx-auto">
           <div className="mb-8">
             <h1 className="text-3xl font-bold text-foreground mb-2">

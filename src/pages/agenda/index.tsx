@@ -88,7 +88,7 @@ export default function Agenda() {
     return (
       <div className="flex min-h-screen w-full bg-background">
         <Sidebar />
-        <main className="flex-1 ml-64 p-8 md:ml-64 ml-0">
+        <main className="flex-1 p-8 transition-all duration-300" style={{ marginLeft: 'var(--sidebar-width, 256px)' }}>
           <div className="flex items-center justify-center py-12">
             <Loader2 className="h-8 w-8 animate-spin text-primary" />
           </div>
@@ -101,7 +101,7 @@ export default function Agenda() {
     return (
       <div className="flex min-h-screen w-full bg-background">
         <Sidebar />
-        <main className="flex-1 ml-64 p-8 md:ml-64 ml-0">
+        <main className="flex-1 p-8 transition-all duration-300" style={{ marginLeft: 'var(--sidebar-width, 256px)' }}>
           <Card className="p-6 text-center">
             <p className="text-destructive">Erro ao carregar agenda</p>
             <p className="text-sm text-muted-foreground mt-2">
@@ -120,7 +120,7 @@ export default function Agenda() {
     <div className="flex min-h-screen w-full bg-background">
       <Sidebar />
 
-      <main className="flex-1 ml-64 p-8 md:ml-64 ml-0">
+      <main className="flex-1 p-8 transition-all duration-300" style={{ marginLeft: 'var(--sidebar-width, 256px)' }}>
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-foreground mb-2 flex items-center gap-3">
             <Calendar className="h-8 w-8 text-primary" />

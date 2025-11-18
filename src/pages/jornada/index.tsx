@@ -49,7 +49,7 @@ export default function Jornada() {
     return (
       <div className="flex min-h-screen w-full bg-gradient-subtle">
         <Sidebar />
-        <main className="flex-1 ml-64 p-8">
+        <main className="flex-1 p-8 transition-all duration-300" style={{ marginLeft: 'var(--sidebar-width, 256px)' }}>
           <div className="flex items-center justify-center py-12">
             <Loader2 className="h-8 w-8 animate-spin text-primary" />
           </div>
@@ -62,7 +62,7 @@ export default function Jornada() {
     return (
       <div className="flex min-h-screen w-full bg-gradient-subtle">
         <Sidebar />
-        <main className="flex-1 ml-64 p-8">
+        <main className="flex-1 p-8 transition-all duration-300" style={{ marginLeft: 'var(--sidebar-width, 256px)' }}>
           <div className="text-center py-12">
             <p className="text-muted-foreground">Erro ao carregar jornada.</p>
           </div>

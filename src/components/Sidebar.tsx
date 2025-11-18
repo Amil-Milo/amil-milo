@@ -211,7 +211,11 @@ const SidebarSection = ({ title, subtitle, items, location, markAllAsCompleted =
             key={item.to}
             to={item.to}
             data-nav-item
-            className="flex items-center gap-4 px-3 py-3 rounded-lg text-muted-foreground hover:text-primary hover:bg-primary/5 transition-all duration-300 group relative"
+            className={cn(
+              "flex items-center gap-4 px-3 py-3 rounded-lg text-muted-foreground hover:text-primary hover:bg-primary/5 transition-all duration-300 group relative",
+              isCollapsed && "justify-center"
+            )}
+            title={isCollapsed ? item.label : undefined}
           >
             <div className="relative z-10 flex items-center justify-center">
               <div 
