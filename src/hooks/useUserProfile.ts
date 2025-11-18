@@ -51,41 +51,46 @@ export function useUserProfile() {
   const fetchProfile = async () => {
     setLoading(true);
     try {
-      const [userData, profileDataResponse] = await Promise.all([
-        usersApi.getCurrentUser(),
-        patientProfileApi.getProfile().catch(() => null),
-      ]);
+      // MODO DEMO - DADOS MOCKADOS
+      await new Promise((resolve) => setTimeout(resolve, 300));
 
-      const profile: PatientProfileData = profileDataResponse
-        ? {
-            dateOfBirth: profileDataResponse.dateOfBirth
-              ? new Date(profileDataResponse.dateOfBirth).toISOString().split("T")[0]
-              : undefined,
-            bloodType: profileDataResponse.bloodType || undefined,
-            height: profileDataResponse.height || undefined,
-            weight: profileDataResponse.weight || undefined,
-            diseases: profileDataResponse.diseases || undefined,
-            medications: profileDataResponse.medications || undefined,
-            familyHistory: profileDataResponse.familyHistory || undefined,
-            specialConditions: profileDataResponse.specialConditions || undefined,
-            address: profileDataResponse.address || null,
-            assignedLineId: profileDataResponse.assignedLineId || null,
-            assignedLine: profileDataResponse.assignedLine || null,
-          }
-        : {
-            address: null,
-            assignedLineId: null,
-            assignedLine: null,
-          };
+      const mockUserData = {
+        id: 1,
+        fullName: "Admin Mockado",
+        email: "admin@mock.com",
+        cpf: "123.456.789-00",
+      };
+
+      const mockProfile: PatientProfileData = {
+        dateOfBirth: "1990-05-15",
+        bloodType: "O+",
+        height: 175,
+        weight: 70,
+        diseases: "Hipertensão arterial",
+        medications: "Losartana 50mg, AAS 100mg",
+        familyHistory: "Histórico de diabetes na família",
+        specialConditions: "Nenhuma condição especial",
+        address: {
+          id: 1,
+          street: "Rua das Flores",
+          number: "123",
+          complement: "Apto 45",
+          neighborhood: "Centro",
+          city: "São Paulo",
+          state: "SP",
+          zipCode: "01234-567",
+        },
+        assignedLineId: 1,
+        assignedLine: {
+          id: 1,
+          name: "Cardiologia",
+          description: "Linha de cuidados cardiológicos",
+        },
+      };
 
       setProfileData({
-        user: {
-          id: userData.id,
-          fullName: userData.fullName,
-          email: userData.email,
-          cpf: userData.cpf || "",
-        },
-        profile,
+        user: mockUserData,
+        profile: mockProfile,
       });
     } catch (error: any) {
       toast.error("Erro ao carregar perfil. Tente novamente.");
@@ -104,55 +109,27 @@ export function useUserProfile() {
   ) => {
     setUpdating(true);
     try {
-      const updateProfilePayload: any = {};
+      // MODO DEMO - SIMULA ATUALIZAÇÃO
+      await new Promise((resolve) => setTimeout(resolve, 500));
 
-      if (profileData.dateOfBirth !== undefined) {
-        updateProfilePayload.dateOfBirth = profileData.dateOfBirth;
-      }
-      if (profileData.bloodType !== undefined) {
-        updateProfilePayload.bloodType = profileData.bloodType;
-      }
-      if (profileData.height !== undefined) {
-        updateProfilePayload.height = profileData.height;
-      }
-      if (profileData.weight !== undefined) {
-        updateProfilePayload.weight = profileData.weight;
-      }
-      if (profileData.diseases !== undefined) {
-        updateProfilePayload.diseases = profileData.diseases;
-      }
-      if (profileData.medications !== undefined) {
-        updateProfilePayload.medications = profileData.medications;
-      }
-      if (profileData.familyHistory !== undefined) {
-        updateProfilePayload.familyHistory = profileData.familyHistory;
-      }
-      if (profileData.specialConditions !== undefined) {
-        updateProfilePayload.specialConditions = profileData.specialConditions;
-      }
-      if (profileData.address !== undefined) {
-        updateProfilePayload.address = profileData.address;
+      if (profileData && setProfileData) {
+        setProfileData((prev) => {
+          if (!prev) return prev;
+          return {
+            ...prev,
+            user: {
+              ...prev.user,
+              ...(userData?.fullName && { fullName: userData.fullName }),
+              ...(userData?.email && { email: userData.email }),
+            },
+            profile: {
+              ...prev.profile,
+              ...profileData,
+            },
+          };
+        });
       }
 
-      const promises = [];
-
-      if (Object.keys(updateProfilePayload).length > 0) {
-        promises.push(patientProfileApi.updateProfile(updateProfilePayload));
-      }
-
-      if (userData && (userData.fullName || userData.email)) {
-        const updateUserPayload: any = {};
-        if (userData.fullName) {
-          updateUserPayload.fullName = userData.fullName;
-        }
-        if (userData.email) {
-          updateUserPayload.email = userData.email;
-        }
-        promises.push(usersApi.updateUser(updateUserPayload));
-      }
-
-      await Promise.all(promises);
-      await fetchProfile();
       toast.success("Perfil atualizado com sucesso!");
       return true;
     } catch (error: any) {
