@@ -234,7 +234,7 @@ const SidebarSection = ({
             data-nav-item
             className={cn(
               "flex items-center rounded-lg text-muted-foreground hover:text-primary hover:bg-primary/5 transition-all duration-300 group relative",
-              isCollapsed ? "justify-center px-2 py-2" : "gap-4 px-3 py-3"
+              isCollapsed ? "justify-center px-1.5 py-2" : "gap-4 px-3 py-3"
             )}
             title={isCollapsed ? item.label : undefined}
           >
@@ -300,7 +300,7 @@ export const Sidebar = () => {
   const { user, logout } = useAuth();
   const location = useLocation();
   const { profileData } = useUserProfile();
-  const [isCollapsed, setIsCollapsed] = useState(false);
+  const [isCollapsed, setIsCollapsed] = useState(true);
 
   const isAdmin = user?.role === "ADMIN";
   const hasAssignedLine = !!user?.assignedLineId;
@@ -317,8 +317,8 @@ export const Sidebar = () => {
     !isAdmin && hasAssignedLine && isInProgramGroup;
 
   useEffect(() => {
-    const sidebarWidth = isCollapsed ? "80px" : "256px";
-    const contentMargin = isCollapsed ? "0px" : "256px";
+    const sidebarWidth = isCollapsed ? "72px" : "256px";
+    const contentMargin = isCollapsed ? "72px" : "256px";
     document.documentElement.style.setProperty("--sidebar-width", sidebarWidth);
     document.documentElement.style.setProperty(
       "--content-margin-left",
@@ -326,19 +326,19 @@ export const Sidebar = () => {
     );
 
     return () => {
-      document.documentElement.style.setProperty("--sidebar-width", "256px");
+      document.documentElement.style.setProperty("--sidebar-width", "72px");
       document.documentElement.style.setProperty(
         "--content-margin-left",
-        "256px"
+        "72px"
       );
     };
   }, [isCollapsed]);
 
   useEffect(() => {
-    document.documentElement.style.setProperty("--sidebar-width", "256px");
+    document.documentElement.style.setProperty("--sidebar-width", "72px");
     document.documentElement.style.setProperty(
       "--content-margin-left",
-      "256px"
+      "72px"
     );
   }, []);
 
@@ -346,7 +346,7 @@ export const Sidebar = () => {
     <aside
       className={cn(
         "fixed left-0 top-0 h-screen bg-gradient-to-b from-background via-background to-muted/20 border-r border-border flex flex-col shadow-soft z-50 overflow-hidden will-change-transform transition-all duration-300",
-        isCollapsed ? "w-20" : "w-64"
+        isCollapsed ? "w-[72px]" : "w-64"
       )}
     >
       <div
@@ -382,7 +382,7 @@ export const Sidebar = () => {
       <nav
         className={cn(
           "flex-1 relative overflow-y-auto",
-          isCollapsed ? "p-2" : "p-6"
+          isCollapsed ? "p-1.5" : "p-6"
         )}
       >
         <div className="space-y-6 relative">
@@ -416,13 +416,13 @@ export const Sidebar = () => {
       </nav>
 
       <div
-        className={cn("border-t border-border/50", isCollapsed ? "p-2" : "p-4")}
+        className={cn("border-t border-border/50", isCollapsed ? "p-1.5" : "p-4")}
       >
         <button
           onClick={logout}
           className={cn(
             "flex items-center w-full text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded-lg transition-all duration-300 group",
-            isCollapsed ? "justify-center px-2 py-2" : "gap-3 px-4 py-3"
+            isCollapsed ? "justify-center px-1.5 py-2" : "gap-3 px-4 py-3"
           )}
           title={isCollapsed ? "Sair" : undefined}
         >
