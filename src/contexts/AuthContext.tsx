@@ -126,6 +126,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           localStorage.removeItem("currentUser");
           localStorage.removeItem("isAuthenticated");
         }
+        setLoading(false);
+        return;
       }
       setLoading(false);
     };
