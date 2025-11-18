@@ -256,7 +256,7 @@ export default function AdminPanel() {
     try {
       await patientProfileAdminApi.removeLine(patientId);
       toast.success("Linha de cuidado removida com sucesso!");
-      await loadData();
+      loadData();
     } catch (error: any) {
       setPatients(prev => prev.map(p => 
         p.id === patientId ? previousPatient : p
