@@ -182,7 +182,7 @@ const SidebarSection = ({
             )}
 
       {/* Linhas verticais entre cada par de itens consecutivos */}
-      {linePositions.map((linePos, index) => {
+      {!isCollapsed && linePositions.map((linePos, index) => {
         // Lógica: linha entre item i e i+1 fica azul se currentIndex > i
         const lineIsActive = isLineActive(index);
 
@@ -316,7 +316,7 @@ export const Sidebar = () => {
     !isAdmin && hasAssignedLine && isInProgramGroup;
 
   useEffect(() => {
-    const sidebarWidth = isCollapsed ? "80px" : "256px";
+    const sidebarWidth = isCollapsed ? "0px" : "256px";
     document.documentElement.style.setProperty("--sidebar-width", sidebarWidth);
 
     return () => {
@@ -330,34 +330,24 @@ export const Sidebar = () => {
                 
                 return (
     <aside
-      className={cn(
+                        className={cn(
         "fixed left-0 top-0 h-screen bg-gradient-to-b from-background via-background to-muted/20 border-r border-border flex flex-col shadow-soft z-50 overflow-hidden will-change-transform transition-all duration-300",
         isCollapsed ? "w-20" : "w-64"
       )}
     >
-                      <div 
-                        className={cn(
-          "flex items-center justify-between border-b border-border/50",
-          isCollapsed ? "p-4" : "p-6"
-        )}
-      >
-        <Link
-          to="/"
-          className={cn(
-            "flex items-center gap-3 cursor-pointer hover:opacity-80 transition-opacity",
-            isCollapsed && "justify-center"
-          )}
-        >
-          <Heart className="h-8 w-8 text-primary fill-primary flex-shrink-0" />
-          {!isCollapsed && (
+                      <div className={cn("flex items-center border-b border-border/50", isCollapsed ? "p-2 justify-center" : "p-6 justify-between")}>
+        {!isCollapsed && (
+          <Link to="/" className="flex items-center gap-3 cursor-pointer hover:opacity-80 transition-opacity flex-1">
+            <Heart className="h-8 w-8 text-primary fill-primary flex-shrink-0" />
             <span className="text-2xl font-bold text-primary">Cuidadomil</span>
-          )}
-        </Link>
+          </Link>
+        )}
         <Button
           variant="ghost"
           size="icon"
           onClick={() => setIsCollapsed(!isCollapsed)}
-          className="h-8 w-8 flex-shrink-0"
+          className={cn("h-8 w-8 flex-shrink-0", isCollapsed && "mx-auto")}
+          title={isCollapsed ? "Expandir sidebar" : "Recolher sidebar"}
         >
           {isCollapsed ? (
             <ChevronRight className="h-4 w-4" />
@@ -409,8 +399,8 @@ export const Sidebar = () => {
         <button
           onClick={logout}
           className={cn(
-            "flex items-center gap-3 w-full px-4 py-3 text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded-lg transition-all duration-300 group",
-            isCollapsed && "justify-center"
+            "flex items-center w-full text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded-lg transition-all duration-300 group",
+            isCollapsed ? "justify-center px-2 py-2" : "gap-3 px-4 py-3"
           )}
           title={isCollapsed ? "Sair" : undefined}
         >
