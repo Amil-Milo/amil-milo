@@ -316,16 +316,20 @@ export const Sidebar = () => {
     !isAdmin && hasAssignedLine && isInProgramGroup;
 
   useEffect(() => {
-    const sidebarWidth = isCollapsed ? "0px" : "256px";
+    const sidebarWidth = isCollapsed ? "80px" : "256px";
+    const contentMargin = isCollapsed ? "0px" : "256px";
     document.documentElement.style.setProperty("--sidebar-width", sidebarWidth);
+    document.documentElement.style.setProperty("--content-margin-left", contentMargin);
 
     return () => {
       document.documentElement.style.setProperty("--sidebar-width", "256px");
+      document.documentElement.style.setProperty("--content-margin-left", "256px");
     };
   }, [isCollapsed]);
 
   useEffect(() => {
     document.documentElement.style.setProperty("--sidebar-width", "256px");
+    document.documentElement.style.setProperty("--content-margin-left", "256px");
   }, []);
                 
                 return (

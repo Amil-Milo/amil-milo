@@ -103,7 +103,7 @@ export default function Agenda() {
         <Sidebar />
         <main
           className="flex-1 p-8 transition-all duration-300"
-          style={{ marginLeft: "var(--sidebar-width, 256px)" }}
+          style={{ marginLeft: "var(--content-margin-left, 256px)" }}
         >
           <div className="flex items-center justify-center py-12">
             <Loader2 className="h-8 w-8 animate-spin text-primary" />
@@ -119,7 +119,7 @@ export default function Agenda() {
         <Sidebar />
         <main
           className="flex-1 p-8 transition-all duration-300"
-          style={{ marginLeft: "var(--sidebar-width, 256px)" }}
+          style={{ marginLeft: "var(--content-margin-left, 256px)" }}
         >
           <Card className="p-6 text-center">
             <p className="text-destructive">Erro ao carregar agenda</p>
@@ -142,7 +142,7 @@ export default function Agenda() {
 
       <main
         className="flex-1 p-8 transition-all duration-300"
-        style={{ marginLeft: "var(--sidebar-width, 256px)" }}
+        style={{ marginLeft: "var(--content-margin-left, 256px)" }}
       >
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-foreground mb-2 flex items-center gap-3">
