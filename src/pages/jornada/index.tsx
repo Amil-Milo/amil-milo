@@ -5,7 +5,7 @@ import { Loader2 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useJourney } from "@/hooks/useJourney";
 import { JourneyProgressBar } from "@/components/jornada/JourneyProgressBar";
-import { CurrentGoals } from "@/components/jornada/CurrentGoals";
+import { GoalManager } from "@/components/jornada/GoalManager";
 import { MilestoneTimeline } from "@/components/jornada/MilestoneTimeline";
 import { MilestoneAchievedModal } from "@/components/jornada/MilestoneAchievedModal";
 import { useState, useEffect } from "react";
@@ -96,7 +96,7 @@ export default function Jornada() {
           </Card>
 
           <div className="grid md:grid-cols-2 gap-6 mb-6">
-            <CurrentGoals goals={data.currentGoals} />
+            <GoalManager />
 
             <Card className="p-6 border-primary/30 hover:scale-[1.02] transition-transform duration-200">
               <div className="flex items-center gap-3 mb-4">
