@@ -1,6 +1,11 @@
+import { useState, useEffect } from "react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { patientProfileApi } from "@/lib/api";
+import { toast } from "sonner";
+import { Loader2 } from "lucide-react";
 
 interface AddressData {
   street: string;
@@ -13,16 +18,81 @@ interface AddressData {
 }
 
 interface AddressFormProps {
-  address: AddressData;
-  onChange: (address: AddressData) => void;
+  initialAddress: AddressData | null;
+  addressId?: number | null;
 }
 
-export function AddressForm({ address, onChange }: AddressFormProps) {
+export function AddressForm({ initialAddress, addressId }: AddressFormProps) {
+  const [address, setAddress] = useState<AddressData>({
+    street: initialAddress?.street || "",
+    number: initialAddress?.number || "",
+    complement: initialAddress?.complement || "",
+    neighborhood: initialAddress?.neighborhood || "",
+    city: initialAddress?.city || "",
+    state: initialAddress?.state || "",
+    zipCode: initialAddress?.zipCode || "",
+  });
+  const [saving, setSaving] = useState(false);
+
+  useEffect(() => {
+    if (initialAddress) {
+      setAddress({
+        street: initialAddress.street || "",
+        number: initialAddress.number || "",
+        complement: initialAddress.complement || "",
+        neighborhood: initialAddress.neighborhood || "",
+        city: initialAddress.city || "",
+        state: initialAddress.state || "",
+        zipCode: initialAddress.zipCode || "",
+      });
+    }
+  }, [initialAddress]);
+
+  const hasChanges = initialAddress
+    ? address.street !== (initialAddress.street || "") ||
+      address.number !== (initialAddress.number || "") ||
+      address.complement !== (initialAddress.complement || "") ||
+      address.neighborhood !== (initialAddress.neighborhood || "") ||
+      address.city !== (initialAddress.city || "") ||
+      address.state !== (initialAddress.state || "") ||
+      address.zipCode !== (initialAddress.zipCode || "")
+    : !!(address.street || address.number || address.complement || address.neighborhood || address.city || address.state || address.zipCode);
+
   const handleChange = (field: keyof AddressData, value: string) => {
-    onChange({
+    setAddress({
       ...address,
       [field]: value,
     });
+  };
+
+  const handleSave = async () => {
+    try {
+      setSaving(true);
+      const addressData = {
+        street: address.street || "",
+        number: address.number || null,
+        complement: address.complement || null,
+        neighborhood: address.neighborhood || null,
+        city: address.city || "",
+        state: address.state || "",
+        zipCode: address.zipCode || "",
+      };
+
+      if (addressId) {
+        // Atualizar endereço existente
+        await patientProfileApi.updateAddress(addressId, addressData);
+      } else {
+        // Criar novo endereço
+        await patientProfileApi.createAddress(addressData);
+      }
+      toast.success("Endereço salvo com sucesso!");
+      // Recarregar a página para atualizar os dados
+      window.location.reload();
+    } catch (error: any) {
+      toast.error(error.response?.data?.message || "Erro ao salvar endereço");
+    } finally {
+      setSaving(false);
+    }
   };
 
   return (
@@ -84,7 +154,7 @@ export function AddressForm({ address, onChange }: AddressFormProps) {
             <Input
               id="state"
               value={address.state}
-              onChange={(e) => handleChange("state", e.target.value)}
+              onChange={(e) => handleChange("state", e.target.value.toUpperCase())}
               placeholder="UF"
               maxLength={2}
             />
@@ -99,6 +169,23 @@ export function AddressForm({ address, onChange }: AddressFormProps) {
               maxLength={8}
             />
           </div>
+        </div>
+        <div className="flex justify-end">
+          <Button
+            type="button"
+            onClick={handleSave}
+            disabled={!hasChanges || saving}
+            size="lg"
+          >
+            {saving ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Salvando...
+              </>
+            ) : (
+              "Salvar Alterações"
+            )}
+          </Button>
         </div>
       </CardContent>
     </Card>

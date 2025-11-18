@@ -1,6 +1,11 @@
+import { useState, useEffect } from "react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { patientProfileApi } from "@/lib/api";
+import { toast } from "sonner";
+import { Loader2 } from "lucide-react";
 
 // Função para formatar CPF
 const formatCPF = (value: string): string => {
@@ -26,20 +31,44 @@ const formatCPF = (value: string): string => {
 };
 
 interface UserDataFormProps {
-  fullName: string;
-  email: string;
+  initialFullName: string;
+  initialEmail: string;
   cpf: string;
-  onNameChange: (value: string) => void;
-  onEmailChange: (value: string) => void;
 }
 
 export function UserDataForm({
-  fullName,
-  email,
+  initialFullName,
+  initialEmail,
   cpf,
-  onNameChange,
-  onEmailChange,
 }: UserDataFormProps) {
+  const [fullName, setFullName] = useState(initialFullName);
+  const [email, setEmail] = useState(initialEmail);
+  const [saving, setSaving] = useState(false);
+
+  useEffect(() => {
+    setFullName(initialFullName);
+    setEmail(initialEmail);
+  }, [initialFullName, initialEmail]);
+
+  const hasChanges = fullName !== initialFullName || email !== initialEmail;
+
+  const handleSave = async () => {
+    try {
+      setSaving(true);
+      await patientProfileApi.updatePersonalData({
+        fullName: fullName !== initialFullName ? fullName : undefined,
+        email: email !== initialEmail ? email : undefined,
+      });
+      toast.success("Dados pessoais atualizados com sucesso!");
+      // Recarregar a página para atualizar os dados
+      window.location.reload();
+    } catch (error: any) {
+      toast.error(error.response?.data?.message || "Erro ao atualizar dados pessoais");
+    } finally {
+      setSaving(false);
+    }
+  };
+
   const formattedCPF = cpf ? formatCPF(cpf) : "";
 
   return (
@@ -53,7 +82,7 @@ export function UserDataForm({
           <Input
             id="fullName"
             value={fullName}
-            onChange={(e) => onNameChange(e.target.value)}
+            onChange={(e) => setFullName(e.target.value)}
             placeholder="Digite seu nome completo"
           />
         </div>
@@ -63,7 +92,7 @@ export function UserDataForm({
             id="email"
             type="email"
             value={email}
-            onChange={(e) => onEmailChange(e.target.value)}
+            onChange={(e) => setEmail(e.target.value)}
             placeholder="Digite seu e-mail"
           />
         </div>
@@ -76,6 +105,23 @@ export function UserDataForm({
             className="bg-muted cursor-not-allowed"
             placeholder="000.000.000-00"
           />
+        </div>
+        <div className="flex justify-end">
+          <Button
+            type="button"
+            onClick={handleSave}
+            disabled={!hasChanges || saving}
+            size="lg"
+          >
+            {saving ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Salvando...
+              </>
+            ) : (
+              "Salvar Alterações"
+            )}
+          </Button>
         </div>
       </CardContent>
     </Card>
