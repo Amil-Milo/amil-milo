@@ -284,10 +284,10 @@ export const Sidebar = () => {
             />
           )}
 
-          {hasAssignedLine && !isAdmin && (
+          {(hasAssignedLine || isAdmin) && (
             <SidebarSection
               title="Programa Cuidadomil"
-              subtitle={assignedLineName}
+              subtitle={assignedLineName || "Cardiologia"}
               items={programNavItems}
               location={location}
             />
