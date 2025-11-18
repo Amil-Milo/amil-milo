@@ -1,7 +1,7 @@
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Calendar, Clock, MapPin, FileText, Bell, AlertCircle } from "lucide-react";
+import { Calendar, Clock, MapPin, FileText, Bell } from "lucide-react";
 import { AgendaConsultation } from "@/hooks/useAgenda";
 
 interface AgendaListProps {
@@ -60,27 +60,6 @@ export function AgendaList({ consultations, onViewChecklist }: AgendaListProps) 
     ];
   };
 
-  const getContextualReminder = (consultationDate: Date): string | null => {
-    const now = new Date();
-    const tomorrow = new Date(now);
-    tomorrow.setDate(tomorrow.getDate() + 1);
-    tomorrow.setHours(0, 0, 0, 0);
-    const dayAfterTomorrow = new Date(tomorrow.getTime() + 24 * 60 * 60 * 1000);
-
-    const daysUntil = Math.ceil(
-      (consultationDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24),
-    );
-
-    if (consultationDate >= tomorrow && consultationDate < dayAfterTomorrow) {
-      return 'Sua consulta é amanhã. Já separou suas dúvidas?';
-    }
-
-    if (daysUntil === 7) {
-      return 'Sua consulta é em uma semana. Reserve um tempo para se preparar.';
-    }
-
-    return null;
-  };
 
   return (
     <Card className="p-6 border-2 border-primary/20 shadow-lg rounded-xl">
@@ -93,23 +72,12 @@ export function AgendaList({ consultations, onViewChecklist }: AgendaListProps) 
         const consultationDate = new Date(consultation.consultationDate);
         const checklistItems = getChecklistItems(consultation.specialty);
         const hasChecklist = checklistItems.length > 0;
-        const contextualReminder = getContextualReminder(consultationDate);
         const daysUntil = Math.ceil(
           (consultationDate.getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24),
         );
 
         return (
           <Card key={consultation.id} className="p-5 border border-border">
-            {contextualReminder && (
-              <div className="mb-4 p-3 bg-blue-50 dark:bg-blue-950 border border-blue-200 dark:border-blue-800 rounded-lg">
-                <div className="flex items-start gap-2">
-                  <AlertCircle className="h-4 w-4 text-blue-600 dark:text-blue-400 mt-0.5 flex-shrink-0" />
-                  <p className="text-sm text-blue-900 dark:text-blue-100">
-                    {contextualReminder}
-                  </p>
-                </div>
-              </div>
-            )}
 
             <div className="flex items-start justify-between mb-4">
               <div className="flex items-start gap-4">
