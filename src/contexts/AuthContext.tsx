@@ -1,4 +1,10 @@
-import { createContext, useContext, useState, ReactNode, useEffect } from "react";
+import {
+  createContext,
+  useContext,
+  useState,
+  ReactNode,
+  useEffect,
+} from "react";
 import { authApi, usersApi, patientProfileApi } from "@/lib/api";
 
 export type UserRole = "PATIENT" | "ADMIN" | "CLINIC_STAFF" | "CLINIC_OWNER";
@@ -22,8 +28,16 @@ export interface User {
 
 interface AuthContextType {
   user: User | null;
-  login: (email: string, password: string) => Promise<{ success: boolean; redirectTo?: string; error?: string }>;
-  register: (data: { fullName: string; cpf: string; email: string; passwordHash: string }) => Promise<{ success: boolean; error?: string }>;
+  login: (
+    email: string,
+    password: string
+  ) => Promise<{ success: boolean; redirectTo?: string; error?: string }>;
+  register: (data: {
+    fullName: string;
+    cpf: string;
+    email: string;
+    passwordHash: string;
+  }) => Promise<{ success: boolean; error?: string }>;
   logout: () => void;
   updateUser: (updates: Partial<User>) => void;
   isAuthenticated: boolean;
@@ -35,7 +49,7 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   // Inicializa o usuário do localStorage imediatamente se existir
   const getInitialUser = (): User | null => {
-    if (typeof window === 'undefined') return null;
+    if (typeof window === "undefined") return null;
     const storedUser = localStorage.getItem("currentUser");
     if (storedUser) {
       try {
@@ -62,14 +76,14 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       const userData = await usersApi.getCurrentUser();
       if (userData) {
         const formattedUser = formatUserFromApi(userData);
-        
+
         // Só tenta buscar perfil se o usuário for PATIENT ou USER
         // E se já tiver patientProfile nos dados retornados (evita 404 desnecessários)
-        const shouldFetchProfile = 
+        const shouldFetchProfile =
           (formattedUser.role === "PATIENT" || formattedUser.role === "USER") &&
           userData.patientProfile &&
           userData.patientProfile.id;
-        
+
         if (shouldFetchProfile) {
           try {
             const profile = await patientProfileApi.getProfile();
@@ -78,8 +92,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
                 height: profile.height,
                 weight: profile.weight,
                 bloodType: profile.bloodType,
-                age: profile.dateOfBirth 
-                  ? new Date().getFullYear() - new Date(profile.dateOfBirth).getFullYear()
+                age: profile.dateOfBirth
+                  ? new Date().getFullYear() -
+                    new Date(profile.dateOfBirth).getFullYear()
                   : undefined,
               };
               formattedUser.isInLine = !!profile.assignedLineId;
@@ -90,7 +105,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
             // Silencia erros 404 - usuário pode ainda não ter criado perfil
           }
         }
-        
+
         // Sempre atualiza o usuário no estado e no localStorage com as informações atualizadas
         // Isso garante que a role seja sempre correta
         setUser(formattedUser);
@@ -113,14 +128,14 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const initializeAuth = async () => {
       const token = localStorage.getItem("authToken");
       const storedUser = localStorage.getItem("currentUser");
-      
+
       if (token && storedUser) {
         try {
           const parsedUser = JSON.parse(storedUser);
           // Define o usuário imediatamente para manter a sessão
           // Isso garante que isAuthenticated seja true imediatamente
           setUser(parsedUser);
-          
+
           // Valida o token em background para atualizar as informações do usuário
           // Isso garante que a role seja atualizada se necessário
           validateToken().catch((error) => {
@@ -156,13 +171,13 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     // Determine role from user roles
     // Prioridade: ADMIN > CLINIC_OWNER > CLINIC_STAFF > PATIENT
     let role: UserRole = "PATIENT";
-    
+
     if (apiUser.userRole && apiUser.userRole.length > 0) {
       // Filtra apenas roles não deletadas e mapeia os nomes
       const activeRoles = apiUser.userRole
         .filter((ur: any) => !ur.deletedAt && ur.role && !ur.role.deletedAt)
         .map((ur: any) => ur.role?.name?.toUpperCase());
-      
+
       if (activeRoles.includes("ADMIN")) {
         role = "ADMIN";
       } else if (activeRoles.includes("CLINIC_OWNER")) {
@@ -184,14 +199,17 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       isInLine: apiUser.patientProfile?.assignedLineId ? true : false,
       careLine: apiUser.patientProfile?.assignedLine?.name,
       assignedLineId: apiUser.patientProfile?.assignedLineId || null,
-      profileData: apiUser.patientProfile ? {
-        height: apiUser.patientProfile.height,
-        weight: apiUser.patientProfile.weight,
-        bloodType: apiUser.patientProfile.bloodType,
-        age: apiUser.patientProfile.dateOfBirth 
-          ? new Date().getFullYear() - new Date(apiUser.patientProfile.dateOfBirth).getFullYear()
-          : undefined,
-      } : undefined,
+      profileData: apiUser.patientProfile
+        ? {
+            height: apiUser.patientProfile.height,
+            weight: apiUser.patientProfile.weight,
+            bloodType: apiUser.patientProfile.bloodType,
+            age: apiUser.patientProfile.dateOfBirth
+              ? new Date().getFullYear() -
+                new Date(apiUser.patientProfile.dateOfBirth).getFullYear()
+              : undefined,
+          }
+        : undefined,
     };
   };
 
@@ -282,26 +300,34 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     */
   };
 
-  const register = async (data: { fullName: string; cpf: string; email: string; passwordHash: string }) => {
+  const register = async (data: {
+    fullName: string;
+    cpf: string;
+    email: string;
+    passwordHash: string;
+  }) => {
     try {
       const response = await authApi.register(data);
-      
+
       if (response.token && response.registerData) {
         // Store token
         localStorage.setItem("authToken", response.token);
-        
+
         // Format and store user
         const formattedUser = formatUserFromApi(response.registerData);
         setUser(formattedUser);
         localStorage.setItem("currentUser", JSON.stringify(formattedUser));
         localStorage.setItem("isAuthenticated", "true");
-        
+
         return { success: true };
       } else {
         return { success: false, error: "Resposta inválida do servidor" };
       }
     } catch (error: any) {
-      const errorMessage = error.response?.data?.message || error.message || "Erro ao realizar cadastro";
+      const errorMessage =
+        error.response?.data?.message ||
+        error.message ||
+        "Erro ao realizar cadastro";
       return { success: false, error: errorMessage };
     }
   };
