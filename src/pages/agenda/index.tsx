@@ -10,7 +10,11 @@ import { GoogleCalendarWrapper } from "@/components/agenda/GoogleCalendarWrapper
 import { CustomCalendar } from "@/components/agenda/CustomCalendar";
 import { GoogleCalendarConnectModal } from "@/components/agenda/GoogleCalendarConnectModal";
 import { EventChecklistModal } from "@/components/agenda/EventChecklistModal";
-import { useGoogleCalendarConnected, useSyncCalendar, useCalendar } from "@/hooks/useCalendar";
+import {
+  useGoogleCalendarConnected,
+  useSyncCalendar,
+  useCalendar,
+} from "@/hooks/useCalendar";
 import { calendarApi } from "@/lib/api";
 import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
@@ -22,14 +26,21 @@ export default function Agenda() {
   const { data: googleConnected } = useGoogleCalendarConnected();
   const syncCalendarMutation = useSyncCalendar();
   const queryClient = useQueryClient();
-  const [selectedConsultation, setSelectedConsultation] = useState<AgendaConsultation | null>(null);
+  const [selectedConsultation, setSelectedConsultation] =
+    useState<AgendaConsultation | null>(null);
   const [checklistModalOpen, setChecklistModalOpen] = useState(false);
   const [connectModalOpen, setConnectModalOpen] = useState(false);
 
   useEffect(() => {
-    const hasDismissedGoogleCalendar = localStorage.getItem('dismissed-google-calendar-prompt');
-    
-    if (!googleConnected?.connected && !connectModalOpen && !hasDismissedGoogleCalendar) {
+    const hasDismissedGoogleCalendar = localStorage.getItem(
+      "dismissed-google-calendar-prompt"
+    );
+
+    if (
+      !googleConnected?.connected &&
+      !connectModalOpen &&
+      !hasDismissedGoogleCalendar
+    ) {
       const timer = setTimeout(() => {
         setConnectModalOpen(true);
       }, 2000);
@@ -40,14 +51,14 @@ export default function Agenda() {
   useEffect(() => {
     if (googleConnected?.connected) {
       setConnectModalOpen(false);
-      localStorage.removeItem('dismissed-google-calendar-prompt');
+      localStorage.removeItem("dismissed-google-calendar-prompt");
     }
   }, [googleConnected?.connected]);
 
   const handleModalClose = (open: boolean) => {
     setConnectModalOpen(open);
     if (!open) {
-      localStorage.setItem('dismissed-google-calendar-prompt', 'true');
+      localStorage.setItem("dismissed-google-calendar-prompt", "true");
     }
   };
 
@@ -63,15 +74,17 @@ export default function Agenda() {
 
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
-    if (urlParams.get('google_connected') === 'true') {
+    if (urlParams.get("google_connected") === "true") {
       toast.success("Google Calendar conectado com sucesso!");
-      queryClient.invalidateQueries({ queryKey: ['calendar', 'google-connected'] });
-      queryClient.invalidateQueries({ queryKey: ['patient-profile'] });
-      window.history.replaceState({}, '', window.location.pathname);
+      queryClient.invalidateQueries({
+        queryKey: ["calendar", "google-connected"],
+      });
+      queryClient.invalidateQueries({ queryKey: ["patient-profile"] });
+      window.history.replaceState({}, "", window.location.pathname);
     }
-    if (urlParams.get('error') === 'google_auth_failed') {
+    if (urlParams.get("error") === "google_auth_failed") {
       toast.error("Erro ao conectar Google Calendar. Tente novamente.");
-      window.history.replaceState({}, '', window.location.pathname);
+      window.history.replaceState({}, "", window.location.pathname);
     }
   }, [queryClient]);
 
@@ -88,7 +101,10 @@ export default function Agenda() {
     return (
       <div className="flex min-h-screen w-full bg-background">
         <Sidebar />
-        <main className="flex-1 p-8 transition-all duration-300" style={{ marginLeft: 'var(--sidebar-width, 256px)' }}>
+        <main
+          className="flex-1 p-8 transition-all duration-300"
+          style={{ marginLeft: "var(--sidebar-width, 256px)" }}
+        >
           <div className="flex items-center justify-center py-12">
             <Loader2 className="h-8 w-8 animate-spin text-primary" />
           </div>
@@ -101,11 +117,15 @@ export default function Agenda() {
     return (
       <div className="flex min-h-screen w-full bg-background">
         <Sidebar />
-        <main className="flex-1 p-8 transition-all duration-300" style={{ marginLeft: 'var(--sidebar-width, 256px)' }}>
+        <main
+          className="flex-1 p-8 transition-all duration-300"
+          style={{ marginLeft: "var(--sidebar-width, 256px)" }}
+        >
           <Card className="p-6 text-center">
             <p className="text-destructive">Erro ao carregar agenda</p>
             <p className="text-sm text-muted-foreground mt-2">
-              Não foi possível carregar os dados da agenda. Tente novamente mais tarde.
+              Não foi possível carregar os dados da agenda. Tente novamente mais
+              tarde.
             </p>
           </Card>
         </main>
@@ -120,7 +140,10 @@ export default function Agenda() {
     <div className="flex min-h-screen w-full bg-background">
       <Sidebar />
 
-      <main className="flex-1 p-8 transition-all duration-300" style={{ marginLeft: 'var(--sidebar-width, 256px)' }}>
+      <main
+        className="flex-1 p-8 transition-all duration-300"
+        style={{ marginLeft: "var(--sidebar-width, 256px)" }}
+      >
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-foreground mb-2 flex items-center gap-3">
             <Calendar className="h-8 w-8 text-primary" />
@@ -164,4 +187,3 @@ export default function Agenda() {
     </div>
   );
 }
-
