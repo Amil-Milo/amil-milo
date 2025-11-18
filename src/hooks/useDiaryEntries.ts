@@ -23,16 +23,58 @@ export function useDiaryEntries(page: number = 1, limit: number = 20) {
   return useQuery<DiaryEntriesResponse>({
     queryKey: ['diary', 'entries', page, limit],
     queryFn: async () => {
-      const data = await diaryApi.getEntries(page, limit);
+      // MODO DEMO - DADOS MOCKADOS
+      const yesterday = new Date();
+      yesterday.setDate(yesterday.getDate() - 1);
+      yesterday.setHours(18, 0, 0, 0);
+
+      const twoDaysAgo = new Date();
+      twoDaysAgo.setDate(twoDaysAgo.getDate() - 2);
+      twoDaysAgo.setHours(19, 30, 0, 0);
+
+      const lastWeek = new Date();
+      lastWeek.setDate(lastWeek.getDate() - 7);
+      lastWeek.setHours(20, 0, 0, 0);
+
+      const entries: DiaryEntry[] = [
+        {
+          id: 1,
+          userId: 1,
+          entryDate: yesterday,
+          moodRating: 5,
+          motivationRating: 4,
+          goalsMet: true,
+          feedbackText: "Dia produtivo! Consegui fazer caminhada e me alimentar bem.",
+        },
+        {
+          id: 2,
+          userId: 1,
+          entryDate: twoDaysAgo,
+          moodRating: 3,
+          motivationRating: 3,
+          goalsMet: false,
+          feedbackText: "Dia mais difícil, mas não desisti.",
+        },
+        {
+          id: 3,
+          userId: 1,
+          entryDate: lastWeek,
+          moodRating: 4,
+          motivationRating: 5,
+          goalsMet: true,
+          feedbackText: "Excelente semana! Me sinto mais disposto.",
+        },
+      ];
+
       return {
-        ...data,
-        entries: data.entries.map((entry: any) => ({
-          ...entry,
-          entryDate: new Date(entry.entryDate),
-        })),
+        entries: entries.slice((page - 1) * limit, page * limit),
+        total: entries.length,
+        page: page,
+        limit: limit,
+        totalPages: Math.ceil(entries.length / limit),
       };
     },
-    staleTime: 1000 * 60 * 5,
+    staleTime: Infinity,
     refetchOnWindowFocus: false,
   });
 }
@@ -41,18 +83,23 @@ export function useTodayEntry() {
   return useQuery<{ entry: DiaryEntry | null }>({
     queryKey: ['diary', 'today'],
     queryFn: async () => {
-      const data = await diaryApi.getTodayEntry();
-      if (data.entry) {
-        return {
-          entry: {
-            ...data.entry,
-            entryDate: new Date(data.entry.entryDate),
-          },
-        };
-      }
-      return { entry: null };
+      // MODO DEMO - DADOS MOCKADOS
+      const today = new Date();
+      today.setHours(18, 0, 0, 0);
+
+      return {
+        entry: {
+          id: 4,
+          userId: 1,
+          entryDate: today,
+          moodRating: 4,
+          motivationRating: 4,
+          goalsMet: true,
+          feedbackText: "Dia positivo! Seguindo o plano de saúde.",
+        },
+      };
     },
-    staleTime: 1000 * 60 * 5,
+    staleTime: Infinity,
     refetchOnWindowFocus: false,
   });
 }
@@ -111,19 +158,24 @@ export function useShouldShowDiary() {
   return useQuery<ShouldShowDiaryResponse>({
     queryKey: ['diary', 'should-show'],
     queryFn: async () => {
-      const data = await diaryApi.shouldShowDiary();
-      if (data.nextConsultation) {
-        return {
-          ...data,
-          nextConsultation: {
-            ...data.nextConsultation,
-            consultationDate: new Date(data.nextConsultation.consultationDate),
-          },
-        };
-      }
-      return data;
+      // MODO DEMO - DADOS MOCKADOS
+      const tomorrow = new Date();
+      tomorrow.setDate(tomorrow.getDate() + 1);
+      tomorrow.setHours(14, 0, 0, 0);
+
+      return {
+        shouldShow: true,
+        nextConsultation: {
+          id: 1,
+          professionalName: "Dr. Carlos Silva",
+          specialty: "Cardiologia",
+          consultationDate: tomorrow,
+          location: "Hospital Amil - Unidade Centro",
+        },
+        message: "Lembre-se de preencher seu diário antes da consulta!",
+      };
     },
-    staleTime: 1000 * 60 * 5,
+    staleTime: Infinity,
     refetchOnWindowFocus: false,
   });
 }
