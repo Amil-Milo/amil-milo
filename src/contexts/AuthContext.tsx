@@ -72,24 +72,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const validateToken = async () => {
-    // MODO DEMO - BYPASS DE VALIDAÇÃO
-    const storedUser = localStorage.getItem("currentUser");
-    const token = localStorage.getItem("authToken");
-
-    if (token && storedUser) {
-      try {
-        const parsedUser = JSON.parse(storedUser);
-        setUser(parsedUser);
-        return true;
-      } catch {
-        return false;
-      }
-    }
-
-    return false;
-
-    // CÓDIGO ORIGINAL COMENTADO - DESCOMENTE QUANDO O BACK-END ESTIVER FUNCIONANDO
-    /*
     try {
       const userData = await usersApi.getCurrentUser();
       if (userData) {
@@ -117,8 +99,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
               formattedUser.careLine = profile.assignedLine?.name;
               formattedUser.assignedLineId = profile.assignedLineId || null;
             }
-          } catch (error: any) {
-          }
+          } catch (error: any) {}
         }
 
         setUser(formattedUser);
@@ -132,25 +113,18 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       }
       return true;
     }
-    */
   };
 
   useEffect(() => {
     const initializeAuth = async () => {
       const token = localStorage.getItem("authToken");
-      const storedUser = localStorage.getItem("currentUser");
-
-      if (token && storedUser) {
-        try {
-          const parsedUser = JSON.parse(storedUser);
-          setUser(parsedUser);
-        } catch (error) {
-          if (!token) {
-            setUser(null);
-            localStorage.removeItem("authToken");
-            localStorage.removeItem("currentUser");
-            localStorage.removeItem("isAuthenticated");
-          }
+      if (token) {
+        const isValid = await validateToken();
+        if (!isValid) {
+          setUser(null);
+          localStorage.removeItem("authToken");
+          localStorage.removeItem("currentUser");
+          localStorage.removeItem("isAuthenticated");
         }
       }
       setLoading(false);
@@ -172,14 +146,18 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
       if (activeRoles.includes("ADMIN")) {
         role = "ADMIN";
-      } else if (activeRoles.includes("CLINIC_OWNER")) {
+      }
+      if (activeRoles.includes("CLINIC_OWNER") && role !== "ADMIN") {
         role = "CLINIC_OWNER";
-      } else if (activeRoles.includes("CLINIC_STAFF")) {
+      }
+      if (activeRoles.includes("CLINIC_STAFF") && role !== "ADMIN" && role !== "CLINIC_OWNER") {
         role = "CLINIC_STAFF";
-      } else if (activeRoles.includes("PATIENT")) {
+      }
+      if (activeRoles.includes("PATIENT") && role === "PATIENT") {
         role = "PATIENT";
-      } else if (activeRoles.includes("USER")) {
-        role = "PATIENT"; // USER é tratado como PATIENT no frontend
+      }
+      if (activeRoles.includes("USER") && role === "PATIENT") {
+        role = "PATIENT";
       }
     }
 
@@ -206,41 +184,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const login = async (email: string, password: string) => {
-    // MODO DEMO - BYPASS TOTAL DE BACK-END
-    await new Promise((resolve) => setTimeout(resolve, 500));
-
-    const mockUser: User = {
-      id: 1,
-      name: "Admin",
-      email: email,
-      role: "ADMIN",
-      isInLine: true,
-      careLine: "Cardiologia",
-      assignedLineId: 1,
-      profileData: {
-        height: 175,
-        weight: 70,
-        bloodType: "O+",
-        age: 30,
-      },
-    };
-
-    const mockToken = "mock-token-jwt-bypass";
-
-    localStorage.setItem("authToken", mockToken);
-    setUser(mockUser);
-    localStorage.setItem("currentUser", JSON.stringify(mockUser));
-    localStorage.setItem("isAuthenticated", "true");
-
-    return { success: true, redirectTo: "/agenda" };
-
-    // CÓDIGO ORIGINAL COMENTADO - DESCOMENTE QUANDO O BACK-END ESTIVER FUNCIONANDO
-    /*
     try {
       const response = await authApi.login(email, password);
       
       if (response.token && response.user) {
-        // Store token
         localStorage.setItem("authToken", response.token);
         
         const formattedUser = formatUserFromApi(response.user);
@@ -261,45 +208,38 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
               formattedUser.careLine = profile.assignedLine?.name;
               formattedUser.assignedLineId = profile.assignedLineId || null;
             }
-          } catch (error) {
-            // Usuário pode não ter perfil ainda
-          }
+          } catch (error) {}
         }
         
         setUser(formattedUser);
         localStorage.setItem("currentUser", JSON.stringify(formattedUser));
         localStorage.setItem("isAuthenticated", "true");
         
-        // Return success and redirect path based on role
         if (formattedUser.role === "ADMIN" || formattedUser.role === "CLINIC_OWNER" || formattedUser.role === "CLINIC_STAFF") {
           return { success: true, redirectTo: "/admin" };
-        } else {
-          // Verificar se tem PatientProfile com linha atribuída
-          if (formattedUser.isInLine) {
-            // Verificar se tem dados completos
-            try {
-              const profile = await patientProfileApi.getProfile();
-              const hasCompleteData = profile?.dateOfBirth && profile?.bloodType && profile?.height && profile?.weight;
-              if (hasCompleteData) {
-                return { success: true, redirectTo: "/agenda" };
-              } else {
-                return { success: true, redirectTo: "/completar-perfil" };
-              }
-            } catch (error) {
-              return { success: true, redirectTo: "/check-in-periodico" };
+        }
+        
+        if (formattedUser.isInLine) {
+          try {
+            const profile = await patientProfileApi.getProfile();
+            const hasCompleteData = profile?.dateOfBirth && profile?.bloodType && profile?.height && profile?.weight;
+            if (hasCompleteData) {
+              return { success: true, redirectTo: "/agenda" };
             }
-          } else {
+            return { success: true, redirectTo: "/completar-perfil" };
+          } catch (error) {
             return { success: true, redirectTo: "/check-in-periodico" };
           }
         }
-      } else {
-        return { success: false, error: "Resposta inválida do servidor" };
+        
+        return { success: true, redirectTo: "/check-in-periodico" };
       }
+      
+      return { success: false, error: "Resposta inválida do servidor" };
     } catch (error: any) {
       const errorMessage = error.response?.data?.message || error.message || "Erro ao fazer login";
       return { success: false, error: errorMessage };
     }
-    */
   };
 
   const register = async (data: {
@@ -322,9 +262,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         localStorage.setItem("isAuthenticated", "true");
 
         return { success: true };
-      } else {
-        return { success: false, error: "Resposta inválida do servidor" };
       }
+      
+      return { success: false, error: "Resposta inválida do servidor" };
     } catch (error: any) {
       const errorMessage =
         error.response?.data?.message ||
