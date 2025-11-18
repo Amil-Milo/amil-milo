@@ -72,13 +72,31 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const validateToken = async () => {
+    // MODO DEMO - BYPASS DE VALIDAÇÃO
+    const storedUser = localStorage.getItem("currentUser");
+    const token = localStorage.getItem("authToken");
+    
+    if (token && storedUser) {
+      try {
+        const parsedUser = JSON.parse(storedUser);
+        if (parsedUser.role === "ADMIN") {
+          setUser(parsedUser);
+          return true;
+        }
+      } catch {
+        return false;
+      }
+    }
+    
+    return false;
+
+    // CÓDIGO ORIGINAL COMENTADO - DESCOMENTE QUANDO O BACK-END ESTIVER FUNCIONANDO
+    /*
     try {
       const userData = await usersApi.getCurrentUser();
       if (userData) {
         const formattedUser = formatUserFromApi(userData);
 
-        // Só tenta buscar perfil se o usuário for PATIENT ou USER
-        // E se já tiver patientProfile nos dados retornados (evita 404 desnecessários)
         const shouldFetchProfile =
           (formattedUser.role === "PATIENT" || formattedUser.role === "USER") &&
           userData.patientProfile &&
@@ -102,26 +120,21 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
               formattedUser.assignedLineId = profile.assignedLineId || null;
             }
           } catch (error: any) {
-            // Silencia erros 404 - usuário pode ainda não ter criado perfil
           }
         }
 
-        // Sempre atualiza o usuário no estado e no localStorage com as informações atualizadas
-        // Isso garante que a role seja sempre correta
         setUser(formattedUser);
         localStorage.setItem("currentUser", JSON.stringify(formattedUser));
         return true;
       }
       return false;
     } catch (error: any) {
-      // Se o erro for 401 (não autorizado), o token é inválido
       if (error.response?.status === 401) {
         return false;
       }
-      // Para outros erros, assumimos que o token pode ser válido mas houve problema na requisição
-      // Mantemos o usuário logado com os dados do localStorage
       return true;
     }
+    */
   };
 
   useEffect(() => {
@@ -214,15 +227,16 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const login = async (email: string, password: string) => {
-    // MODO MOCKADO - BYPASS DE BACK-END
-    // Aceita qualquer email e senha, simula login como ADMIN com acesso total
+    // MODO DEMO - BYPASS TOTAL DE BACK-END
+    await new Promise((resolve) => setTimeout(resolve, 500));
+
     const mockUser: User = {
       id: 1,
-      name: "Admin",
+      name: "Admin Mockado",
       email: email,
       role: "ADMIN",
       isInLine: true,
-      careLine: "Linha de Cuidados Mockada",
+      careLine: "Cardiologia",
       assignedLineId: 1,
       profileData: {
         height: 175,
@@ -232,7 +246,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       },
     };
 
-    const mockToken = "mock-token-123";
+    const mockToken = "mock-token-jwt-bypass";
 
     localStorage.setItem("authToken", mockToken);
     setUser(mockUser);
