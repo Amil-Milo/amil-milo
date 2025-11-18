@@ -11,12 +11,15 @@ import {
   LayoutDashboard,
   UserCircle,
   Bell,
-  LucideIcon
+  LucideIcon,
+  ChevronLeft,
+  ChevronRight
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useLocation, Link } from "react-router-dom";
 import { useUserProfile } from "@/hooks/useUserProfile";
 import { useRef, useEffect, useState } from "react";
+import { Button } from "@/components/ui/button";
 
 const generalNavItems = [
   { to: "/perfil", label: "Meu Perfil", icon: UserCircle },
@@ -48,9 +51,10 @@ interface SidebarSectionProps {
   items: NavItem[];
   location: { pathname: string };
   markAllAsCompleted?: boolean; // Se true, todos os itens são marcados como completos
+  isCollapsed?: boolean;
 }
 
-const SidebarSection = ({ title, subtitle, items, location, markAllAsCompleted = false }: SidebarSectionProps) => {
+const SidebarSection = ({ title, subtitle, items, location, markAllAsCompleted = false, isCollapsed = false }: SidebarSectionProps) => {
   const sectionRef = useRef<HTMLDivElement>(null);
   const [linePositions, setLinePositions] = useState<Array<{ top: number; height: number; left: number }>>([]);
   
@@ -144,16 +148,18 @@ const SidebarSection = ({ title, subtitle, items, location, markAllAsCompleted =
   
   return (
     <div ref={sectionRef} className="space-y-2 relative">
-      <div className="px-3 mb-2">
-        <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1">
-          {title}
-        </h3>
-        {subtitle && (
-          <p className="text-xs text-muted-foreground italic">
-            {subtitle}
-          </p>
-        )}
-      </div>
+      {!isCollapsed && (
+        <div className="px-3 mb-2">
+          <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1">
+            {title}
+          </h3>
+          {subtitle && (
+            <p className="text-xs text-muted-foreground italic">
+              {subtitle}
+            </p>
+          )}
+        </div>
+      )}
       
       {/* Linhas verticais entre cada par de itens consecutivos */}
       {linePositions.map((linePos, index) => {
@@ -230,15 +236,17 @@ const SidebarSection = ({ title, subtitle, items, location, markAllAsCompleted =
               </div>
             </div>
             <item.icon className={cn(
-              "h-5 w-5 transition-all duration-300",
+              "h-5 w-5 transition-all duration-300 flex-shrink-0",
               itemIsCurrent ? "scale-110 text-primary" : itemIsActive ? "text-primary/80" : "group-hover:scale-105"
             )} />
-            <span className={cn(
-              "transition-all duration-300 text-sm",
-              itemIsCurrent ? "font-semibold text-primary scale-105" : itemIsActive ? "text-primary/90" : "group-hover:text-foreground"
-            )}>
-              {item.label}
-            </span>
+            {!isCollapsed && (
+              <span className={cn(
+                "transition-all duration-300 text-sm",
+                itemIsCurrent ? "font-semibold text-primary scale-105" : itemIsActive ? "text-primary/90" : "group-hover:text-foreground"
+              )}>
+                {item.label}
+              </span>
+            )}
             {itemIsCurrent && (
               <div className="absolute right-0 top-1/2 -translate-y-1/2 w-1 h-8 bg-primary rounded-l-full animate-fade-in" />
             )}
@@ -253,6 +261,7 @@ export const Sidebar = () => {
   const { user, logout } = useAuth();
   const location = useLocation();
   const { profileData } = useUserProfile();
+  const [isCollapsed, setIsCollapsed] = useState(false);
   
   const isAdmin = user?.role === "ADMIN";
   const hasAssignedLine = !!user?.assignedLineId;
@@ -264,14 +273,36 @@ export const Sidebar = () => {
   // Se estamos no Grupo 2, o Grupo 1 deve ser marcado como completamente percorrido
   const shouldMarkGeneralAsCompleted = !isAdmin && hasAssignedLine && isInProgramGroup;
 
+  useEffect(() => {
+    const sidebarWidth = isCollapsed ? '80px' : '256px';
+    document.documentElement.style.setProperty('--sidebar-width', sidebarWidth);
+  }, [isCollapsed]);
+
   return (
-    <aside className="fixed left-0 top-0 h-screen w-64 bg-gradient-to-b from-background via-background to-muted/20 border-r border-border flex flex-col shadow-soft z-50 overflow-hidden will-change-transform">
-      <Link to="/" className="p-6 border-b border-border/50">
-        <div className="flex items-center gap-3 cursor-pointer hover:opacity-80 transition-opacity">
-          <Heart className="h-8 w-8 text-primary fill-primary" />
-          <span className="text-2xl font-bold text-primary">Cuidadomil</span>
-        </div>
-      </Link>
+    <aside className={cn(
+      "fixed left-0 top-0 h-screen bg-gradient-to-b from-background via-background to-muted/20 border-r border-border flex flex-col shadow-soft z-50 overflow-hidden will-change-transform transition-all duration-300",
+      isCollapsed ? "w-20" : "w-64"
+    )}>
+      <div className="flex items-center justify-between p-6 border-b border-border/50">
+        <Link to="/" className={cn("flex items-center gap-3 cursor-pointer hover:opacity-80 transition-opacity", isCollapsed && "justify-center")}>
+          <Heart className="h-8 w-8 text-primary fill-primary flex-shrink-0" />
+          {!isCollapsed && (
+            <span className="text-2xl font-bold text-primary">Cuidadomil</span>
+          )}
+        </Link>
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={() => setIsCollapsed(!isCollapsed)}
+          className="h-8 w-8 flex-shrink-0"
+        >
+          {isCollapsed ? (
+            <ChevronRight className="h-4 w-4" />
+          ) : (
+            <ChevronLeft className="h-4 w-4" />
+          )}
+        </Button>
+      </div>
 
       <nav className="flex-1 p-6 relative overflow-y-auto">
         <div className="space-y-6 relative">
@@ -281,6 +312,7 @@ export const Sidebar = () => {
               items={generalNavItems}
               location={location}
               markAllAsCompleted={shouldMarkGeneralAsCompleted}
+              isCollapsed={isCollapsed}
             />
           )}
 
@@ -289,6 +321,7 @@ export const Sidebar = () => {
             subtitle={assignedLineName || (isAdmin ? "Cardiologia" : "")}
             items={programNavItems}
             location={location}
+            isCollapsed={isCollapsed}
           />
 
           {isAdmin && (
@@ -296,6 +329,7 @@ export const Sidebar = () => {
               title="Administração"
               items={adminNavItems}
               location={location}
+              isCollapsed={isCollapsed}
             />
           )}
         </div>
@@ -304,10 +338,16 @@ export const Sidebar = () => {
       <div className="p-4 border-t border-border/50">
         <button
           onClick={logout}
-          className="flex items-center gap-3 w-full px-4 py-3 text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded-lg transition-all duration-300 group"
+          className={cn(
+            "flex items-center gap-3 w-full px-4 py-3 text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded-lg transition-all duration-300 group",
+            isCollapsed && "justify-center"
+          )}
+          title={isCollapsed ? "Sair" : undefined}
         >
-          <LogOut className="h-5 w-5 group-hover:scale-110 transition-transform" />
-          <span className="text-sm">Sair</span>
+          <LogOut className="h-5 w-5 group-hover:scale-110 transition-transform flex-shrink-0" />
+          {!isCollapsed && (
+            <span className="text-sm">Sair</span>
+          )}
         </button>
       </div>
     </aside>
