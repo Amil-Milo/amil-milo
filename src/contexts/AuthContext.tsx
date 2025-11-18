@@ -79,10 +79,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     if (token && storedUser) {
       try {
         const parsedUser = JSON.parse(storedUser);
-        if (parsedUser.role === "ADMIN") {
-          setUser(parsedUser);
-          return true;
-        }
+        setUser(parsedUser);
+        return true;
       } catch {
         return false;
       }
@@ -145,25 +143,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       if (token && storedUser) {
         try {
           const parsedUser = JSON.parse(storedUser);
-          // Define o usuário imediatamente para manter a sessão
-          // Isso garante que isAuthenticated seja true imediatamente
           setUser(parsedUser);
-
-          // Valida o token em background para atualizar as informações do usuário
-          // Isso garante que a role seja atualizada se necessário
-          validateToken().catch((error) => {
-            // Se a validação falhar com 401, limpa tudo
-            if (error?.response?.status === 401) {
-              setUser(null);
-              localStorage.removeItem("authToken");
-              localStorage.removeItem("currentUser");
-              localStorage.removeItem("isAuthenticated");
-            }
-            // Para outros erros, mantém o usuário logado
-          });
         } catch (error) {
-          // Em caso de erro ao parsear, mantém o usuário se o token existir
-          // Só limpa se não houver token
           if (!token) {
             setUser(null);
             localStorage.removeItem("authToken");
@@ -172,8 +153,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           }
         }
       }
-      // Define loading como false imediatamente após restaurar o usuário
-      // Não espera a validação do token
       setLoading(false);
     };
 
@@ -232,7 +211,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
     const mockUser: User = {
       id: 1,
-      name: "Admin Mockado",
+      name: "Admin",
       email: email,
       role: "ADMIN",
       isInLine: true,
