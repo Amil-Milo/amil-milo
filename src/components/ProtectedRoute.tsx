@@ -10,11 +10,11 @@ interface ProtectedRouteProps {
   requireAdmin?: boolean;
 }
 
-export function ProtectedRoute({ 
-  children, 
+export function ProtectedRoute({
+  children,
   requirePatientProfile = false,
   requireAssignedLine = false,
-  requireAdmin = false
+  requireAdmin = false,
 }: ProtectedRouteProps) {
   const { user, isAuthenticated, loading } = useAuth();
   const location = useLocation();
@@ -23,9 +23,10 @@ export function ProtectedRoute({
   const [hasProfile, setHasProfile] = useState(false);
   const [hasAssignedLine, setHasAssignedLine] = useState(false);
   const [hasCompleteData, setHasCompleteData] = useState(false);
-  
+
   // Verifica se há token no localStorage para não redirecionar durante o loading
-  const hasToken = typeof window !== 'undefined' && !!localStorage.getItem('authToken');
+  const hasToken =
+    typeof window !== "undefined" && !!localStorage.getItem("authToken");
 
   useEffect(() => {
     if (!isAuthenticated || !user || loading) {
@@ -35,26 +36,39 @@ export function ProtectedRoute({
     const isAdmin = user.role === "ADMIN";
     const currentPath = location.pathname;
 
-    if (!isAdmin && user.assignedLineId && currentPath === '/check-in-periodico') {
-      navigate('/agenda', { replace: true });
+    if (
+      !isAdmin &&
+      user.assignedLineId &&
+      currentPath === "/check-in-periodico"
+    ) {
+      navigate("/agenda", { replace: true });
       return;
     }
 
-    if (!isAdmin && !user.assignedLineId && (
-      currentPath.startsWith('/agenda') ||
-      currentPath.startsWith('/jornada') ||
-      currentPath.startsWith('/prontuario') ||
-      currentPath.startsWith('/diario') ||
-      (currentPath.startsWith('/conteudos') && requireAssignedLine)
-    )) {
-      navigate('/check-in-periodico', { replace: true });
+    if (
+      !isAdmin &&
+      !user.assignedLineId &&
+      (currentPath.startsWith("/agenda") ||
+        currentPath.startsWith("/jornada") ||
+        currentPath.startsWith("/prontuario") ||
+        currentPath.startsWith("/diario") ||
+        (currentPath.startsWith("/conteudos") && requireAssignedLine))
+    ) {
+      navigate("/check-in-periodico", { replace: true });
       return;
     }
 
     if (isAdmin && requireAssignedLine) {
       return;
     }
-  }, [isAuthenticated, user, loading, location.pathname, navigate, requireAssignedLine]);
+  }, [
+    isAuthenticated,
+    user,
+    loading,
+    location.pathname,
+    navigate,
+    requireAssignedLine,
+  ]);
 
   useEffect(() => {
     const checkProfile = async () => {
@@ -65,7 +79,11 @@ export function ProtectedRoute({
       }
 
       // ADMIN, CLINIC_OWNER e CLINIC_STAFF não precisam de perfil de paciente
-      if (user.role === 'ADMIN' || user.role === 'CLINIC_OWNER' || user.role === 'CLINIC_STAFF') {
+      if (
+        user.role === "ADMIN" ||
+        user.role === "CLINIC_OWNER" ||
+        user.role === "CLINIC_STAFF"
+      ) {
         setProfileLoading(false);
         return;
       }
@@ -81,7 +99,12 @@ export function ProtectedRoute({
         if (profile) {
           setHasProfile(true);
           setHasAssignedLine(!!profile.assignedLineId);
-          const complete = !!(profile.dateOfBirth && profile.bloodType && profile.height && profile.weight);
+          const complete = !!(
+            profile.dateOfBirth &&
+            profile.bloodType &&
+            profile.height &&
+            profile.weight
+          );
           setHasCompleteData(complete);
         } else {
           setHasProfile(false);
@@ -113,7 +136,9 @@ export function ProtectedRoute({
         <div className="min-h-screen flex items-center justify-center">
           <div className="text-center">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
-            <p className="mt-4 text-muted-foreground">Verificando autenticação...</p>
+            <p className="mt-4 text-muted-foreground">
+              Verificando autenticação...
+            </p>
           </div>
         </div>
       );
@@ -142,16 +167,16 @@ export function ProtectedRoute({
   if (!isAuthenticated && !hasToken && !loading) {
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
-  
+
   if (!isAuthenticated && hasToken && !loading) {
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
 
   if (requireAdmin) {
-    if (isAuthenticated && user && user.role !== 'ADMIN') {
+    if (isAuthenticated && user && user.role !== "ADMIN") {
       return <Navigate to="/" replace />;
     }
-    
+
     if (!isAuthenticated && !loading) {
       return <Navigate to="/login" replace />;
     }
@@ -169,11 +194,11 @@ export function ProtectedRoute({
     if (isAdmin) {
       return <>{children}</>;
     }
-    
+
     if (!hasProfile || !hasAssignedLine) {
       return <Navigate to="/check-in-periodico" replace />;
     }
-    
+
     if (hasProfile && hasAssignedLine && !hasCompleteData) {
       return <Navigate to="/completar-perfil" replace />;
     }
@@ -181,4 +206,3 @@ export function ProtectedRoute({
 
   return <>{children}</>;
 }
-
