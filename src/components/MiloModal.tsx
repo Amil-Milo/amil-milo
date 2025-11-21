@@ -8,6 +8,8 @@ import { useNavigate } from "react-router-dom";
 import {
   Dialog,
   DialogContent,
+  DialogTitle,
+  DialogDescription,
 } from "@/components/ui/dialog";
 
 interface MiloModalProps {
@@ -69,6 +71,10 @@ export const MiloModal = ({ isOpen, onClose }: MiloModalProps) => {
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto p-0">
+        <DialogTitle className="sr-only">Olá! Eu sou o Milo. Seu assistente virtual de saúde.</DialogTitle>
+        <DialogDescription className="sr-only">
+          Modal de assistente virtual com opções para acessar perguntas frequentes, tour inicial e check-in periódico.
+        </DialogDescription>
         <div className="relative">
           <div className="bg-gradient-to-br from-primary/10 to-primary/5 p-6 border-b border-border">
             <div className="flex items-center gap-4">
