@@ -25,7 +25,8 @@ export function useContent() {
   const recommendationsQuery = useQuery<Content[]>({
     queryKey: ["contents", "recommendations"],
     queryFn: async () => {
-      return await contentApi.getRecommendations();
+      const response = await contentApi.getRecommendations();
+      return response.data || response;
     },
     enabled: shouldEnable,
   });
@@ -33,7 +34,8 @@ export function useContent() {
   const allContentsQuery = useQuery<Content[]>({
     queryKey: ["contents", "all"],
     queryFn: async () => {
-      return await contentApi.getAll();
+      const response = await contentApi.getAll();
+      return response.data || response;
     },
     enabled: shouldEnable,
   });
@@ -58,7 +60,8 @@ export function useContentBySpecialty(specialtyId: number) {
   return useQuery<Content[]>({
     queryKey: ["contents", "specialty", specialtyId],
     queryFn: async () => {
-      return await contentApi.getBySpecialty(specialtyId);
+      const response = await contentApi.getBySpecialty(specialtyId);
+      return response.data || response;
     },
     enabled: shouldEnable,
   });
@@ -72,7 +75,8 @@ export function useContentByCategory(category: string) {
   return useQuery<Content[]>({
     queryKey: ["contents", "category", category],
     queryFn: async () => {
-      return await contentApi.getByCategory(category);
+      const response = await contentApi.getByCategory(category);
+      return response.data || response;
     },
     enabled: shouldEnable,
   });

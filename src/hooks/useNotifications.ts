@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
-import api from "@/lib/api";
+import { notificationsApi } from "@/lib/api";
 import { AxiosError } from "axios";
 import { useAuth } from "@/contexts/AuthContext";
 
@@ -18,6 +18,29 @@ export function useNotifications() {
   const [loading, setLoading] = useState(true);
   const { isAuthenticated, loading: authLoading } = useAuth();
 
+  const getDismissedNotifications = (): number[] => {
+    if (typeof window === "undefined") return [];
+    const dismissed = localStorage.getItem("milo_seen_notifications");
+    if (!dismissed) return [];
+    try {
+      return JSON.parse(dismissed);
+    } catch {
+      return [];
+    }
+  };
+
+  const saveDismissedNotification = (id: number) => {
+    if (typeof window === "undefined") return;
+    const dismissed = getDismissedNotifications();
+    if (!dismissed.includes(id)) {
+      dismissed.push(id);
+      localStorage.setItem(
+        "milo_seen_notifications",
+        JSON.stringify(dismissed)
+      );
+    }
+  };
+
   const fetchNotifications = useCallback(async () => {
     if (!isAuthenticated || authLoading) {
       setNotifications([]);
@@ -26,20 +49,23 @@ export function useNotifications() {
     }
 
     try {
-      const response = await api.get("/notifications/me/unread");
-      setNotifications(response.data);
-    } catch (error) {
-      const axiosError = error as AxiosError;
-      if (axiosError.response?.status === 401) {
-        setNotifications([]);
-        return;
-      }
-      if (axiosError.code === 'ERR_NETWORK' || axiosError.response?.status === 502) {
-        setNotifications([]);
-        return;
-      }
-      if (axiosError.response?.status !== 403 && axiosError.response?.status !== 404) {
-        console.error("Erro ao buscar notificações:", error);
+      const response = await notificationsApi.getNotifications();
+      const allNotifications = response.data || response || [];
+
+      const dismissedIds = getDismissedNotifications();
+
+      const filteredNotifications = allNotifications.filter(
+        (notif: Notification) => !dismissedIds.includes(notif.id)
+      );
+
+      setNotifications(filteredNotifications);
+    } catch (error: any) {
+      if (
+        error.response?.status !== 401 &&
+        error.code !== "ERR_NETWORK" &&
+        error.response?.status !== 502
+      ) {
+        console.error("Error fetching notifications:", error);
       }
       setNotifications([]);
     } finally {
@@ -71,13 +97,14 @@ export function useNotifications() {
 
   const markAsRead = async (notificationId: number) => {
     try {
-      await api.patch(`/notifications/me/${notificationId}/read`);
-      setNotifications((prev) =>
-        prev.filter((n) => n.id !== notificationId)
-      );
+      await notificationsApi.markAsRead(notificationId);
     } catch (error) {
-      console.error("Erro ao marcar notificação como lida:", error);
+      // Continue even if API call fails
     }
+
+    saveDismissedNotification(notificationId);
+
+    setNotifications((prev) => prev.filter((n) => n.id !== notificationId));
   };
 
   return {
@@ -87,4 +114,3 @@ export function useNotifications() {
     refetch: fetchNotifications,
   };
 }
-

@@ -55,7 +55,8 @@ export function useMedicalRecords() {
   const query = useQuery<MedicalRecordData>({
     queryKey: ["medical-record", "me"],
     queryFn: async () => {
-      return await medicalRecordApi.getMedicalRecord();
+      const response = await medicalRecordApi.getMedicalRecord();
+      return response.data || response;
     },
     enabled: shouldEnable,
   });

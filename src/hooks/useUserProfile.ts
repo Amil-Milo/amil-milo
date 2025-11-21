@@ -51,47 +51,26 @@ export function useUserProfile() {
   const fetchProfile = async () => {
     setLoading(true);
     try {
-      const [userData, profileData] = await Promise.all([
+      const [userResponse, profileResponse] = await Promise.all([
         usersApi.getCurrentUser(),
-        patientProfileApi.getProfile().catch((error: any) => {
-          if (error.response?.status === 404) {
-            return null;
-          }
-          throw error;
-        }),
+        patientProfileApi.getProfile().catch(() => null),
       ]);
 
-      if (userData) {
         const user: UserData = {
-          id: userData.id,
-          fullName: userData.fullName,
-          email: userData.email,
-          cpf: userData.cpf,
+        id: userResponse.id,
+        fullName: userResponse.fullName,
+        email: userResponse.email,
+        cpf: userResponse.cpf || "",
         };
 
-        const profile: PatientProfileData = profileData
-          ? {
-              dateOfBirth: profileData.dateOfBirth,
-              bloodType: profileData.bloodType,
-              height: profileData.height,
-              weight: profileData.weight,
-              diseases: profileData.diseases,
-              medications: profileData.medications,
-              familyHistory: profileData.familyHistory,
-              specialConditions: profileData.specialConditions,
-              address: profileData.address,
-              assignedLineId: profileData.assignedLineId,
-              assignedLine: profileData.assignedLine,
-            }
-          : {};
+      const profile: PatientProfileData = profileResponse || {};
 
         setProfileData({
           user,
           profile,
         });
-      }
-    } catch (error: any) {
-      toast.error("Erro ao carregar perfil. Tente novamente.");
+    } catch (error) {
+      console.error("Error fetching profile:", error);
     } finally {
       setLoading(false);
     }
@@ -109,11 +88,11 @@ export function useUserProfile() {
     try {
       const promises = [];
 
-      if (userData && (userData.fullName || userData.email)) {
+      if (userData) {
         promises.push(usersApi.updateUser(userData));
       }
 
-      if (profileData && Object.keys(profileData).length > 0) {
+      if (profileData) {
         promises.push(patientProfileApi.updateProfile(profileData));
       }
 
@@ -122,16 +101,13 @@ export function useUserProfile() {
       await fetchProfile();
 
       toast.success("Perfil atualizado com sucesso!");
+      setUpdating(false);
       return true;
     } catch (error: any) {
-      const errorMessage =
-        error.response?.data?.message ||
-        error.response?.data?.error ||
-        "Erro ao atualizar perfil. Tente novamente.";
+      const errorMessage = error.response?.data?.message || "Erro ao atualizar perfil";
       toast.error(errorMessage);
-      return false;
-    } finally {
       setUpdating(false);
+      return false;
     }
   };
 

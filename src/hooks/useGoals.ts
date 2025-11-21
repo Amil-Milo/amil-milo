@@ -26,13 +26,13 @@ export function useGoals() {
     }
     setLoading(true);
     setError(null);
+    
     try {
-      const data = await goalsApi.getGoals();
-      setGoals(data);
-    } catch (err: any) {
-      const errorMessage = err.response?.data?.message || 'Erro ao carregar metas';
-      setError(errorMessage);
-      toast.error(errorMessage);
+      const response = await goalsApi.getGoals();
+      setGoals(response.data || response || []);
+    } catch (error: any) {
+      setError(error.response?.data?.message || "Erro ao carregar metas");
+      setGoals([]);
     } finally {
       setLoading(false);
     }
@@ -47,53 +47,58 @@ export function useGoals() {
   const createGoal = useCallback(async (data: { title: string; description?: string; endDate?: string }) => {
     setLoading(true);
     setError(null);
+    
     try {
-      const newGoal = await goalsApi.createGoal(data);
+      const response = await goalsApi.createGoal(data);
+      const newGoal = response.data || response;
       setGoals(prev => [newGoal, ...prev]);
       toast.success('Meta criada com sucesso!');
-      return newGoal;
-    } catch (err: any) {
-      const errorMessage = err.response?.data?.message || 'Erro ao criar meta';
-      setError(errorMessage);
-      toast.error(errorMessage);
-      throw err;
-    } finally {
       setLoading(false);
+      return newGoal;
+    } catch (error: any) {
+      const errorMessage = error.response?.data?.message || "Erro ao criar meta";
+      toast.error(errorMessage);
+      setError(errorMessage);
+      setLoading(false);
+      throw error;
     }
   }, []);
 
   const updateGoal = useCallback(async (id: number, data: { title?: string; description?: string; endDate?: string; status?: string }) => {
     setLoading(true);
     setError(null);
+    
     try {
-      const updatedGoal = await goalsApi.updateGoal(id, data);
+      const response = await goalsApi.updateGoal(id, data);
+      const updatedGoal = response.data || response;
       setGoals(prev => prev.map(goal => goal.id === id ? updatedGoal : goal));
       toast.success('Meta atualizada com sucesso!');
-      return updatedGoal;
-    } catch (err: any) {
-      const errorMessage = err.response?.data?.message || 'Erro ao atualizar meta';
-      setError(errorMessage);
-      toast.error(errorMessage);
-      throw err;
-    } finally {
       setLoading(false);
+      return updatedGoal;
+    } catch (error: any) {
+      const errorMessage = error.response?.data?.message || "Erro ao atualizar meta";
+      toast.error(errorMessage);
+      setError(errorMessage);
+      setLoading(false);
+      throw error;
     }
   }, []);
 
   const deleteGoal = useCallback(async (id: number) => {
     setLoading(true);
     setError(null);
+    
     try {
       await goalsApi.deleteGoal(id);
       setGoals(prev => prev.filter(goal => goal.id !== id));
       toast.success('Meta excluída com sucesso!');
-    } catch (err: any) {
-      const errorMessage = err.response?.data?.message || 'Erro ao excluir meta';
-      setError(errorMessage);
-      toast.error(errorMessage);
-      throw err;
-    } finally {
       setLoading(false);
+    } catch (error: any) {
+      const errorMessage = error.response?.data?.message || "Erro ao excluir meta";
+      toast.error(errorMessage);
+      setError(errorMessage);
+      setLoading(false);
+      throw error;
     }
   }, []);
 

@@ -36,7 +36,8 @@ export function useJourney() {
   return useQuery<JourneyData>({
     queryKey: ['journey'],
     queryFn: async () => {
-      return await journeyApi.getJourneyData();
+      const response = await journeyApi.getJourneyData();
+      return response.data || response;
     },
     enabled: shouldEnable,
     retry: (failureCount, error) => {

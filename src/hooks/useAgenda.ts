@@ -33,7 +33,14 @@ export function useAgenda() {
   return useQuery<AgendaSummary>({
     queryKey: ['agenda', 'summary'],
     queryFn: async () => {
-      return await agendaApi.getSummary();
+      const response = await agendaApi.getSummary();
+      return {
+        upcomingConsultations: response.upcomingConsultations?.map((c: any) => ({
+          ...c,
+          consultationDate: new Date(c.consultationDate),
+        })) || [],
+        medicationReminders: response.medicationReminders || [],
+      };
     },
     enabled: shouldEnable,
     retry: (failureCount, error) => {
