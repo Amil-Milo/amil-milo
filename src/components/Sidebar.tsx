@@ -316,36 +316,10 @@ export const Sidebar = () => {
   const shouldMarkGeneralAsCompleted =
     !isAdmin && hasAssignedLine && isInProgramGroup;
 
-  useEffect(() => {
-    const sidebarWidth = isCollapsed ? "72px" : "256px";
-    const contentMargin = isCollapsed ? "72px" : "256px";
-    document.documentElement.style.setProperty("--sidebar-width", sidebarWidth);
-    document.documentElement.style.setProperty(
-      "--content-margin-left",
-      contentMargin
-    );
-
-    return () => {
-      document.documentElement.style.setProperty("--sidebar-width", "72px");
-      document.documentElement.style.setProperty(
-        "--content-margin-left",
-        "72px"
-      );
-    };
-  }, [isCollapsed]);
-
-  useEffect(() => {
-    document.documentElement.style.setProperty("--sidebar-width", "72px");
-    document.documentElement.style.setProperty(
-      "--content-margin-left",
-      "72px"
-    );
-  }, []);
-
   return (
     <aside
       className={cn(
-        "fixed left-0 top-0 h-screen bg-gradient-to-b from-background via-background to-muted/20 border-r border-border flex flex-col shadow-soft z-50 overflow-hidden will-change-transform transition-all duration-300",
+        "hidden md:flex flex-shrink-0 h-screen bg-gradient-to-b from-background via-background to-muted/20 border-r border-border flex-col shadow-soft z-50 overflow-hidden will-change-transform transition-all duration-300",
         isCollapsed ? "w-[72px]" : "w-64"
       )}
     >
