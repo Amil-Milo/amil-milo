@@ -77,50 +77,53 @@ export function AgendaList({ consultations, onViewChecklist }: AgendaListProps) 
         );
 
         return (
-          <Card key={consultation.id} className="p-5 border border-border">
+          <Card key={consultation.id} className="p-4 md:p-5 border border-border">
 
-            <div className="flex items-start justify-between mb-4">
-              <div className="flex items-start gap-4">
-                <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center flex-shrink-0">
-                  <Calendar className="h-6 w-6 text-primary" />
+            <div className="flex flex-col sm:flex-row items-start justify-between gap-3 sm:gap-4 mb-3 md:mb-4">
+              <div className="flex items-start gap-3 md:gap-4 w-full sm:flex-1">
+                <div className="w-10 h-10 sm:w-12 sm:h-12 bg-primary/10 rounded-lg flex items-center justify-center flex-shrink-0">
+                  <Calendar className="h-5 w-5 sm:h-6 sm:w-6 text-primary" />
                 </div>
-                <div className="flex-1">
-                  <div className="flex items-center gap-2 mb-1">
-                    <h3 className="font-semibold text-foreground">
+                <div className="flex-1 min-w-0">
+                  <div className="flex flex-col sm:flex-row sm:items-center gap-2 mb-1">
+                    <h3 className="text-sm sm:text-base font-semibold text-foreground">
                       {consultation.specialty}
                     </h3>
                     <Badge
                       variant={
-                        consultation.status === "SCHEDULED" ? "default" : "secondary"
+                        consultation.status === "SCHEDULED" || consultation.status === "AGENDADA" ? "default" : "secondary"
                       }
+                      className="text-xs w-fit"
                     >
-                      {consultation.status === "SCHEDULED" ? "Agendada" : consultation.status}
+                      {consultation.status === "SCHEDULED" || consultation.status === "AGENDADA" ? "AGENDADA" : consultation.status}
                     </Badge>
                   </div>
-                  <p className="text-sm text-muted-foreground mb-2">
+                  <p className="text-xs sm:text-sm text-muted-foreground mb-2">
                     {consultation.professionalName}
                   </p>
-                  <div className="flex flex-wrap gap-4 text-sm text-muted-foreground">
+                  <div className="flex flex-col sm:flex-row sm:flex-wrap gap-2 sm:gap-4 text-xs sm:text-sm text-muted-foreground">
                     <div className="flex items-center gap-1">
-                      <Clock className="h-4 w-4" />
+                      <Clock className="h-3 w-3 sm:h-4 sm:w-4 flex-shrink-0" />
+                      <span className="break-words">
                       {consultationDate.toLocaleDateString("pt-BR", {
                         day: "2-digit",
                         month: "2-digit",
                         year: "numeric",
-                      })} às{" "}
-                      {consultationDate.toLocaleTimeString("pt-BR", {
+                        })} às {consultationDate.toLocaleTimeString("pt-BR", {
                         hour: "2-digit",
                         minute: "2-digit",
+                          hour12: false,
                       })}
+                      </span>
                     </div>
                     <div className="flex items-center gap-1">
-                      <MapPin className="h-4 w-4" />
-                      {consultation.location}
+                      <MapPin className="h-3 w-3 sm:h-4 sm:w-4 flex-shrink-0" />
+                      <span className="break-words">{consultation.location}</span>
                     </div>
                     {daysUntil >= 0 && daysUntil <= 7 && (
                       <div className="flex items-center gap-1 text-orange-600 dark:text-orange-400">
-                        <Bell className="h-4 w-4" />
-                        Em {daysUntil} {daysUntil === 1 ? "dia" : "dias"}
+                        <Bell className="h-3 w-3 sm:h-4 sm:w-4 flex-shrink-0" />
+                        <span>Em {daysUntil} {daysUntil === 1 ? "dia" : "dias"}</span>
                       </div>
                     )}
                   </div>
@@ -129,23 +132,26 @@ export function AgendaList({ consultations, onViewChecklist }: AgendaListProps) 
             </div>
 
             {hasChecklist && (
-              <div className="mt-4 p-4 bg-secondary/50 rounded-lg">
-                <div className="flex items-center gap-2 mb-2">
-                  <FileText className="h-4 w-4 text-secondary" />
-                  <span className="text-sm font-medium text-foreground">
+              <div className="mt-3 md:mt-4 p-3 md:p-4 bg-green-50 dark:bg-green-950/30 rounded-lg border border-green-200 dark:border-green-800">
+                <div className="flex items-center gap-2 mb-2 md:mb-3">
+                  <FileText className="h-3 w-3 sm:h-4 sm:w-4 text-green-700 dark:text-green-400 flex-shrink-0" />
+                  <span className="text-xs sm:text-sm font-semibold text-green-900 dark:text-green-100">
                     Preparação necessária:
                   </span>
                 </div>
-                <ul className="text-sm text-muted-foreground space-y-1">
+                <ul className="text-xs sm:text-sm text-green-800 dark:text-green-200 space-y-1 md:space-y-1.5">
                   {checklistItems.slice(0, 3).map((item, idx) => (
-                    <li key={idx}>• {item}</li>
+                    <li key={idx} className="flex items-start gap-2">
+                      <span className="text-green-600 dark:text-green-400 mt-0.5 flex-shrink-0">•</span>
+                      <span className="break-words">{item}</span>
+                    </li>
                   ))}
                   {checklistItems.length > 3 && (
                     <li className="mt-2">
                       <Button
                         variant="link"
                         size="sm"
-                        className="h-auto p-0 text-sm"
+                        className="h-auto p-0 text-xs sm:text-sm text-green-700 dark:text-green-300 hover:text-green-900 dark:hover:text-green-100"
                         onClick={() => onViewChecklist?.(consultation)}
                       >
                         Ver lista completa ({checklistItems.length} itens)
@@ -157,9 +163,12 @@ export function AgendaList({ consultations, onViewChecklist }: AgendaListProps) 
             )}
 
             {consultation.notes && (
-              <div className="mt-4 p-3 bg-muted rounded-lg">
-                <p className="text-sm text-muted-foreground">
-                  <strong>Observações:</strong> {consultation.notes}
+              <div className="mt-3 md:mt-4 p-3 bg-muted/50 rounded-lg border border-border">
+                <p className="text-xs sm:text-sm font-semibold text-foreground mb-1">
+                  Observações:
+                </p>
+                <p className="text-xs sm:text-sm text-muted-foreground break-words">
+                  {consultation.notes}
                 </p>
               </div>
             )}
