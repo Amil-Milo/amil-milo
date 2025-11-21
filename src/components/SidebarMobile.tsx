@@ -35,7 +35,7 @@ export const SidebarMobile = () => {
   const hasAssignedLine = !!user?.assignedLineId;
 
   const allNavItems = isAdmin
-    ? programNavItems
+    ? [...generalNavItems, ...programNavItems]
     : hasAssignedLine
     ? [...generalNavItems, ...programNavItems]
     : generalNavItems;
@@ -47,34 +47,36 @@ export const SidebarMobile = () => {
 
   return (
     <nav className="fixed bottom-0 left-0 right-0 bg-background border-t border-border z-50 md:hidden">
-      <div className="flex items-center justify-around px-2 py-2">
-        {allNavItems.map((item) => {
-          const isActive = location.pathname === item.to;
-          return (
-            <NavLink
-              key={item.to}
-              to={item.to}
-              className={cn(
-                "flex flex-col items-center justify-center gap-1 px-3 py-2 rounded-lg transition-all duration-200 min-w-[60px]",
-                isActive
-                  ? "text-primary bg-primary/10"
-                  : "text-muted-foreground hover:text-primary hover:bg-primary/5"
-              )}
-            >
-              <item.icon className={cn("h-5 w-5", isActive && "scale-110")} />
-              <span className="text-[10px] font-medium leading-tight text-center">
-                {item.label}
-              </span>
-            </NavLink>
-          );
-        })}
-        <button
-          onClick={handleLogout}
-          className="flex flex-col items-center justify-center gap-1 px-3 py-2 rounded-lg transition-all duration-200 min-w-[60px] text-muted-foreground hover:text-destructive hover:bg-destructive/10"
-        >
-          <LogOut className="h-5 w-5" />
-          <span className="text-[10px] font-medium leading-tight">Sair</span>
-        </button>
+      <div className="flex items-center overflow-x-auto overflow-y-hidden px-2 py-2 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+        <div className="flex items-center gap-1 min-w-max">
+          {allNavItems.map((item) => {
+            const isActive = location.pathname === item.to;
+            return (
+              <NavLink
+                key={item.to}
+                to={item.to}
+                className={cn(
+                  "flex flex-col items-center justify-center gap-1 px-3 py-2 rounded-lg transition-all duration-200 min-w-[80px] shrink-0",
+                  isActive
+                    ? "text-primary bg-primary/10"
+                    : "text-muted-foreground hover:text-primary hover:bg-primary/5"
+                )}
+              >
+                <item.icon className={cn("h-5 w-5", isActive && "scale-110")} />
+                <span className="text-[10px] font-medium leading-tight text-center whitespace-nowrap">
+                  {item.label}
+                </span>
+              </NavLink>
+            );
+          })}
+          <button
+            onClick={handleLogout}
+            className="flex flex-col items-center justify-center gap-1 px-3 py-2 rounded-lg transition-all duration-200 min-w-[80px] shrink-0 text-muted-foreground hover:text-destructive hover:bg-destructive/10"
+          >
+            <LogOut className="h-5 w-5" />
+            <span className="text-[10px] font-medium leading-tight whitespace-nowrap">Sair</span>
+          </button>
+        </div>
       </div>
     </nav>
   );
