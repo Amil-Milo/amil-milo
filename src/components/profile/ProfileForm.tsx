@@ -1,11 +1,7 @@
 import { useUserProfile } from "@/hooks/useUserProfile";
 import { Loader2 } from "lucide-react";
 import { UserDataForm } from "./UserDataForm";
-import { HealthInfoForm } from "./HealthInfoForm";
-import { DiseasesMedicationsForm } from "./DiseasesMedicationsForm";
-import { FamilyHistoryForm } from "./FamilyHistoryForm";
-import { AllergiesForm } from "./AllergiesForm";
-import { SpecialConditionsForm } from "./SpecialConditionsForm";
+import { ClinicalDataForm } from "./ClinicalDataForm";
 import { AddressForm } from "./AddressForm";
 import { PhoneForm } from "./PhoneForm";
 
@@ -44,27 +40,15 @@ export function ProfileForm() {
         cpf={profileData.user.cpf || ""}
       />
 
-      <HealthInfoForm
+      <ClinicalDataForm
         initialDateOfBirth={formattedDate}
         initialBloodType={profileData.profile.bloodType || ""}
         initialHeight={heightInMeters}
         initialWeight={weightFormatted}
-      />
-
-      <DiseasesMedicationsForm
         initialDiseases={profileData.profile.diseases || ""}
         initialMedications={profileData.profile.medications || ""}
-      />
-
-      <FamilyHistoryForm
         initialFamilyHistory={profileData.profile.familyHistory || ""}
-      />
-
-      <AllergiesForm
         initialAllergies={profileData.profile.allergies || ""}
-      />
-
-      <SpecialConditionsForm
         initialSpecialConditions={profileData.profile.specialConditions || ""}
       />
 
