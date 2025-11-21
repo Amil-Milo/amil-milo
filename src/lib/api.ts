@@ -317,7 +317,7 @@ export const checkinApi = {
   },
   
   submitCheckin: async (data: { questionnaireId: number; answers: Array<{ questionId: number; chosenAnswerId: number }> }) => {
-    const response = await api.post('/checkin/submit', data);
+    const response = await api.post('/checkin', data);
     return response.data;
   },
 };
@@ -346,6 +346,11 @@ export const notificationsApi = {
   
   markAllAsRead: async () => {
     const response = await api.patch('/notifications/me/mark-all-read');
+    return response.data;
+  },
+  
+  deleteNotification: async (id: number) => {
+    const response = await api.delete(`/notifications/me/${id}`);
     return response.data;
   },
 };
