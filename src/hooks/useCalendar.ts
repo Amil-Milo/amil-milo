@@ -18,9 +18,15 @@ export function useCalendar(startDate?: Date, endDate?: Date) {
   return useQuery<CalendarEvent[]>({
     queryKey: ['calendar', 'events', startDate?.toISOString(), endDate?.toISOString()],
     queryFn: async () => {
-      const startDateStr = startDate?.toISOString();
-      const endDateStr = endDate?.toISOString();
-      return await calendarApi.getEvents(startDateStr, endDateStr);
+      const startDateStr = startDate ? startDate.toISOString() : undefined;
+      const endDateStr = endDate ? endDate.toISOString() : undefined;
+      
+      const response = await calendarApi.getEvents(startDateStr, endDateStr);
+      return (response.data || response).map((event: any) => ({
+        ...event,
+        startDate: new Date(event.startDate),
+        endDate: new Date(event.endDate),
+      }));
     },
   });
 }
@@ -33,16 +39,10 @@ export function useGoogleCalendarConnected() {
   return useQuery<{ connected: boolean }>({
     queryKey: ['calendar', 'google-connected'],
     queryFn: async () => {
-      return await calendarApi.isGoogleConnected();
+      const response = await calendarApi.isGoogleConnected();
+      return response.data || response;
     },
     enabled: shouldEnable,
-    retry: (failureCount, error) => {
-      const axiosError = error as AxiosError;
-      if (axiosError.response?.status === 403 || axiosError.response?.status === 404 || axiosError.code === 'ERR_NETWORK' || axiosError.response?.status === 502) {
-        return false;
-      }
-      return failureCount < 3;
-    },
   });
 }
 
@@ -51,7 +51,8 @@ export function useSyncCalendar() {
 
   return useMutation({
     mutationFn: async () => {
-      return calendarApi.sync();
+      const response = await calendarApi.sync();
+      return response.data || response;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['calendar'] });
