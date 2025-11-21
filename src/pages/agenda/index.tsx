@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Sidebar } from "@/components/Sidebar";
+import { Layout } from "@/components/layout/Layout";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Loader2, Bell, Calendar } from "lucide-react";
@@ -99,17 +99,11 @@ export default function Agenda() {
 
   if (isLoading) {
     return (
-      <div className="flex min-h-screen w-full bg-background">
-        <Sidebar />
-        <main
-          className="flex-1 p-8 transition-all duration-300"
-          style={{ marginLeft: "var(--content-margin-left, 256px)" }}
-        >
-          <div className="flex items-center justify-center py-12">
+      <Layout>
+        <div className="flex items-center justify-center py-12 px-4 md:px-8 pt-4 md:pt-8 pb-20 md:pb-8">
             <Loader2 className="h-8 w-8 animate-spin text-primary" />
           </div>
-        </main>
-      </div>
+      </Layout>
     );
   }
 
@@ -117,39 +111,28 @@ export default function Agenda() {
     const axiosError = error as any;
     const isForbidden = axiosError?.response?.status === 403;
     const isNotFound = axiosError?.response?.status === 404;
-    
+
     if (isForbidden || isNotFound) {
       return (
-      <div className="flex min-h-screen w-full bg-background overflow-x-hidden">
-        <Sidebar />
-        <main
-          className="flex-1 p-8 transition-all duration-300"
-          style={{ 
-            marginLeft: "var(--content-margin-left, 72px)",
-            width: "calc(100% - var(--content-margin-left, 72px))",
-            maxWidth: "100%"
-          }}
-        >
+        <Layout>
+          <div className="px-4 md:px-8 pt-4 md:pt-8 pb-20 md:pb-8">
             <Card className="p-6 text-center">
               <p className="text-foreground font-semibold mb-2">
                 Linha de cuidado não atribuída
               </p>
               <p className="text-sm text-muted-foreground mt-2">
-                Você precisa ter uma linha de cuidado atribuída para acessar a agenda.
+                Você precisa ter uma linha de cuidado atribuída para acessar a
+                agenda.
               </p>
             </Card>
-          </main>
-        </div>
+          </div>
+        </Layout>
       );
     }
-    
+
     return (
-      <div className="flex min-h-screen w-full bg-background">
-        <Sidebar />
-        <main
-          className="flex-1 p-8 transition-all duration-300"
-          style={{ marginLeft: "var(--content-margin-left, 256px)" }}
-        >
+      <Layout>
+        <div className="px-4 md:px-8 pt-4 md:pt-8 pb-20 md:pb-8">
           <Card className="p-6 text-center">
             <p className="text-destructive">Erro ao carregar agenda</p>
             <p className="text-sm text-muted-foreground mt-2">
@@ -157,8 +140,8 @@ export default function Agenda() {
               tarde.
             </p>
           </Card>
-        </main>
       </div>
+      </Layout>
     );
   }
 
@@ -166,29 +149,20 @@ export default function Agenda() {
   const medications = agendaData?.medicationReminders || [];
 
   return (
-    <div className="flex min-h-screen w-full bg-background overflow-x-hidden">
-      <Sidebar />
-
-      <main
-        className="flex-1 p-8 transition-all duration-300"
-        style={{ 
-          marginLeft: "var(--content-margin-left, 72px)",
-          width: "calc(100% - var(--content-margin-left, 72px))",
-          maxWidth: "100%"
-        }}
-      >
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-foreground mb-2 flex items-center gap-3">
-            <Calendar className="h-8 w-8 text-primary" />
+    <Layout>
+      <div className="px-4 md:px-8 pt-4 md:pt-8 pb-20 md:pb-8">
+        <div className="mb-6 md:mb-8">
+          <h1 className="text-2xl md:text-3xl font-bold text-foreground mb-2 flex items-center gap-2 md:gap-3">
+            <Calendar className="h-6 w-6 md:h-8 md:w-8 text-primary" />
             Sua Agenda de Saúde
           </h1>
-          <p className="text-muted-foreground">
+          <p className="text-sm md:text-base text-muted-foreground">
             Consultas, exames e lembretes em um só lugar
           </p>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 w-full">
-          <div className="lg:col-span-2 space-y-6 min-w-0">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-6 w-full">
+          <div className="lg:col-span-2 space-y-4 md:space-y-6 min-w-0">
             <AgendaList
               consultations={consultations}
               onViewChecklist={handleViewChecklist}
@@ -200,8 +174,9 @@ export default function Agenda() {
             />
           </div>
 
-          <div className="space-y-6 min-w-0">
+          <div className="space-y-4 md:space-y-6 min-w-0">
             <MedicationCard medications={medications} />
+          </div>
           </div>
         </div>
 
@@ -216,7 +191,6 @@ export default function Agenda() {
           onOpenChange={handleModalClose}
           onConnect={handleConnectGoogleCalendar}
         />
-      </main>
-    </div>
+    </Layout>
   );
 }

@@ -1,4 +1,4 @@
-import { Sidebar } from "@/components/Sidebar";
+import { Layout } from "@/components/layout/Layout";
 import { BookOpen, Calendar, Loader2, Info } from "lucide-react";
 import { DiaryEntryForm } from "@/components/diary/DiaryEntryForm";
 import { DiaryList } from "@/components/diary/DiaryList";
@@ -11,41 +11,32 @@ export default function Diario() {
 
   if (isLoading) {
     return (
-      <div className="flex min-h-screen w-full bg-background overflow-x-hidden">
-        <Sidebar />
-        <main className="flex-1 p-8 transition-all duration-300" style={{ 
-          marginLeft: 'var(--content-margin-left, 72px)',
-          width: 'calc(100% - var(--content-margin-left, 72px))',
-          maxWidth: '100%'
-        }}>
-          <div className="flex items-center justify-center py-12">
+      <Layout>
+        <div className="flex items-center justify-center py-12 px-4 md:px-8 pt-4 md:pt-8 pb-20 md:pb-8">
             <Loader2 className="h-8 w-8 animate-spin text-primary" />
           </div>
-        </main>
-      </div>
+      </Layout>
     );
   }
 
   const shouldShow = shouldShowData?.shouldShow ?? false;
 
   return (
-    <div className="flex min-h-screen w-full bg-background">
-      <Sidebar />
-
-      <main className="flex-1 ml-64 p-8">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-foreground mb-2 flex items-center gap-3">
-            <BookOpen className="h-8 w-8 text-primary" />
+    <Layout>
+      <div className="px-4 md:px-8 pt-4 md:pt-8 pb-20 md:pb-8">
+          <div className="mb-4 md:mb-8">
+            <h1 className="text-2xl md:text-3xl font-bold text-foreground mb-2 flex items-center gap-2 md:gap-3">
+              <BookOpen className="h-6 w-6 md:h-8 md:w-8 text-primary" />
             Diário de Saúde
           </h1>
-          <p className="text-muted-foreground">
+            <p className="text-sm md:text-base text-muted-foreground">
             {shouldShow
               ? "Registre como você está se sentindo hoje, um dia antes da sua consulta"
               : "Acompanhe sua evolução e registros anteriores"}
           </p>
         </div>
 
-        <div className="grid md:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
           <div className="md:col-span-2">
             {shouldShow ? (
               <DiaryEntryForm />
@@ -104,14 +95,14 @@ export default function Diario() {
             )}
           </div>
 
-          <div className="space-y-6">
+          <div className="space-y-4 md:space-y-6">
             <DiaryList />
 
-            <Card className="p-6 bg-secondary-light">
-              <h3 className="font-semibold text-foreground mb-3">
+            <Card className="p-4 md:p-6 bg-secondary-light">
+              <h3 className="text-sm md:text-base font-semibold text-foreground mb-2 md:mb-3">
                 💡 Dica do Milo
               </h3>
-              <p className="text-sm text-muted-foreground">
+              <p className="text-xs md:text-sm text-muted-foreground">
                 {shouldShow
                   ? "Registre como está se sentindo hoje para ajudar seu médico na consulta de amanhã."
                   : "O diário estará disponível um dia antes da sua próxima consulta. Registros regulares ajudam você e seu médico a identificar padrões e ajustar o tratamento."}
@@ -119,8 +110,8 @@ export default function Diario() {
             </Card>
           </div>
         </div>
-      </main>
     </div>
+    </Layout>
   );
 }
 

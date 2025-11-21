@@ -1,5 +1,5 @@
 import { useState, useMemo } from "react";
-import { Sidebar } from "@/components/Sidebar";
+import { Layout } from "@/components/layout/Layout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -48,20 +48,14 @@ export default function Conteudos() {
   };
 
   return (
-    <div className="flex min-h-screen w-full bg-background overflow-x-hidden">
-      <Sidebar />
-      
-      <main className="flex-1 p-8 transition-all duration-300" style={{ 
-        marginLeft: 'var(--content-margin-left, 72px)',
-        width: 'calc(100% - var(--content-margin-left, 72px))',
-        maxWidth: '100%'
-      }}>
-        <Card className="p-6 mb-6 border-2 border-primary/20 shadow-lg rounded-xl">
-          <h1 className="text-3xl font-bold text-foreground mb-4 flex items-center gap-3">
-            <BookOpen className="h-8 w-8 text-primary" />
+    <Layout>
+      <div className="px-4 md:px-8 pt-4 md:pt-8 pb-20 md:pb-8">
+          <Card className="p-4 md:p-6 mb-4 md:mb-6 border-2 border-primary/20 shadow-lg rounded-xl">
+            <h1 className="text-2xl md:text-3xl font-bold text-foreground mb-3 md:mb-4 flex items-center gap-2 md:gap-3">
+              <BookOpen className="h-6 w-6 md:h-8 md:w-8 text-primary" />
             Conteúdos para Você
           </h1>
-          <p className="text-muted-foreground mb-6">
+            <p className="text-sm md:text-base text-muted-foreground mb-4 md:mb-6">
             Artigos e vídeos personalizados para sua saúde
           </p>
 
@@ -72,15 +66,15 @@ export default function Conteudos() {
         )}
 
         {!isLoadingRecommendations && recommendations.length > 0 && (
-          <Card className="mb-8 bg-gradient-to-br from-primary/10 to-primary/5">
-            <CardHeader>
-              <div className="flex items-center justify-between">
-                <CardTitle className="text-2xl">Recomendado para Você</CardTitle>
-                <Badge variant="secondary">Personalizado</Badge>
+          <Card className="mb-4 md:mb-8 bg-gradient-to-br from-primary/10 to-primary/5">
+            <CardHeader className="p-4 md:p-6">
+              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
+                <CardTitle className="text-xl md:text-2xl">Recomendado para Você</CardTitle>
+                <Badge variant="secondary" className="text-xs">Personalizado</Badge>
               </div>
             </CardHeader>
-            <CardContent>
-              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <CardContent className="p-4 md:p-6 pt-0">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
                 {recommendations.map((content) => (
                   <ContentCard
                     key={content.id}
@@ -94,22 +88,23 @@ export default function Conteudos() {
         )}
 
         {!isLoadingRecommendations && recommendations.length === 0 && (
-          <Card className="mb-8">
+          <Card className="mb-4 md:mb-8">
             <CardContent className="py-8 text-center">
-              <p className="text-muted-foreground">
+              <p className="text-sm md:text-base text-muted-foreground">
                 Nenhuma recomendação disponível no momento. Complete seu perfil para receber conteúdos personalizados.
               </p>
             </CardContent>
           </Card>
         )}
+        </Card>
 
           <Card>
-            <CardHeader>
-              <CardTitle className="text-2xl">Explorar Biblioteca</CardTitle>
+          <CardHeader className="p-4 md:p-6">
+            <CardTitle className="text-xl md:text-2xl">Explorar Biblioteca</CardTitle>
             </CardHeader>
-          <CardContent className="space-y-6">
-            <div className="flex items-center gap-4 w-full">
-              <div className="relative flex-1">
+          <CardContent className="space-y-4 md:space-y-6 p-4 md:p-6">
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:gap-4 w-full">
+              <div className="relative flex-1 w-full">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-muted-foreground" />
                 <Input
                   placeholder="Buscar conteúdos..."
@@ -119,7 +114,7 @@ export default function Conteudos() {
                 />
               </div>
 
-              <div className="flex-shrink-0">
+              <div className="flex-shrink-0 w-full sm:w-auto">
                 <CategoryFilter
                   selectedCategory={selectedCategory}
                   selectedSpecialty={selectedSpecialty}
@@ -134,7 +129,7 @@ export default function Conteudos() {
                 <Loader2 className="h-8 w-8 animate-spin text-primary" />
               </div>
             ) : filteredLibraryContents.length > 0 ? (
-              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
                 {filteredLibraryContents.map((content) => (
                   <ContentCard
                     key={content.id}
@@ -152,9 +147,8 @@ export default function Conteudos() {
             )}
             </CardContent>
           </Card>
-        </Card>
-      </main>
     </div>
+    </Layout>
   );
 }
 
