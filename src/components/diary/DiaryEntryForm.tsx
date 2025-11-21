@@ -14,7 +14,7 @@ interface DiaryEntryFormProps {
 }
 
 export function DiaryEntryForm({ onSuccess }: DiaryEntryFormProps) {
-  const { data: todayData } = useTodayEntry();
+  const { data: todayData, refetch: refetchToday } = useTodayEntry();
   const createMutation = useCreateDiaryEntry();
   const updateMutation = useUpdateDiaryEntry();
   
@@ -55,6 +55,7 @@ export function DiaryEntryForm({ onSuccess }: DiaryEntryFormProps) {
         {
           onSuccess: () => {
             toast.success("Registro atualizado! Obrigado por compartilhar como você está se sentindo.");
+            refetchToday();
             if (onSuccess) {
               onSuccess();
             }
@@ -67,14 +68,9 @@ export function DiaryEntryForm({ onSuccess }: DiaryEntryFormProps) {
       );
     } else {
       createMutation.mutate(submitData, {
-        onSuccess: () => {
+        onSuccess: (newEntry) => {
           toast.success("Registro salvo! Obrigado por compartilhar como você está se sentindo.");
-          setFormData({
-            moodRating: [5],
-            motivationRating: [5],
-            goalsMet: undefined,
-            feedbackText: "",
-          });
+          refetchToday();
           if (onSuccess) {
             onSuccess();
           }
