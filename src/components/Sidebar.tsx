@@ -36,7 +36,6 @@ const programNavItems = [
 
 const adminNavItems = [
   { to: "/admin", label: "Painel", icon: LayoutDashboard },
-  { to: "/admin/pacientes", label: "Pacientes", icon: Users },
 ];
 
 interface NavItem {
