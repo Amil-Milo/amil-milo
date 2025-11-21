@@ -12,7 +12,7 @@ export function Layout({ children, backgroundClass = "bg-background" }: LayoutPr
     <div className={`flex h-screen w-full ${backgroundClass} overflow-hidden`}>
       <Sidebar />
       <SidebarMobile />
-      <main className="flex-1 min-w-0 overflow-y-auto">
+      <main className="flex-1 min-w-0 overflow-y-auto overflow-x-hidden">
         {children}
       </main>
     </div>
