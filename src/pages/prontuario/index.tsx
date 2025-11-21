@@ -22,7 +22,8 @@ const bloodTypeLabels: Record<string, string> = {
 
 export default function Prontuario() {
   const { user } = useAuth();
-  const { data, isLoading } = useMedicalRecords();
+  const { data, isLoading, error } = useMedicalRecords();
+  const isAdmin = user?.role === "ADMIN";
 
   if (isLoading) {
     return (
@@ -34,7 +35,31 @@ export default function Prontuario() {
     );
   }
 
-  if (!data) {
+  // Se for ADMIN e der erro 404, mostra prontuário vazio ao invés de erro
+  if (!data && !isAdmin) {
+    return (
+      <Layout>
+        <div className="text-center py-12 px-4 md:px-8 pt-4 md:pt-8 pb-20 md:pb-8">
+            <p className="text-muted-foreground">Erro ao carregar prontuário.</p>
+          </div>
+      </Layout>
+    );
+  }
+
+  // Se for ADMIN e não tiver dados, cria dados vazios
+  const medicalData = data || (isAdmin ? {
+    profile: {
+      id: 0,
+      userId: user?.id || 0,
+    },
+    medicalRecords: [],
+    consultations: [],
+    medications: [],
+    allergies: null,
+    additionalObservations: null,
+  } : null);
+
+  if (!medicalData) {
     return (
       <Layout>
         <div className="text-center py-12 px-4 md:px-8 pt-4 md:pt-8 pb-20 md:pb-8">
@@ -56,8 +81,8 @@ export default function Prontuario() {
     return age;
   };
 
-  const age = calculateAge(data.profile.dateOfBirth);
-  const bloodType = data.profile.bloodType ? bloodTypeLabels[data.profile.bloodType] : null;
+  const age = calculateAge(medicalData.profile.dateOfBirth);
+  const bloodType = medicalData.profile.bloodType ? bloodTypeLabels[medicalData.profile.bloodType] : null;
 
   const calculateBMI = (height?: number, weight?: number): number | null => {
     if (!height || !weight) return null;
@@ -66,7 +91,7 @@ export default function Prontuario() {
     return parseFloat(bmi.toFixed(1));
   };
 
-  const bmi = calculateBMI(data.profile.height, data.profile.weight);
+  const bmi = calculateBMI(medicalData.profile.height, medicalData.profile.weight);
 
   return (
     <Layout>
@@ -94,16 +119,16 @@ export default function Prontuario() {
                     )}
                   </div>
                   <div className="flex flex-wrap gap-x-4 sm:gap-x-6 gap-y-2">
-                    {data.profile.height && (
+                    {medicalData.profile.height && (
                       <div className="flex items-center gap-2">
                         <span className="text-xs text-muted-foreground">Altura:</span>
-                        <span className="text-sm font-medium text-foreground">{(data.profile.height / 100).toFixed(2)}m</span>
+                        <span className="text-sm font-medium text-foreground">{(medicalData.profile.height / 100).toFixed(2)}m</span>
                       </div>
                     )}
-                    {data.profile.weight && (
+                    {medicalData.profile.weight && (
                       <div className="flex items-center gap-2">
                         <span className="text-xs text-muted-foreground">Peso:</span>
-                        <span className="text-sm font-medium text-foreground">{data.profile.weight.toFixed(1)}kg</span>
+                        <span className="text-sm font-medium text-foreground">{medicalData.profile.weight.toFixed(1)}kg</span>
                       </div>
                     )}
                     {bmi && (
@@ -112,11 +137,11 @@ export default function Prontuario() {
                         <span className="text-sm font-medium text-foreground">{bmi}</span>
                       </div>
                     )}
-                    {data.profile.assignedLine && (
+                    {medicalData.profile.assignedLine && (
                       <div className="flex items-center gap-2">
                         <span className="text-xs text-muted-foreground">Linha de Cuidado:</span>
                         <Badge variant="secondary" className="text-xs">
-                          {data.profile.assignedLine.name}
+                          {medicalData.profile.assignedLine.name}
                         </Badge>
                       </div>
                     )}
@@ -135,9 +160,9 @@ export default function Prontuario() {
           </Card>
 
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 md:gap-6 mb-4 md:mb-6">
-            <ConsultationHistory consultations={data.consultations} />
-            <ExamResultsList medicalRecords={data.medicalRecords} />
-            <MedicationList medications={data.medications} />
+            <ConsultationHistory consultations={medicalData.consultations} />
+            <ExamResultsList medicalRecords={medicalData.medicalRecords} />
+            <MedicationList medications={medicalData.medications} />
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 mb-4 md:mb-6">
@@ -149,12 +174,12 @@ export default function Prontuario() {
                 <h2 className="text-lg sm:text-xl font-semibold text-foreground">Alergias</h2>
               </div>
               <div className="space-y-3">
-                {data.allergies ? (
+                {medicalData.allergies ? (
                   <>
                     <div className="p-4 bg-destructive/20 rounded-lg border-2 border-destructive/40">
                       <div className="flex items-center gap-3">
                         <AlertTriangle className="h-5 w-5 text-destructive flex-shrink-0" />
-                        <p className="font-semibold text-destructive">{data.allergies}</p>
+                        <p className="font-semibold text-destructive">{medicalData.allergies}</p>
                       </div>
                     </div>
                     <div className="mt-4 pt-3 border-t border-destructive/20">
@@ -177,8 +202,8 @@ export default function Prontuario() {
                 <h2 className="text-lg sm:text-xl font-semibold text-foreground">Doenças/Diagnósticos</h2>
               </div>
               <div className="p-4 bg-gradient-to-r from-primary/10 to-background rounded-lg border border-primary/10 min-h-[100px]">
-                {data.profile.diseases ? (
-                  <p className="text-sm text-foreground whitespace-pre-line">{data.profile.diseases}</p>
+                {medicalData.profile.diseases ? (
+                  <p className="text-sm text-foreground whitespace-pre-line">{medicalData.profile.diseases}</p>
                 ) : (
                   <p className="text-sm text-muted-foreground">Nenhuma doença ou diagnóstico cadastrado.</p>
                 )}
@@ -195,8 +220,8 @@ export default function Prontuario() {
                 <h2 className="text-lg sm:text-xl font-semibold text-foreground">Observações Adicionais</h2>
               </div>
               <div className="p-4 bg-gradient-to-r from-primary/10 to-background rounded-lg border border-primary/10 min-h-[100px]">
-                {data.additionalObservations ? (
-                  <p className="text-sm text-foreground">{data.additionalObservations}</p>
+                {medicalData.additionalObservations ? (
+                  <p className="text-sm text-foreground">{medicalData.additionalObservations}</p>
                 ) : (
                   <p className="text-sm text-muted-foreground">Nenhuma observação adicional cadastrada.</p>
                 )}
@@ -211,8 +236,8 @@ export default function Prontuario() {
                 <h2 className="text-lg sm:text-xl font-semibold text-foreground">Histórico Familiar</h2>
               </div>
               <div className="p-4 bg-gradient-to-r from-secondary-light/20 to-background rounded-lg border border-secondary/10 min-h-[100px]">
-                {data.profile.familyHistory ? (
-                  <p className="text-sm text-foreground">{data.profile.familyHistory}</p>
+                {medicalData.profile.familyHistory ? (
+                  <p className="text-sm text-foreground">{medicalData.profile.familyHistory}</p>
                 ) : (
                   <p className="text-sm text-muted-foreground">Nenhum histórico familiar cadastrado.</p>
                 )}

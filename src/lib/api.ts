@@ -1,20 +1,44 @@
-import axios, { AxiosInstance, AxiosError } from 'axios';
+import axios, { AxiosInstance, AxiosError } from "axios";
 
 // API base URL - can be overridden by environment variable
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
 
 // Create axios instance
 const api: AxiosInstance = axios.create({
   baseURL: API_BASE_URL,
   headers: {
-    'Content-Type': 'application/json',
+    "Content-Type": "application/json",
   },
 });
+
+// Função para verificar se deve suprimir erro no console
+const shouldSuppressError = (error: AxiosError): boolean => {
+  if (error.response?.status === 404) {
+    const url = error.config?.url || "";
+    const currentUser = localStorage.getItem("currentUser");
+
+    if (currentUser) {
+      try {
+        const user = JSON.parse(currentUser);
+        if (
+          user.role === "ADMIN" &&
+          (url.includes("/agenda/summary") ||
+            url.includes("/medical-records/me"))
+        ) {
+          return true;
+        }
+      } catch (e) {
+        // Ignora erro de parsing
+      }
+    }
+  }
+  return false;
+};
 
 // Request interceptor to add auth token
 api.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem('authToken');
+    const token = localStorage.getItem("authToken");
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
@@ -29,45 +53,90 @@ api.interceptors.request.use(
 api.interceptors.response.use(
   (response) => response,
   (error: AxiosError) => {
+    // Marca erros que devem ser suprimidos no console
+    if (shouldSuppressError(error)) {
+      (error as any).__suppressConsole = true;
+    }
+
     if (error.response?.status === 401) {
       const currentPath = window.location.pathname;
-      const publicPaths = ['/login', '/cadastro', '/', '/sobre-o-programa', '/nossos-planos', '/contato'];
-      const isPublicPath = publicPaths.includes(currentPath) || currentPath.startsWith('/tour');
-      
-      const hasToken = !!localStorage.getItem('authToken');
-      
+      const publicPaths = [
+        "/login",
+        "/cadastro",
+        "/",
+        "/sobre-o-programa",
+        "/nossos-planos",
+        "/contato",
+      ];
+      const isPublicPath =
+        publicPaths.includes(currentPath) || currentPath.startsWith("/tour");
+
+      const hasToken = !!localStorage.getItem("authToken");
+
       if (hasToken && !isPublicPath) {
-        localStorage.removeItem('authToken');
-        localStorage.removeItem('currentUser');
-        localStorage.removeItem('isAuthenticated');
-        window.location.href = '/login';
+        localStorage.removeItem("authToken");
+        localStorage.removeItem("currentUser");
+        localStorage.removeItem("isAuthenticated");
+        window.location.href = "/login";
       }
     }
-    
+
     if (error.response?.status === 404) {
-      const url = error.config?.url || '';
-      if (url.includes('/patient-profile/me') && error.config?.method === 'get') {
+      const url = error.config?.url || "";
+      // Não rejeita erros 404 para endpoints que podem não existir para ADMINs
+      // O frontend já trata esses casos
+      if (
+        url.includes("/patient-profile/me") &&
+        error.config?.method === "get"
+      ) {
         return Promise.reject(error);
       }
     }
-    
-    if (error.code === 'ERR_NETWORK' || error.response?.status === 502) {
+
+    if (error.code === "ERR_NETWORK" || error.response?.status === 502) {
       return Promise.reject(error);
     }
-    
+
     return Promise.reject(error);
   }
 );
 
+// Intercepta console.error para suprimir erros marcados
+const originalConsoleError = console.error;
+console.error = (...args: any[]) => {
+  // Verifica se o erro é um AxiosError que deve ser suprimido
+  if (
+    args[0] &&
+    typeof args[0] === "object" &&
+    (args[0] as any).__suppressConsole
+  ) {
+    return; // Suprime o log
+  }
+  // Verifica se há um erro no stack trace que deve ser suprimido
+  if (
+    args.some(
+      (arg) => arg && typeof arg === "object" && (arg as any).__suppressConsole
+    )
+  ) {
+    return; // Suprime o log
+  }
+  originalConsoleError.apply(console, args);
+};
+
 // Auth API
 export const authApi = {
   login: async (email: string, password: string) => {
-    const response = await api.post('/auth/login', { email, password });
+    const response = await api.post("/auth/login", { email, password });
     return response.data;
   },
-  
-  register: async (data: { fullName: string; cpf: string; email: string; passwordHash: string }) => {
-    const response = await api.post('/auth/register', data);
+
+  register: async (data: {
+    fullName: string;
+    cpf: string;
+    email: string;
+    passwordHash: string;
+  }) => {
+    const response = await api.post("/auth/register", data);
     return response.data;
   },
 };
@@ -75,12 +144,12 @@ export const authApi = {
 // Users API
 export const usersApi = {
   getCurrentUser: async () => {
-    const response = await api.get('/user/me');
+    const response = await api.get("/user/me");
     return response.data;
   },
-  
+
   updateUser: async (data: any) => {
-    const response = await api.patch('/user/me', data);
+    const response = await api.patch("/user/me", data);
     return response.data;
   },
 };
@@ -88,25 +157,25 @@ export const usersApi = {
 // Content API
 export const contentApi = {
   getRecommendations: async () => {
-    const response = await api.get('/contents/recommendations');
+    const response = await api.get("/contents/recommendations");
     return response.data;
   },
-  
+
   getAll: async () => {
-    const response = await api.get('/contents');
+    const response = await api.get("/contents");
     return response.data;
   },
-  
+
   getBySpecialty: async (specialtyId: number) => {
     const response = await api.get(`/contents/specialty/${specialtyId}`);
     return response.data;
   },
-  
+
   getByCategory: async (category: string) => {
     const response = await api.get(`/contents/category/${category}`);
     return response.data;
   },
-  
+
   getById: async (id: number) => {
     const response = await api.get(`/contents/${id}`);
     return response.data;
@@ -116,7 +185,7 @@ export const contentApi = {
 // Medical Record API
 export const medicalRecordApi = {
   getMedicalRecord: async () => {
-    const response = await api.get('/medical-records/me');
+    const response = await api.get("/medical-records/me");
     return response.data;
   },
 };
@@ -124,55 +193,77 @@ export const medicalRecordApi = {
 // Patient Profile API
 export const patientProfileApi = {
   getProfile: async () => {
-    const response = await api.get('/patient-profile/me');
+    const response = await api.get("/patient-profile/me");
     return response.data;
   },
-  
+
   createProfile: async (data: any) => {
-    const response = await api.post('/patient-profile/me', data);
+    const response = await api.post("/patient-profile/me", data);
     return response.data;
   },
-  
+
   updateProfile: async (data: any) => {
-    const response = await api.patch('/patient-profile/me', data);
+    const response = await api.patch("/patient-profile/me", data);
     return response.data;
   },
   connectGoogleCalendar: async (calendarId: string) => {
-    const response = await api.patch('/patient-profile/me', { googleCalendarId: calendarId });
+    const response = await api.patch("/patient-profile/me", {
+      googleCalendarId: calendarId,
+    });
     return response.data;
   },
   // Métodos para atualizar seções específicas
   updatePersonalData: async (data: { fullName?: string; email?: string }) => {
-    const response = await api.patch('/patient-profile/me/personal-data', data);
+    const response = await api.patch("/patient-profile/me/personal-data", data);
     return response.data;
   },
-  updateHealthInfo: async (data: { dateOfBirth?: string; bloodType?: string; height?: number; weight?: number }) => {
-    const response = await api.patch('/patient-profile/me/health-info', data);
+  updateHealthInfo: async (data: {
+    dateOfBirth?: string;
+    bloodType?: string;
+    height?: number;
+    weight?: number;
+  }) => {
+    const response = await api.patch("/patient-profile/me/health-info", data);
     return response.data;
   },
-  updateDiseasesMedications: async (data: { diseases?: string; medications?: string }) => {
-    const response = await api.patch('/patient-profile/me/diseases-medications', data);
+  updateDiseasesMedications: async (data: {
+    diseases?: string;
+    medications?: string;
+  }) => {
+    const response = await api.patch(
+      "/patient-profile/me/diseases-medications",
+      data
+    );
     return response.data;
   },
   updateFamilyHistory: async (data: { familyHistory?: string }) => {
-    const response = await api.patch('/patient-profile/me/family-history', data);
+    const response = await api.patch(
+      "/patient-profile/me/family-history",
+      data
+    );
     return response.data;
   },
   updateAllergies: async (data: { allergies?: string }) => {
-    const response = await api.patch('/patient-profile/me/allergies', data);
+    const response = await api.patch("/patient-profile/me/allergies", data);
     return response.data;
   },
   updateSpecialConditions: async (data: { specialConditions?: string }) => {
-    const response = await api.patch('/patient-profile/me/special-conditions', data);
+    const response = await api.patch(
+      "/patient-profile/me/special-conditions",
+      data
+    );
     return response.data;
   },
   // Métodos para gerenciar endereço
   createAddress: async (data: any) => {
-    const response = await api.post('/patient-profile/me/address', data);
+    const response = await api.post("/patient-profile/me/address", data);
     return response.data;
   },
   updateAddress: async (addressId: number, data: any) => {
-    const response = await api.patch(`/patient-profile/me/address/${addressId}`, data);
+    const response = await api.patch(
+      `/patient-profile/me/address/${addressId}`,
+      data
+    );
     return response.data;
   },
 };
@@ -180,20 +271,20 @@ export const patientProfileApi = {
 // Consultation API
 export const consultationApi = {
   getConsultations: async () => {
-    const response = await api.get('/consultation/me');
+    const response = await api.get("/consultation/me");
     return response.data;
   },
-  
+
   getConsultationById: async (id: number) => {
     const response = await api.get(`/consultation/me/${id}`);
     return response.data;
   },
-  
+
   createConsultation: async (data: any) => {
-    const response = await api.post('/consultation', data);
+    const response = await api.post("/consultation", data);
     return response.data;
   },
-  
+
   updateConsultation: async (id: number, data: any) => {
     const response = await api.patch(`/consultation/${id}`, data);
     return response.data;
@@ -206,32 +297,32 @@ export const diaryApi = {
     const response = await api.get(`/diary/me?page=${page}&limit=${limit}`);
     return response.data;
   },
-  
+
   getTodayEntry: async () => {
-    const response = await api.get('/diary/me/today');
+    const response = await api.get("/diary/me/today");
     return response.data;
   },
-  
+
   shouldShowDiary: async () => {
-    const response = await api.get('/diary/should-show');
+    const response = await api.get("/diary/should-show");
     return response.data;
   },
-  
+
   createEntry: async (data: any) => {
-    const response = await api.post('/diary/me', data);
+    const response = await api.post("/diary/me", data);
     return response.data;
   },
-  
+
   updateEntry: async (id: number, data: any) => {
     const response = await api.patch(`/diary/me/${id}`, data);
     return response.data;
   },
-  
+
   getEntryById: async (id: number) => {
     const response = await api.get(`/diary/${id}`);
     return response.data;
   },
-  
+
   deleteEntry: async (id: number) => {
     const response = await api.delete(`/diary/${id}`);
     return response.data;
@@ -241,25 +332,38 @@ export const diaryApi = {
 // Goals API
 export const goalsApi = {
   getGoals: async () => {
-    const response = await api.get('/goals/me');
+    const response = await api.get("/goals/me");
     return response.data;
   },
-  
-  createGoal: async (data: { title: string; description?: string; endDate?: string; status?: string }) => {
-    const response = await api.post('/goals/me', data);
+
+  createGoal: async (data: {
+    title: string;
+    description?: string;
+    endDate?: string;
+    status?: string;
+  }) => {
+    const response = await api.post("/goals/me", data);
     return response.data;
   },
-  
-  updateGoal: async (id: number, data: { title?: string; description?: string; endDate?: string; status?: string }) => {
+
+  updateGoal: async (
+    id: number,
+    data: {
+      title?: string;
+      description?: string;
+      endDate?: string;
+      status?: string;
+    }
+  ) => {
     const response = await api.patch(`/goals/me/${id}`, data);
     return response.data;
   },
-  
+
   getGoalById: async (id: number) => {
     const response = await api.get(`/goals/${id}`);
     return response.data;
   },
-  
+
   deleteGoal: async (id: number) => {
     const response = await api.delete(`/goals/me/${id}`);
     return response.data;
@@ -269,7 +373,7 @@ export const goalsApi = {
 // Journey API
 export const journeyApi = {
   getJourneyData: async () => {
-    const response = await api.get('/journey/me');
+    const response = await api.get("/journey/me");
     return response.data;
   },
 };
@@ -277,7 +381,7 @@ export const journeyApi = {
 // Agenda API
 export const agendaApi = {
   getSummary: async () => {
-    const response = await api.get('/agenda/summary');
+    const response = await api.get("/agenda/summary");
     return response.data;
   },
 };
@@ -286,25 +390,25 @@ export const agendaApi = {
 export const calendarApi = {
   getEvents: async (startDate?: string, endDate?: string) => {
     const params = new URLSearchParams();
-    if (startDate) params.append('startDate', startDate);
-    if (endDate) params.append('endDate', endDate);
+    if (startDate) params.append("startDate", startDate);
+    if (endDate) params.append("endDate", endDate);
     const response = await api.get(`/calendar/events?${params.toString()}`);
     return response.data;
   },
   sync: async () => {
-    const response = await api.get('/calendar/sync');
+    const response = await api.get("/calendar/sync");
     return response.data;
   },
   isGoogleConnected: async () => {
-    const response = await api.get('/calendar/google-connected');
+    const response = await api.get("/calendar/google-connected");
     return response.data;
   },
   connectGoogle: () => {
-    const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+    const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:3000";
     window.location.href = `${apiUrl}/google-calendar/auth`;
   },
   disconnectGoogle: async () => {
-    const response = await api.get('/google-calendar/disconnect');
+    const response = await api.get("/google-calendar/disconnect");
     return response.data;
   },
 };
@@ -312,12 +416,15 @@ export const calendarApi = {
 // Checkin API
 export const checkinApi = {
   getNextCheckin: async () => {
-    const response = await api.get('/checkin/next');
+    const response = await api.get("/checkin/next");
     return response.data;
   },
-  
-  submitCheckin: async (data: { questionnaireId: number; answers: Array<{ questionId: number; chosenAnswerId: number }> }) => {
-    const response = await api.post('/checkin', data);
+
+  submitCheckin: async (data: {
+    questionnaireId: number;
+    answers: Array<{ questionId: number; chosenAnswerId: number }>;
+  }) => {
+    const response = await api.post("/checkin", data);
     return response.data;
   },
 };
@@ -325,30 +432,30 @@ export const checkinApi = {
 // Notifications API
 export const notificationsApi = {
   getNotifications: async () => {
-    const response = await api.get('/notifications/me');
+    const response = await api.get("/notifications/me");
     return response.data;
   },
-  
+
   getUnreadNotifications: async () => {
-    const response = await api.get('/notifications/me/unread');
+    const response = await api.get("/notifications/me/unread");
     return response.data;
   },
-  
+
   getNotificationCount: async () => {
-    const response = await api.get('/notifications/me/count');
+    const response = await api.get("/notifications/me/count");
     return response.data;
   },
-  
+
   markAsRead: async (id: number) => {
     const response = await api.patch(`/notifications/me/${id}/read`);
     return response.data;
   },
-  
+
   markAllAsRead: async () => {
-    const response = await api.patch('/notifications/me/mark-all-read');
+    const response = await api.patch("/notifications/me/mark-all-read");
     return response.data;
   },
-  
+
   deleteNotification: async (id: number) => {
     const response = await api.delete(`/notifications/me/${id}`);
     return response.data;
@@ -358,37 +465,37 @@ export const notificationsApi = {
 // Admin API
 export const adminApi = {
   getAllPatients: async () => {
-    const response = await api.get('/admin/patients');
+    const response = await api.get("/admin/patients");
     return response.data;
   },
-  
+
   getPatientTriageList: async () => {
-    const response = await api.get('/admin/triage-list');
+    const response = await api.get("/admin/triage-list");
     return response.data;
   },
-  
+
   getUnassignedPatients: async () => {
-    const response = await api.get('/admin/triage/unassigned');
+    const response = await api.get("/admin/triage/unassigned");
     return response.data;
   },
-  
+
   getPatientCheckinSummary: async (userId: number) => {
     const response = await api.get(`/admin/patients/${userId}/checkin-summary`);
     return response.data;
   },
-  
+
   getPatientCheckinHistory: async (userId: number) => {
     const response = await api.get(`/admin/patients/${userId}/checkin-history`);
     return response.data;
   },
-  
+
   getCheckinDetails: async (checkinId: number) => {
     const response = await api.get(`/admin/checkins/${checkinId}`);
     return response.data;
   },
-  
+
   getAllCheckinsBySpecialty: async () => {
-    const response = await api.get('/admin/checkins/all');
+    const response = await api.get("/admin/checkins/all");
     return response.data;
   },
 };
@@ -396,7 +503,73 @@ export const adminApi = {
 // Specialty API
 export const specialtyApi = {
   listSpecialties: async () => {
-    const response = await api.get('/specialty');
+    const response = await api.get("/specialty");
+    return response.data;
+  },
+};
+
+export const questionnaireApi = {
+  listAll: async () => {
+    const response = await api.get("/questionnaires");
+    return response.data;
+  },
+
+  listBySpecialty: async (specialtyId: number) => {
+    const response = await api.get(`/questionnaires/specialty/${specialtyId}`);
+    return response.data;
+  },
+
+  getQuestions: async (questionnaireId: number) => {
+    const response = await api.get(
+      `/questionnaires/${questionnaireId}/questions`
+    );
+    return response.data;
+  },
+
+  updateQuestion: async (
+    questionId: number,
+    data: { text?: string; order?: number }
+  ) => {
+    const response = await api.patch(
+      `/questionnaires/questions/${questionId}`,
+      data
+    );
+    return response.data;
+  },
+
+  deleteQuestion: async (questionId: number) => {
+    const response = await api.delete(
+      `/questionnaires/questions/${questionId}`
+    );
+    return response.data;
+  },
+
+  createAnswerOption: async (
+    questionId: number,
+    data: { text: string; value: number }
+  ) => {
+    const response = await api.post(
+      `/questionnaires/questions/${questionId}/options`,
+      data
+    );
+    return response.data;
+  },
+
+  updateAnswerOption: async (
+    answerOptionId: number,
+    data: { text?: string; value?: number }
+  ) => {
+    const response = await api.patch(
+      `/questionnaires/answer-options/${answerOptionId}`,
+      data
+    );
+    return response.data;
+  },
+
+  deleteAnswerOption: async (answerOptionId: number) => {
+    const response = await api.delete(
+      `/questionnaires/answer-options/${answerOptionId}`
+    );
     return response.data;
   },
 };
@@ -404,10 +577,12 @@ export const specialtyApi = {
 // Patient Profile API (Admin endpoints)
 export const patientProfileAdminApi = {
   assignLine: async (userId: number, specialtyId: number) => {
-    const response = await api.patch(`/patient-profile/${userId}/assign-line`, { specialtyId });
+    const response = await api.patch(`/patient-profile/${userId}/assign-line`, {
+      specialtyId,
+    });
     return response.data;
   },
-  
+
   removeLine: async (userId: number) => {
     const response = await api.delete(`/patient-profile/${userId}/assign-line`);
     return response.data;
@@ -415,4 +590,3 @@ export const patientProfileAdminApi = {
 };
 
 export default api;
-

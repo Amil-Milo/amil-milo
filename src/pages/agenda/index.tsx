@@ -20,8 +20,10 @@ import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import type { AgendaConsultation } from "@/hooks/useAgenda";
 import type { CalendarEvent } from "@/hooks/useCalendar";
+import { useAuth } from "@/contexts/AuthContext";
 
 export default function Agenda() {
+  const { user } = useAuth();
   const { data: agendaData, isLoading, error } = useAgenda();
   const { data: googleConnected } = useGoogleCalendarConnected();
   const syncCalendarMutation = useSyncCalendar();
@@ -111,6 +113,41 @@ export default function Agenda() {
     const axiosError = error as any;
     const isForbidden = axiosError?.response?.status === 403;
     const isNotFound = axiosError?.response?.status === 404;
+    const isAdmin = user?.role === "ADMIN";
+
+    // ADMIN pode acessar tudo, mesmo sem linha de cuidado
+    if (isAdmin) {
+      // Se for ADMIN, mostra a agenda vazia ao invés de erro
+      return (
+        <Layout>
+          <div className="px-4 md:px-8 pt-4 md:pt-8 pb-20 md:pb-8">
+            <div className="mb-6 md:mb-8">
+              <h1 className="text-2xl md:text-3xl font-bold text-foreground mb-2 flex items-center gap-2 md:gap-3">
+                <Calendar className="h-6 w-6 md:h-8 md:w-8 text-primary" />
+                Sua Agenda de Saúde
+              </h1>
+              <p className="text-sm md:text-base text-muted-foreground">
+                Consultas, exames e lembretes em um só lugar
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-6 w-full">
+              <div className="lg:col-span-2 space-y-4 md:space-y-6 min-w-0">
+                <AgendaList consultations={[]} onViewChecklist={() => {}} />
+                <CustomCalendar
+                  onEventClick={handleEventClick}
+                  showConnectButton={false}
+                />
+              </div>
+
+              <div className="space-y-4 md:space-y-6 min-w-0">
+                <MedicationCard medications={[]} />
+              </div>
+            </div>
+          </div>
+        </Layout>
+      );
+    }
 
     if (isForbidden || isNotFound) {
       return (
