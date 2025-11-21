@@ -202,7 +202,7 @@ export function GoalItem({ goal, onUpdate, onDelete, onToggleStatus, isUpdating 
         </div>
       )}
 
-      {!isEditing && (
+      {!isEditing && !isCompleted && (
         <div className="mt-3 flex items-center gap-3">
           <div className="flex-1">
             <div className="flex justify-between text-xs mb-1">
@@ -212,7 +212,7 @@ export function GoalItem({ goal, onUpdate, onDelete, onToggleStatus, isUpdating 
             <Progress value={progress} className="h-2" />
           </div>
           <Button
-            variant={isCompleted ? "outline" : "default"}
+            variant="default"
             size="sm"
             onClick={handleToggleStatus}
             disabled={isUpdating}
@@ -220,8 +220,6 @@ export function GoalItem({ goal, onUpdate, onDelete, onToggleStatus, isUpdating 
           >
             {isUpdating ? (
               <Loader2 className="h-4 w-4 animate-spin" />
-            ) : isCompleted ? (
-              'Reativar'
             ) : (
               'Concluir'
             )}
