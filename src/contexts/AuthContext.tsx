@@ -72,51 +72,17 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const validateToken = async () => {
-    try {
-      const userData = await usersApi.getCurrentUser();
-      if (userData) {
-        const formattedUser = formatUserFromApi(userData);
-
-        const shouldFetchProfile =
-          (formattedUser.role === "PATIENT" || formattedUser.role === "USER") &&
-          userData.patientProfile &&
-          userData.patientProfile.id;
-
-        if (shouldFetchProfile) {
-          try {
-            const profile = await patientProfileApi.getProfile();
-            if (profile) {
-              formattedUser.profileData = {
-                height: profile.height,
-                weight: profile.weight,
-                bloodType: profile.bloodType,
-                age: profile.dateOfBirth
-                  ? new Date().getFullYear() -
-                    new Date(profile.dateOfBirth).getFullYear()
-                  : undefined,
-              };
-              formattedUser.isInLine = !!profile.assignedLineId;
-              formattedUser.careLine = profile.assignedLine?.name;
-              formattedUser.assignedLineId = profile.assignedLineId || null;
-            }
-          } catch (error: any) {
-            if (error.response?.status !== 404) {
-              console.error("Error fetching profile:", error);
-            }
-          }
-        }
-
-        setUser(formattedUser);
-        localStorage.setItem("currentUser", JSON.stringify(formattedUser));
+    const storedUser = localStorage.getItem("currentUser");
+    if (storedUser) {
+      try {
+        const user = JSON.parse(storedUser);
+        setUser(user);
         return true;
-      }
-      return false;
-    } catch (error: any) {
-      if (error.response?.status === 401) {
+      } catch {
         return false;
       }
-      return true;
     }
+    return false;
   };
 
   useEffect(() => {
@@ -194,63 +160,39 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       const response = await authApi.login(email, password);
       
       if (response.token && response.user) {
+        // Store token
         localStorage.setItem("authToken", response.token);
         
-        const formattedUser = formatUserFromApi(response.user);
-        
-        if (formattedUser.role !== "ADMIN") {
-          try {
-            const profile = await patientProfileApi.getProfile();
-            if (profile) {
-              formattedUser.profileData = {
-                height: profile.height,
-                weight: profile.weight,
-                bloodType: profile.bloodType,
-                age: profile.dateOfBirth 
-                  ? new Date().getFullYear() - new Date(profile.dateOfBirth).getFullYear()
-                  : undefined,
-              };
-              formattedUser.isInLine = !!profile.assignedLineId;
-              formattedUser.careLine = profile.assignedLine?.name;
-              formattedUser.assignedLineId = profile.assignedLineId || null;
-            }
-          } catch (error: any) {
-            if (error.response?.status !== 404) {
-              console.error("Error fetching profile during login:", error);
-            }
-          }
-        }
-        
-        setUser(formattedUser);
+        // Fetch full user data with profile
+        const fullUserData = await usersApi.getCurrentUser();
+        const formattedUser = formatUserFromApi(fullUserData);
+
+        // Store user data
         localStorage.setItem("currentUser", JSON.stringify(formattedUser));
         localStorage.setItem("isAuthenticated", "true");
         
-        if (formattedUser.role === "ADMIN" || formattedUser.role === "CLINIC_OWNER" || formattedUser.role === "CLINIC_STAFF") {
-          return { success: true, redirectTo: "/admin" };
+        setUser(formattedUser);
+
+        // Determine redirect based on user role and profile
+        let redirectTo = "/agenda";
+        if (formattedUser.role === "ADMIN") {
+          redirectTo = "/admin";
+        } else if (!formattedUser.assignedLineId) {
+          redirectTo = "/check-in-periodico";
         }
         
-        if (formattedUser.isInLine) {
-          try {
-            const profile = await patientProfileApi.getProfile();
-            const hasCompleteData = profile?.dateOfBirth && profile?.bloodType && profile?.height && profile?.weight;
-            if (hasCompleteData) {
-              return { success: true, redirectTo: "/agenda" };
-            }
-            return { success: true, redirectTo: "/completar-perfil" };
-          } catch (error: any) {
-            if (error.response?.status !== 404) {
-              console.error("Error fetching profile for redirect:", error);
-            }
-            return { success: true, redirectTo: "/check-in-periodico" };
-          }
-        }
-        
-        return { success: true, redirectTo: "/check-in-periodico" };
+        return { success: true, redirectTo };
+      } else {
+        return {
+          success: false,
+          error: "Resposta inválida do servidor",
+        };
       }
-      
-      return { success: false, error: "Resposta inválida do servidor" };
     } catch (error: any) {
-      const errorMessage = error.response?.data?.message || error.message || "Erro ao fazer login";
+      const errorMessage =
+        error.response?.data?.message ||
+        error.response?.data?.description ||
+        "E-mail ou senha incorretos. Verifique e tente novamente.";
       return { success: false, error: errorMessage };
     }
   };
