@@ -1,4 +1,4 @@
-import { Sidebar } from "@/components/Sidebar";
+import { Layout } from "@/components/layout/Layout";
 import { useAuth } from "@/contexts/AuthContext";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -26,35 +26,21 @@ export default function Prontuario() {
 
   if (isLoading) {
     return (
-      <div className="flex min-h-screen w-full bg-gradient-subtle overflow-x-hidden">
-        <Sidebar />
-        <main className="flex-1 p-8 transition-all duration-300" style={{ 
-          marginLeft: 'var(--content-margin-left, 72px)',
-          width: 'calc(100% - var(--content-margin-left, 72px))',
-          maxWidth: '100%'
-        }}>
-          <div className="flex items-center justify-center py-12">
+      <Layout>
+        <div className="flex items-center justify-center py-12 px-4 md:px-8 pt-4 md:pt-8 pb-20 md:pb-8">
             <Loader2 className="h-8 w-8 animate-spin text-primary" />
           </div>
-        </main>
-      </div>
+      </Layout>
     );
   }
 
   if (!data) {
     return (
-      <div className="flex min-h-screen w-full bg-gradient-subtle overflow-x-hidden">
-        <Sidebar />
-        <main className="flex-1 p-8 transition-all duration-300" style={{ 
-          marginLeft: 'var(--content-margin-left, 72px)',
-          width: 'calc(100% - var(--content-margin-left, 72px))',
-          maxWidth: '100%'
-        }}>
-          <div className="text-center py-12">
+      <Layout>
+        <div className="text-center py-12 px-4 md:px-8 pt-4 md:pt-8 pb-20 md:pb-8">
             <p className="text-muted-foreground">Erro ao carregar prontuário.</p>
           </div>
-        </main>
-      </div>
+      </Layout>
     );
   }
 
@@ -83,34 +69,31 @@ export default function Prontuario() {
   const bmi = calculateBMI(data.profile.height, data.profile.weight);
 
   return (
-    <div className="flex min-h-screen w-full bg-gradient-subtle">
-      <Sidebar />
-      
-      <main className="flex-1 ml-64 p-8">
-        <div className="max-w-5xl mx-auto">
-          <Card className="p-6 mb-6 border-2 border-primary/20 shadow-lg rounded-xl">
-            <h1 className="text-3xl font-bold text-foreground mb-4 flex items-center gap-3">
-              <FileText className="h-8 w-8 text-primary" />
-              Prontuário Médico
-            </h1>
-            <p className="text-muted-foreground mb-6">Seu histórico completo de saúde</p>
+    <Layout>
+      <div className="px-4 md:px-8 pt-4 md:pt-8 pb-20 md:pb-8">
+        <Card className="p-4 md:p-6 mb-4 md:mb-6 border-2 border-primary/20 shadow-lg rounded-xl">
+          <h1 className="text-2xl md:text-3xl font-bold text-foreground mb-3 md:mb-4 flex items-center gap-2 md:gap-3">
+            <FileText className="h-6 w-6 md:h-8 md:w-8 text-primary" />
+            Prontuário Médico
+          </h1>
+          <p className="text-sm md:text-base text-muted-foreground mb-4 md:mb-6">Seu histórico completo de saúde</p>
 
-            <Card className="p-6 mb-6 border-primary/30 hover:scale-[1.02] transition-transform duration-200">
-            <div className="flex items-center justify-between gap-6">
-              <div className="flex items-center gap-6 flex-1">
-                <Avatar className="w-20 h-20 border-2 border-primary/30">
-                  <AvatarFallback className="bg-primary text-white text-2xl font-bold">
+          <Card className="p-4 md:p-6 mb-4 md:mb-6 border-primary/30 hover:scale-[1.02] transition-transform duration-200">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 sm:gap-6">
+              <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-6 flex-1 w-full">
+                <Avatar className="w-16 h-16 sm:w-20 sm:h-20 border-2 border-primary/30 flex-shrink-0">
+                  <AvatarFallback className="bg-primary text-white text-xl sm:text-2xl font-bold">
                     {user?.name?.charAt(0) || "P"}
                   </AvatarFallback>
                 </Avatar>
-                <div className="flex-1 space-y-3">
+                <div className="flex-1 space-y-2 sm:space-y-3 w-full">
                   <div>
-                    <h3 className="text-2xl font-bold text-foreground mb-1">{user?.name || "Paciente"}</h3>
+                    <h3 className="text-xl sm:text-2xl font-bold text-foreground mb-1">{user?.name || "Paciente"}</h3>
                     {age && (
-                      <p className="text-sm text-muted-foreground">{age} anos</p>
+                      <p className="text-xs sm:text-sm text-muted-foreground">{age} anos</p>
                     )}
                   </div>
-                  <div className="flex flex-wrap gap-x-6 gap-y-2">
+                  <div className="flex flex-wrap gap-x-4 sm:gap-x-6 gap-y-2">
                     {data.profile.height && (
                       <div className="flex items-center gap-2">
                         <span className="text-xs text-muted-foreground">Altura:</span>
@@ -141,93 +124,91 @@ export default function Prontuario() {
                 </div>
               </div>
               {bloodType && (
-                <div className="flex flex-col items-end gap-2 flex-shrink-0">
-                  <Badge className="bg-destructive text-white text-base px-4 py-2 font-bold hover:!bg-destructive">
+                <div className="flex flex-col items-start sm:items-end gap-2 flex-shrink-0 w-full sm:w-auto">
+                  <Badge className="bg-destructive text-white text-sm sm:text-base px-3 sm:px-4 py-1.5 sm:py-2 font-bold hover:!bg-destructive">
                     {bloodType}
                   </Badge>
                   <span className="text-xs text-muted-foreground">Tipo Sanguíneo</span>
                 </div>
               )}
             </div>
+          </Card>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 md:gap-6 mb-4 md:mb-6">
+            <ConsultationHistory consultations={data.consultations} />
+            <ExamResultsList medicalRecords={data.medicalRecords} />
+            <MedicationList medications={data.medications} />
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 mb-4 md:mb-6">
+            <Card className="p-4 md:p-6 bg-gradient-to-br from-destructive/10 to-destructive/5 border-destructive/40 hover:scale-[1.02] transition-transform duration-200">
+              <div className="flex items-center gap-2 md:gap-3 mb-3 md:mb-4">
+                <div className="w-10 h-10 sm:w-12 sm:h-12 bg-destructive/20 rounded-full flex items-center justify-center flex-shrink-0">
+                  <AlertTriangle className="h-5 w-5 sm:h-6 sm:w-6 text-destructive" />
+                </div>
+                <h2 className="text-lg sm:text-xl font-semibold text-foreground">Alergias</h2>
+              </div>
+              <div className="space-y-3">
+                {data.allergies ? (
+                  <>
+                    <div className="p-4 bg-destructive/20 rounded-lg border-2 border-destructive/40">
+                      <div className="flex items-center gap-3">
+                        <AlertTriangle className="h-5 w-5 text-destructive flex-shrink-0" />
+                        <p className="font-semibold text-destructive">{data.allergies}</p>
+                      </div>
+                    </div>
+                    <div className="mt-4 pt-3 border-t border-destructive/20">
+                      <p className="text-xs text-destructive/70 text-center font-medium">⚠️ Informação crítica</p>
+                    </div>
+                  </>
+                ) : (
+                  <div className="text-center py-8">
+                    <p className="text-muted-foreground">Nenhuma alergia cadastrada.</p>
+                  </div>
+                )}
+              </div>
             </Card>
 
-            <div className="grid md:grid-cols-2 gap-6 mb-6">
-              <ConsultationHistory consultations={data.consultations} />
-              <ExamResultsList medicalRecords={data.medicalRecords} />
-            </div>
+            <Card className="p-4 md:p-6 border-primary/20 hover:scale-[1.02] transition-transform duration-200">
+              <div className="flex items-center gap-2 md:gap-3 mb-3 md:mb-4">
+                <div className="w-10 h-10 sm:w-12 sm:h-12 bg-primary/10 rounded-full flex items-center justify-center flex-shrink-0">
+                  <Activity className="h-5 w-5 sm:h-6 sm:w-6 text-primary" />
+                </div>
+                <h2 className="text-lg sm:text-xl font-semibold text-foreground">Doenças/Diagnósticos</h2>
+              </div>
+              <div className="p-4 bg-gradient-to-r from-primary/10 to-background rounded-lg border border-primary/10 min-h-[100px]">
+                {data.profile.diseases ? (
+                  <p className="text-sm text-foreground whitespace-pre-line">{data.profile.diseases}</p>
+                ) : (
+                  <p className="text-sm text-muted-foreground">Nenhuma doença ou diagnóstico cadastrado.</p>
+                )}
+              </div>
+            </Card>
+          </div>
 
-            <div className="grid md:grid-cols-2 gap-6 mb-6">
-              <MedicationList medications={data.medications} />
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 mb-4 md:mb-6">
+            <Card className="p-4 md:p-6 border-primary/20 hover:scale-[1.02] transition-transform duration-200">
+              <div className="flex items-center gap-2 md:gap-3 mb-3 md:mb-4">
+                <div className="w-10 h-10 sm:w-12 sm:h-12 bg-primary/10 rounded-full flex items-center justify-center flex-shrink-0">
+                  <AlertTriangle className="h-5 w-5 sm:h-6 sm:w-6 text-primary" />
+                </div>
+                <h2 className="text-lg sm:text-xl font-semibold text-foreground">Observações Adicionais</h2>
+              </div>
+              <div className="p-4 bg-gradient-to-r from-primary/10 to-background rounded-lg border border-primary/10 min-h-[100px]">
+                {data.additionalObservations ? (
+                  <p className="text-sm text-foreground">{data.additionalObservations}</p>
+                ) : (
+                  <p className="text-sm text-muted-foreground">Nenhuma observação adicional cadastrada.</p>
+                )}
+              </div>
+            </Card>
 
-              <Card className="p-6 bg-gradient-to-br from-destructive/10 to-destructive/5 border-destructive/40 hover:scale-[1.02] transition-transform duration-200">
-                <div className="flex items-center gap-3 mb-4">
-                  <div className="w-12 h-12 bg-destructive/20 rounded-full flex items-center justify-center">
-                    <AlertTriangle className="h-6 w-6 text-destructive" />
-                  </div>
-                  <h2 className="text-xl font-semibold text-foreground">Alergias</h2>
+            <Card className="p-4 md:p-6 border-secondary/20 hover:scale-[1.02] transition-transform duration-200">
+              <div className="flex items-center gap-2 md:gap-3 mb-3 md:mb-4">
+                <div className="w-10 h-10 sm:w-12 sm:h-12 bg-secondary-light rounded-full flex items-center justify-center flex-shrink-0">
+                  <Heart className="h-5 w-5 sm:h-6 sm:w-6 text-secondary" />
                 </div>
-                <div className="space-y-3">
-                  {data.allergies ? (
-                    <>
-                      <div className="p-4 bg-destructive/20 rounded-lg border-2 border-destructive/40">
-                        <div className="flex items-center gap-3">
-                          <AlertTriangle className="h-5 w-5 text-destructive flex-shrink-0" />
-                          <p className="font-semibold text-destructive">{data.allergies}</p>
-                        </div>
-                      </div>
-                      <div className="mt-4 pt-3 border-t border-destructive/20">
-                        <p className="text-xs text-destructive/70 text-center font-medium">⚠️ Informação crítica</p>
-                      </div>
-                    </>
-                  ) : (
-                    <div className="text-center py-8">
-                      <p className="text-muted-foreground">Nenhuma alergia cadastrada.</p>
-                    </div>
-                  )}
-                </div>
-              </Card>
-            </div>
-
-            <div className="grid md:grid-cols-2 gap-6 mb-6">
-              <Card className="p-6 border-primary/20 hover:scale-[1.02] transition-transform duration-200">
-                <div className="flex items-center gap-3 mb-4">
-                  <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center">
-                    <Activity className="h-6 w-6 text-primary" />
-                  </div>
-                  <h2 className="text-xl font-semibold text-foreground">Doenças/Diagnósticos</h2>
-                </div>
-                <div className="p-4 bg-gradient-to-r from-primary/10 to-background rounded-lg border border-primary/10 min-h-[100px]">
-                  {data.profile.diseases ? (
-                    <p className="text-sm text-foreground whitespace-pre-line">{data.profile.diseases}</p>
-                  ) : (
-                    <p className="text-sm text-muted-foreground">Nenhuma doença ou diagnóstico cadastrado.</p>
-                  )}
-                </div>
-              </Card>
-
-              <Card className="p-6 border-primary/20 hover:scale-[1.02] transition-transform duration-200">
-                <div className="flex items-center gap-3 mb-4">
-                  <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center">
-                    <AlertTriangle className="h-6 w-6 text-primary" />
-                  </div>
-                  <h2 className="text-xl font-semibold text-foreground">Observações Adicionais</h2>
-                </div>
-                <div className="p-4 bg-gradient-to-r from-primary/10 to-background rounded-lg border border-primary/10 min-h-[100px]">
-                  {data.additionalObservations ? (
-                    <p className="text-sm text-foreground">{data.additionalObservations}</p>
-                  ) : (
-                    <p className="text-sm text-muted-foreground">Nenhuma observação adicional cadastrada.</p>
-                  )}
-                </div>
-              </Card>
-            </div>
-
-            <Card className="p-6 mb-6 border-secondary/20 hover:scale-[1.02] transition-transform duration-200">
-              <div className="flex items-center gap-3 mb-4">
-                <div className="w-12 h-12 bg-secondary-light rounded-full flex items-center justify-center">
-                  <Heart className="h-6 w-6 text-secondary" />
-                </div>
-                <h2 className="text-xl font-semibold text-foreground">Histórico Familiar</h2>
+                <h2 className="text-lg sm:text-xl font-semibold text-foreground">Histórico Familiar</h2>
               </div>
               <div className="p-4 bg-gradient-to-r from-secondary-light/20 to-background rounded-lg border border-secondary/10 min-h-[100px]">
                 {data.profile.familyHistory ? (
@@ -237,10 +218,10 @@ export default function Prontuario() {
                 )}
               </div>
             </Card>
-          </Card>
-        </div>
-      </main>
-    </div>
+          </div>
+        </Card>
+      </div>
+    </Layout>
   );
 }
 
