@@ -209,8 +209,8 @@ export default function Prontuario() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 mb-4 md:mb-6">
             <Card className="p-4 md:p-6 bg-gradient-to-br from-destructive/10 to-destructive/5 border-destructive/40 hover:scale-[1.02] transition-transform duration-200">
               <div className="flex items-center gap-2 md:gap-3 mb-3 md:mb-4">
-                <div className="w-10 h-10 sm:w-12 sm:h-12 bg-destructive/20 rounded-full flex items-center justify-center flex-shrink-0">
-                  <AlertTriangle className="h-5 w-5 sm:h-6 sm:w-6 text-destructive" />
+                <div className="w-10 h-10 sm:w-12 sm:h-12 bg-destructive rounded-full flex items-center justify-center flex-shrink-0 p-3">
+                  <AlertTriangle className="h-5 w-5 sm:h-6 sm:w-6 text-white" />
                 </div>
                 <h2 className="text-lg sm:text-xl font-semibold text-foreground">
                   Alergias
@@ -245,8 +245,8 @@ export default function Prontuario() {
 
             <Card className="p-4 md:p-6 border-primary/20 hover:scale-[1.02] transition-transform duration-200">
               <div className="flex items-center gap-2 md:gap-3 mb-3 md:mb-4">
-                <div className="w-10 h-10 sm:w-12 sm:h-12 bg-primary/10 rounded-full flex items-center justify-center flex-shrink-0">
-                  <Activity className="h-5 w-5 sm:h-6 sm:w-6 text-primary" />
+                <div className="w-10 h-10 sm:w-12 sm:h-12 bg-[#461BFF] rounded-full flex items-center justify-center flex-shrink-0 p-3">
+                  <Activity className="h-5 w-5 sm:h-6 sm:w-6 text-white" />
                 </div>
                 <h2 className="text-lg sm:text-xl font-semibold text-foreground">
                   Doenças/Diagnósticos
@@ -269,8 +269,8 @@ export default function Prontuario() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 mb-4 md:mb-6">
             <Card className="p-4 md:p-6 border-primary/20 hover:scale-[1.02] transition-transform duration-200">
               <div className="flex items-center gap-2 md:gap-3 mb-3 md:mb-4">
-                <div className="w-10 h-10 sm:w-12 sm:h-12 bg-primary/10 rounded-full flex items-center justify-center flex-shrink-0">
-                  <AlertTriangle className="h-5 w-5 sm:h-6 sm:w-6 text-primary" />
+                <div className="w-10 h-10 sm:w-12 sm:h-12 bg-[#461BFF] rounded-full flex items-center justify-center flex-shrink-0 p-3">
+                  <AlertTriangle className="h-5 w-5 sm:h-6 sm:w-6 text-white" />
                 </div>
                 <h2 className="text-lg sm:text-xl font-semibold text-foreground">
                   Observações Adicionais
@@ -291,8 +291,8 @@ export default function Prontuario() {
 
             <Card className="p-4 md:p-6 border-secondary/20 hover:scale-[1.02] transition-transform duration-200">
               <div className="flex items-center gap-2 md:gap-3 mb-3 md:mb-4">
-                <div className="w-10 h-10 sm:w-12 sm:h-12 bg-secondary-light rounded-full flex items-center justify-center flex-shrink-0">
-                  <Heart className="h-5 w-5 sm:h-6 sm:w-6 text-secondary" />
+                <div className="w-10 h-10 sm:w-12 sm:h-12 bg-[#00AEEF] rounded-full flex items-center justify-center flex-shrink-0 p-3">
+                  <Heart className="h-5 w-5 sm:h-6 sm:w-6 text-white" />
                 </div>
                 <h2 className="text-lg sm:text-xl font-semibold text-foreground">
                   Histórico Familiar

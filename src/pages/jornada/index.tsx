@@ -91,8 +91,8 @@ export default function Jornada() {
 
           <Card className="p-4 md:p-6 border-primary/30 hover:scale-[1.02] transition-transform duration-200">
             <div className="flex items-center gap-3 mb-4">
-              <div className="w-12 h-12 bg-primary-light rounded-full flex items-center justify-center">
-                <Activity className="h-6 w-6 text-primary" />
+              <div className="w-12 h-12 bg-[#461BFF] rounded-full flex items-center justify-center p-3">
+                <Activity className="h-6 w-6 text-white" />
               </div>
               <div>
                 <h3 className="font-semibold text-foreground">

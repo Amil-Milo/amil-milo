@@ -1,22 +1,30 @@
-import { useEffect, useState } from 'react';
-import { Card } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Target, Plus, Loader2, History } from 'lucide-react';
-import { useGoals, Goal } from '@/hooks/useGoals';
-import { GoalItem } from './GoalItem';
-import { CompletedGoalsModal } from './CompletedGoalsModal';
-import { CreateGoalModal } from './CreateGoalModal';
+import { useEffect, useState } from "react";
+import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Target, Plus, Loader2, History } from "lucide-react";
+import { useGoals, Goal } from "@/hooks/useGoals";
+import { GoalItem } from "./GoalItem";
+import { CompletedGoalsModal } from "./CompletedGoalsModal";
+import { CreateGoalModal } from "./CreateGoalModal";
 
 export function GoalManager() {
-  const { goals, loading, fetchGoals, createGoal, updateGoal, deleteGoal, toggleGoalStatus } = useGoals();
+  const {
+    goals,
+    loading,
+    fetchGoals,
+    createGoal,
+    updateGoal,
+    deleteGoal,
+    toggleGoalStatus,
+  } = useGoals();
   const [isCreating, setIsCreating] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [isUpdating, setIsUpdating] = useState(false);
   const [showCompletedModal, setShowCompletedModal] = useState(false);
   const [newGoalData, setNewGoalData] = useState({
-    title: '',
-    description: '',
-    endDate: '',
+    title: "",
+    description: "",
+    endDate: "",
   });
 
   useEffect(() => {
@@ -31,7 +39,7 @@ export function GoalManager() {
         description: newGoalData.description || undefined,
         endDate: newGoalData.endDate || undefined,
       });
-      setNewGoalData({ title: '', description: '', endDate: '' });
+      setNewGoalData({ title: "", description: "", endDate: "" });
       setIsCreating(false);
     } catch (error) {
     } finally {
@@ -42,11 +50,19 @@ export function GoalManager() {
   const handleCloseModal = (open: boolean) => {
     setIsCreating(open);
     if (!open) {
-      setNewGoalData({ title: '', description: '', endDate: '' });
+      setNewGoalData({ title: "", description: "", endDate: "" });
     }
   };
 
-  const handleUpdate = async (id: number, data: { title?: string; description?: string; endDate?: string; status?: string }) => {
+  const handleUpdate = async (
+    id: number,
+    data: {
+      title?: string;
+      description?: string;
+      endDate?: string;
+      status?: string;
+    }
+  ) => {
     setIsUpdating(true);
     try {
       await updateGoal(id, data);
@@ -73,8 +89,8 @@ export function GoalManager() {
     }
   };
 
-  const activeGoals = goals.filter(g => g.status === 'ACTIVE');
-  const completedGoals = goals.filter(g => g.status === 'COMPLETED');
+  const activeGoals = goals.filter((g) => g.status === "ACTIVE");
+  const completedGoals = goals.filter((g) => g.status === "COMPLETED");
 
   if (loading && goals.length === 0) {
     return (
@@ -90,14 +106,17 @@ export function GoalManager() {
     <Card className="p-6 border-primary/30 hover:scale-[1.02] transition-transform duration-200 relative">
       <div className="flex items-center justify-between mb-4 relative">
         <div className="flex items-center gap-3">
-          <div className="w-12 h-12 bg-primary-light rounded-full flex items-center justify-center">
-            <Target className="h-6 w-6 text-primary" />
+          <div className="w-12 h-12 bg-[#461BFF] rounded-full flex items-center justify-center p-3">
+            <Target className="h-6 w-6 text-white" />
           </div>
           <div>
             <h3 className="font-semibold text-foreground">Metas Atuais</h3>
             {completedGoals.length > 0 && (
               <p className="text-xs text-muted-foreground">
-                {completedGoals.length} {completedGoals.length === 1 ? 'meta concluída' : 'metas concluídas'}
+                {completedGoals.length}{" "}
+                {completedGoals.length === 1
+                  ? "meta concluída"
+                  : "metas concluídas"}
               </p>
             )}
           </div>
@@ -137,7 +156,9 @@ export function GoalManager() {
 
       {activeGoals.length === 0 && !isCreating && (
         <div className="text-center py-8">
-          <p className="text-muted-foreground">Nenhuma meta ativa no momento.</p>
+          <p className="text-muted-foreground">
+            Nenhuma meta ativa no momento.
+          </p>
         </div>
       )}
 
@@ -168,4 +189,3 @@ export function GoalManager() {
     </Card>
   );
 }
-
