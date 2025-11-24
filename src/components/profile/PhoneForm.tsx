@@ -32,15 +32,17 @@ export function PhoneForm() {
   const fetchPhones = async () => {
     try {
       setLoading(true);
-      const response = await api.get('/user/me');
+      const response = await api.get("/user/me");
       const userPhones = response.data.phones || [];
-      setPhones(userPhones.map((phone: any) => ({
-        id: phone.id,
-        countryCode: phone.countryCode || "+55",
-        areaCode: phone.areaCode || "",
-        number: phone.number || "",
-        isPrimary: phone.isPrimary || false,
-      })));
+      setPhones(
+        userPhones.map((phone: any) => ({
+          id: phone.id,
+          countryCode: phone.countryCode || "+55",
+          areaCode: phone.areaCode || "",
+          number: phone.number || "",
+          isPrimary: phone.isPrimary || false,
+        }))
+      );
       setHasChanges(false);
     } catch (error: any) {
       console.error("Erro ao carregar telefones:", error);
@@ -50,7 +52,12 @@ export function PhoneForm() {
     }
   };
 
-  const handleAddPhone = async (countryCode: string, areaCode: string, number: string, isPrimary: boolean) => {
+  const handleAddPhone = async (
+    countryCode: string,
+    areaCode: string,
+    number: string,
+    isPrimary: boolean
+  ) => {
     const newPhone = {
       countryCode,
       areaCode,
@@ -59,7 +66,7 @@ export function PhoneForm() {
     };
 
     if (isPrimary) {
-      const updatedPhones = phones.map(phone => ({
+      const updatedPhones = phones.map((phone) => ({
         ...phone,
         isPrimary: false,
       }));
@@ -96,17 +103,17 @@ export function PhoneForm() {
     try {
       setSaving(true);
 
-      const primaryPhone = phones.find(p => p.isPrimary);
+      const primaryPhone = phones.find((p) => p.isPrimary);
       if (!primaryPhone && phones.length > 0) {
         toast.error("Selecione pelo menos um telefone como principal");
         return;
       }
 
-      const newPhones = phones.filter(p => !p.id);
-      const existingPhones = phones.filter(p => p.id);
+      const newPhones = phones.filter((p) => !p.id);
+      const existingPhones = phones.filter((p) => p.id);
 
       for (const phone of newPhones) {
-        await api.post('/patient-profile/me/phones', {
+        await api.post("/patient-profile/me/phones", {
           countryCode: phone.countryCode,
           areaCode: phone.areaCode,
           number: phone.number,
@@ -179,10 +186,16 @@ export function PhoneForm() {
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <span className="text-sm font-medium">
-                    {formatPhoneNumber(phone.countryCode, phone.areaCode, phone.number)}
+                    {formatPhoneNumber(
+                      phone.countryCode,
+                      phone.areaCode,
+                      phone.number
+                    )}
                   </span>
                   {phone.isPrimary && (
-                    <span className="text-xs text-primary font-medium">(Principal)</span>
+                    <span className="text-xs text-primary font-medium">
+                      (Principal)
+                    </span>
                   )}
                 </div>
                 <div className="flex items-center gap-2">
@@ -194,7 +207,10 @@ export function PhoneForm() {
                       onChange={() => handleTogglePrimary(index)}
                       className="h-4 w-4"
                     />
-                    <Label htmlFor={`isPrimary-${phone.id || index}`} className="text-sm cursor-pointer">
+                    <Label
+                      htmlFor={`isPrimary-${phone.id || index}`}
+                      className="text-sm cursor-pointer"
+                    >
                       Principal
                     </Label>
                   </div>
@@ -227,6 +243,7 @@ export function PhoneForm() {
               onClick={handleSaveAll}
               disabled={!hasChanges || saving}
               size="lg"
+              className="bg-[#461BFF] hover:brightness-90 text-white rounded-full"
             >
               {saving ? (
                 <>

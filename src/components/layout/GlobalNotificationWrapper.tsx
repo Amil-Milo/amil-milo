@@ -13,7 +13,7 @@ export function GlobalNotificationWrapper() {
   const [showMessage, setShowMessage] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
   const autoCloseTimerRef = useRef<NodeJS.Timeout | null>(null);
-  
+
   const firstUnread = notifications.length > 0 ? notifications[0] : null;
 
   const handleDismiss = async (e?: React.MouseEvent) => {
@@ -35,7 +35,7 @@ export function GlobalNotificationWrapper() {
     if (firstUnread && isAuthenticated) {
       setIsVisible(true);
       setTimeout(() => setShowMessage(true), 200);
-      
+
       autoCloseTimerRef.current = setTimeout(() => {
         handleDismiss();
       }, 15000);
@@ -47,7 +47,7 @@ export function GlobalNotificationWrapper() {
         setShowMessage(false);
       };
     }
-    
+
     if (!firstUnread) {
       setIsVisible(false);
       setShowMessage(false);
@@ -81,48 +81,38 @@ export function GlobalNotificationWrapper() {
   return (
     <div className="fixed bottom-20 md:bottom-6 right-4 md:right-6 z-50">
       <div className="relative flex items-end gap-3">
-        <div 
+        <div
           className="relative mb-16"
           style={{
-            animation: 'speech-bubble 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards',
+            animation:
+              "speech-bubble 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards",
           }}
         >
-          <div 
-            className={`relative bg-card rounded-2xl rounded-tr-none shadow-lg border border-border p-4 max-w-[280px] cursor-pointer hover:shadow-xl transition-all duration-300 ${
-              firstUnread.linkUrl ? 'hover:scale-[1.01]' : ''
+          <div
+            className={`relative bg-white rounded-2xl rounded-tr-none shadow-xl border border-gray-200 p-4 max-w-[280px] cursor-pointer hover:shadow-2xl transition-all duration-300 ${
+              firstUnread.linkUrl ? "hover:scale-[1.01]" : ""
             }`}
             onClick={handleNotificationClick}
           >
-            <div 
+            <div
               className="absolute right-0 bottom-0 translate-y-full"
               style={{
                 width: 0,
                 height: 0,
-                borderTop: '12px solid hsl(var(--card))',
-                borderRight: '12px solid transparent',
-                borderBottom: '12px solid transparent',
-                filter: 'drop-shadow(2px 2px 4px rgba(0,0,0,0.1))',
+                borderTop: "12px solid white",
+                borderRight: "12px solid transparent",
+                borderBottom: "12px solid transparent",
               }}
             />
-            <div 
-              className="absolute right-[-1px] bottom-[-1px] translate-y-full"
-              style={{
-                width: 0,
-                height: 0,
-                borderTop: '13px solid hsl(var(--border))',
-                borderRight: '13px solid transparent',
-                borderBottom: '13px solid transparent',
-              }}
-            />
-            
+
             <div className="relative z-10">
               <div className="flex items-start justify-between gap-3">
-                <p 
-                  className="text-sm text-foreground leading-relaxed flex-1 font-normal pr-1"
+                <p
+                  className="text-sm text-gray-800 leading-relaxed flex-1 font-normal pr-1"
                   style={{
-                    animation: showMessage 
-                      ? 'message-appear 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) 0.2s forwards' 
-                      : 'none',
+                    animation: showMessage
+                      ? "message-appear 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) 0.2s forwards"
+                      : "none",
                     opacity: 0,
                   }}
                 >
@@ -148,4 +138,3 @@ export function GlobalNotificationWrapper() {
     </div>
   );
 }
-

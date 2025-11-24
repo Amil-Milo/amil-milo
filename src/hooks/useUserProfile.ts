@@ -49,28 +49,44 @@ export function useUserProfile() {
   const [updating, setUpdating] = useState(false);
 
   const fetchProfile = async () => {
+    const token = localStorage.getItem("authToken");
+    if (!token) {
+      setLoading(false);
+      return;
+    }
+
     setLoading(true);
     try {
-      const [userResponse, profileResponse] = await Promise.all([
-        usersApi.getCurrentUser(),
-        patientProfileApi.getProfile().catch(() => null),
-      ]);
+      const userResponse = await usersApi.getCurrentUser();
 
-        const user: UserData = {
+      const user: UserData = {
         id: userResponse.id,
         fullName: userResponse.fullName,
         email: userResponse.email,
         cpf: userResponse.cpf || "",
-        };
+      };
 
-      const profile: PatientProfileData = profileResponse || {};
+      const userRole = userResponse.userRole?.[0]?.role?.name;
+      const isNewUser = userRole === "USER" || !userRole;
 
+      if (isNewUser) {
         setProfileData({
           user,
-          profile,
+          profile: {},
         });
+        setLoading(false);
+        return;
+      }
+
+      const profileResponse = await patientProfileApi.getProfile();
+      const profile: PatientProfileData = profileResponse || {};
+
+      setProfileData({
+        user,
+        profile,
+      });
     } catch (error) {
-      console.error("Error fetching profile:", error);
+      setProfileData(null);
     } finally {
       setLoading(false);
     }
@@ -104,7 +120,8 @@ export function useUserProfile() {
       setUpdating(false);
       return true;
     } catch (error: any) {
-      const errorMessage = error.response?.data?.message || "Erro ao atualizar perfil";
+      const errorMessage =
+        error.response?.data?.message || "Erro ao atualizar perfil";
       toast.error(errorMessage);
       setUpdating(false);
       return false;
@@ -119,4 +136,3 @@ export function useUserProfile() {
     refetch: fetchProfile,
   };
 }
-

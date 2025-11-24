@@ -56,7 +56,15 @@ export function AddressForm({ initialAddress, addressId }: AddressFormProps) {
       address.city !== (initialAddress.city || "") ||
       address.state !== (initialAddress.state || "") ||
       address.zipCode !== (initialAddress.zipCode || "")
-    : !!(address.street || address.number || address.complement || address.neighborhood || address.city || address.state || address.zipCode);
+    : !!(
+        address.street ||
+        address.number ||
+        address.complement ||
+        address.neighborhood ||
+        address.city ||
+        address.state ||
+        address.zipCode
+      );
 
   const handleChange = (field: keyof AddressData, value: string) => {
     setAddress({
@@ -154,7 +162,9 @@ export function AddressForm({ initialAddress, addressId }: AddressFormProps) {
             <Input
               id="state"
               value={address.state}
-              onChange={(e) => handleChange("state", e.target.value.toUpperCase())}
+              onChange={(e) =>
+                handleChange("state", e.target.value.toUpperCase())
+              }
               placeholder="UF"
               maxLength={2}
             />
@@ -164,7 +174,9 @@ export function AddressForm({ initialAddress, addressId }: AddressFormProps) {
             <Input
               id="zipCode"
               value={address.zipCode}
-              onChange={(e) => handleChange("zipCode", e.target.value.replace(/\D/g, ""))}
+              onChange={(e) =>
+                handleChange("zipCode", e.target.value.replace(/\D/g, ""))
+              }
               placeholder="00000-000"
               maxLength={8}
             />
@@ -176,6 +188,7 @@ export function AddressForm({ initialAddress, addressId }: AddressFormProps) {
             onClick={handleSave}
             disabled={!hasChanges || saving}
             size="lg"
+            className="bg-[#461BFF] hover:brightness-90 text-white rounded-full"
           >
             {saving ? (
               <>
@@ -191,4 +204,3 @@ export function AddressForm({ initialAddress, addressId }: AddressFormProps) {
     </Card>
   );
 }
-

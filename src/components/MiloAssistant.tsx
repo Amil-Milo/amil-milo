@@ -1,6 +1,6 @@
 import { ReactNode } from "react";
 import { Card } from "@/components/ui/card";
-import miloClipboard from "@/assets/milo-clipboard.jpg";
+import miloClipboard from "@/assets/milo-clipboard.png";
 
 interface MiloAssistantProps {
   message: string | ReactNode;
@@ -15,34 +15,42 @@ export const MiloAssistant = ({
   variant = "default",
   className = "",
 }: MiloAssistantProps) => {
-  const sizeClasses = {
-    sm: "w-12 h-12",
-    md: "w-20 h-20",
-    lg: "w-32 h-32",
-  };
-
   if (variant === "floating") {
     return (
       <div className={`fixed bottom-6 right-6 z-50 ${className}`}>
-        <div className="relative">
+        <div className="relative flex items-end gap-3">
+          {message && (
+            <div className="relative mb-16">
+              <div className="relative bg-white rounded-2xl rounded-tr-none shadow-lg border border-gray-200 p-4 max-w-xs">
+                <div
+                  className="absolute right-0 bottom-0 translate-y-full"
+                  style={{
+                    width: 0,
+                    height: 0,
+                    borderTop: "12px solid white",
+                    borderRight: "12px solid transparent",
+                    borderBottom: "12px solid transparent",
+                  }}
+                />
+                <p className="text-sm text-gray-800 leading-relaxed">
+                  {message}
+                </p>
+              </div>
+            </div>
+          )}
           <img
             src={miloClipboard}
             alt="Milo"
-            className={`${sizeClasses[size]} object-contain animate-bounce`}
+            className={`w-20 h-20 md:w-24 md:h-24 object-contain flex-shrink-0`}
           />
-          {message && (
-            <Card className="absolute bottom-full right-0 mb-4 p-3 max-w-xs shadow-strong bg-card">
-              <div className="text-sm text-card-foreground">{message}</div>
-            </Card>
-          )}
         </div>
       </div>
     );
   }
 
   const enhancedSizeClasses = {
-    sm: "w-16 h-16",
-    md: "w-24 h-24",
+    sm: "w-20 h-20",
+    md: "w-28 h-28",
     lg: "w-40 h-40",
   };
 
@@ -55,7 +63,7 @@ export const MiloAssistant = ({
           className={`${enhancedSizeClasses[size]} object-contain flex-shrink-0`}
         />
         <div className="flex-1">
-          <div className="text-foreground leading-relaxed">{message}</div>
+          <div className="text-gray-800 leading-relaxed">{message}</div>
         </div>
       </div>
     </Card>

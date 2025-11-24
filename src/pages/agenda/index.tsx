@@ -103,8 +103,8 @@ export default function Agenda() {
     return (
       <Layout>
         <div className="flex items-center justify-center py-12 px-4 md:px-8 pt-4 md:pt-8 pb-20 md:pb-8">
-            <Loader2 className="h-8 w-8 animate-spin text-primary" />
-          </div>
+          <Loader2 className="h-8 w-8 animate-spin text-primary" />
+        </div>
       </Layout>
     );
   }
@@ -120,7 +120,7 @@ export default function Agenda() {
       // Se for ADMIN, mostra a agenda vazia ao invés de erro
       return (
         <Layout>
-          <div className="px-4 md:px-8 pt-4 md:pt-8 pb-20 md:pb-8">
+          <div className="w-full max-w-7xl mx-auto p-4 md:p-8 pb-20 md:pb-8">
             <div className="mb-6 md:mb-8">
               <h1 className="text-2xl md:text-3xl font-bold text-foreground mb-2 flex items-center gap-2 md:gap-3">
                 <Calendar className="h-6 w-6 md:h-8 md:w-8 text-primary" />
@@ -152,7 +152,7 @@ export default function Agenda() {
     if (isForbidden || isNotFound) {
       return (
         <Layout>
-          <div className="px-4 md:px-8 pt-4 md:pt-8 pb-20 md:pb-8">
+          <div className="w-full max-w-7xl mx-auto p-4 md:p-8 pb-20 md:pb-8">
             <Card className="p-6 text-center">
               <p className="text-foreground font-semibold mb-2">
                 Linha de cuidado não atribuída
@@ -169,7 +169,7 @@ export default function Agenda() {
 
     return (
       <Layout>
-        <div className="px-4 md:px-8 pt-4 md:pt-8 pb-20 md:pb-8">
+        <div className="w-full max-w-7xl mx-auto p-4 md:p-8 pb-20 md:pb-8">
           <Card className="p-6 text-center">
             <p className="text-destructive">Erro ao carregar agenda</p>
             <p className="text-sm text-muted-foreground mt-2">
@@ -177,7 +177,7 @@ export default function Agenda() {
               tarde.
             </p>
           </Card>
-      </div>
+        </div>
       </Layout>
     );
   }
@@ -214,20 +214,20 @@ export default function Agenda() {
           <div className="space-y-4 md:space-y-6 min-w-0">
             <MedicationCard medications={medications} />
           </div>
-          </div>
         </div>
+      </div>
 
-        <EventChecklistModal
-          consultation={selectedConsultation}
-          open={checklistModalOpen}
-          onOpenChange={setChecklistModalOpen}
-        />
+      <EventChecklistModal
+        consultation={selectedConsultation}
+        open={checklistModalOpen}
+        onOpenChange={setChecklistModalOpen}
+      />
 
-        <GoogleCalendarConnectModal
-          open={connectModalOpen}
-          onOpenChange={handleModalClose}
-          onConnect={handleConnectGoogleCalendar}
-        />
+      <GoogleCalendarConnectModal
+        open={connectModalOpen}
+        onOpenChange={handleModalClose}
+        onConnect={handleConnectGoogleCalendar}
+      />
     </Layout>
   );
 }

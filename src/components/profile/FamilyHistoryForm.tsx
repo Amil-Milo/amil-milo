@@ -27,13 +27,18 @@ export function FamilyHistoryForm({
     try {
       setSaving(true);
       await patientProfileApi.updateFamilyHistory({
-        familyHistory: familyHistory !== initialFamilyHistory ? familyHistory || undefined : undefined,
+        familyHistory:
+          familyHistory !== initialFamilyHistory
+            ? familyHistory || undefined
+            : undefined,
       });
       toast.success("Histórico familiar atualizado com sucesso!");
       // Recarregar a página para atualizar os dados
       window.location.reload();
     } catch (error: any) {
-      toast.error(error.response?.data?.message || "Erro ao atualizar histórico familiar");
+      toast.error(
+        error.response?.data?.message || "Erro ao atualizar histórico familiar"
+      );
     } finally {
       setSaving(false);
     }
@@ -61,6 +66,7 @@ export function FamilyHistoryForm({
             onClick={handleSave}
             disabled={!hasChanges || saving}
             size="lg"
+            className="bg-[#461BFF] hover:brightness-90 text-white rounded-full"
           >
             {saving ? (
               <>
@@ -76,4 +82,3 @@ export function FamilyHistoryForm({
     </Card>
   );
 }
-

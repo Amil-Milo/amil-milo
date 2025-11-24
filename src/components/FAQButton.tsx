@@ -7,33 +7,35 @@ export const FAQButton = () => {
   const [isOpen, setIsOpen] = useState(false);
   const { notifications } = useNotifications();
   const hasNewNotification = notifications.length > 0;
-  const [animationState, setAnimationState] = useState<'idle' | 'proactive'>('idle');
+  const [animationState, setAnimationState] = useState<"idle" | "proactive">(
+    "idle"
+  );
 
   useEffect(() => {
     if (hasNewNotification) {
-      setAnimationState('proactive');
+      setAnimationState("proactive");
       const timer = setTimeout(() => {
-        setAnimationState('idle');
+        setAnimationState("idle");
       }, 3000);
       return () => clearTimeout(timer);
     }
-    setAnimationState('idle');
+    setAnimationState("idle");
   }, [hasNewNotification]);
 
   return (
     <>
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="w-16 h-16 flex items-center justify-center hover:scale-110 transition-smooth bg-transparent group cursor-pointer"
+        className="w-14 h-14 md:w-16 md:h-16 flex items-center justify-center hover:scale-110 transition-smooth bg-transparent group cursor-pointer z-50"
         aria-label="Milo - Assistente Virtual"
       >
-        <img 
-          src={miloFaqHead} 
-          alt="Milo" 
-          className={`w-[3.75rem] h-[3.75rem] object-contain transition-transform group-hover:scale-105 drop-shadow-lg ${
-            animationState === 'idle' 
-              ? 'animate-[milo-idle_3s_ease-in-out_infinite]' 
-              : 'animate-[milo-pulse_1.5s_ease-in-out_infinite,milo-tilt_2s_ease-in-out_infinite]'
+        <img
+          src={miloFaqHead}
+          alt="Milo"
+          className={`w-14 h-14 md:w-16 md:h-16 object-contain transition-transform group-hover:scale-105 drop-shadow-2xl ${
+            animationState === "idle"
+              ? ""
+              : "animate-[milo-idle_3s_ease-in-out_infinite]"
           }`}
         />
       </button>

@@ -16,7 +16,12 @@ import { formatPhoneInput, formatAreaCode } from "@/lib/phoneUtils";
 interface AddPhoneModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onSave: (countryCode: string, areaCode: string, number: string, isPrimary: boolean) => Promise<void>;
+  onSave: (
+    countryCode: string,
+    areaCode: string,
+    number: string,
+    isPrimary: boolean
+  ) => Promise<void>;
   isPrimary: boolean;
 }
 
@@ -61,7 +66,12 @@ export function AddPhoneModal({
 
     setSaving(true);
     try {
-      await onSave(`+${cleanCountryCode}`, cleanAreaCode, cleanNumber, isPrimaryChecked);
+      await onSave(
+        `+${cleanCountryCode}`,
+        cleanAreaCode,
+        cleanNumber,
+        isPrimaryChecked
+      );
       setCountryCode("+55");
       setAreaCode("");
       setNumber("");
@@ -86,7 +96,11 @@ export function AddPhoneModal({
   const cleanCountryCode = countryCode.replace(/\D/g, "");
   const cleanAreaCode = areaCode.replace(/\D/g, "");
   const cleanNumber = number.replace(/\D/g, "");
-  const isValid = cleanCountryCode.length > 0 && cleanAreaCode.length === 2 && cleanNumber.length >= 8 && cleanNumber.length <= 9;
+  const isValid =
+    cleanCountryCode.length > 0 &&
+    cleanAreaCode.length === 2 &&
+    cleanNumber.length >= 8 &&
+    cleanNumber.length <= 9;
 
   return (
     <Dialog open={open} onOpenChange={handleClose}>
@@ -148,22 +162,22 @@ export function AddPhoneModal({
               disabled={saving}
               className="h-4 w-4"
             />
-            <Label htmlFor="isPrimary" className="text-sm font-normal cursor-pointer">
+            <Label
+              htmlFor="isPrimary"
+              className="text-sm font-normal cursor-pointer"
+            >
               Principal
             </Label>
           </div>
         </div>
         <DialogFooter>
-          <Button
-            variant="outline"
-            onClick={handleClose}
-            disabled={saving}
-          >
+          <Button variant="outline" onClick={handleClose} disabled={saving}>
             Cancelar
           </Button>
           <Button
             onClick={handleSave}
             disabled={!isValid || saving}
+            className="bg-[#461BFF] hover:brightness-90 text-white rounded-full"
           >
             {saving ? (
               <>
@@ -179,4 +193,3 @@ export function AddPhoneModal({
     </Dialog>
   );
 }
-

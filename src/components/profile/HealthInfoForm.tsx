@@ -25,7 +25,10 @@ const formatDateOfBirth = (value: string): string => {
     return `${numbers.slice(0, 2)}/${numbers.slice(2)}`;
   }
   if (numbers.length <= 8) {
-    return `${numbers.slice(0, 2)}/${numbers.slice(2, 4)}/${numbers.slice(4, 8)}`;
+    return `${numbers.slice(0, 2)}/${numbers.slice(2, 4)}/${numbers.slice(
+      4,
+      8
+    )}`;
   }
   return `${numbers.slice(0, 2)}/${numbers.slice(2, 4)}/${numbers.slice(4, 8)}`;
 };
@@ -45,62 +48,62 @@ const formatDateToISO = (value: string): string => {
 // Função para formatar altura em metros
 const formatHeight = (value: string): string => {
   const cleaned = value.replace(/[^\d.]/g, "");
-  
+
   if (cleaned.length <= 2) {
     return cleaned;
   }
-  
+
   if (cleaned.includes(".")) {
     const parts = cleaned.split(".");
     const integerPart = parts[0];
     const decimalPart = parts.slice(1).join("");
-    
+
     if (decimalPart.length > 2) {
       return `${integerPart}.${decimalPart.slice(0, 2)}`;
     }
-    
+
     return `${integerPart}.${decimalPart}`;
   }
-  
+
   if (cleaned.length === 3) {
     return `${cleaned.slice(0, 1)}.${cleaned.slice(1)}`;
   }
-  
+
   if (cleaned.length >= 4) {
     return `${cleaned.slice(0, -2)}.${cleaned.slice(-2)}`;
   }
-  
+
   return cleaned;
 };
 
 // Função para formatar peso
 const formatWeight = (value: string): string => {
   const cleaned = value.replace(/[^\d.]/g, "");
-  
+
   if (cleaned.length <= 2) {
     return cleaned;
   }
-  
+
   if (cleaned.includes(".")) {
     const parts = cleaned.split(".");
     const integerPart = parts[0];
     const decimalPart = parts.slice(1).join("");
-    
+
     if (decimalPart.length > 1) {
       return `${integerPart}.${decimalPart.slice(0, 1)}`;
     }
-    
+
     return `${integerPart}.${decimalPart}`;
   }
-  
+
   if (cleaned.length === 3) {
     return `${cleaned.slice(0, 2)}.${cleaned.slice(2)}`;
   }
-  
+
   if (cleaned.length >= 4) {
     return `${cleaned.slice(0, -1)}.${cleaned.slice(-1)}`;
   }
-  
+
   return cleaned;
 };
 
@@ -168,7 +171,9 @@ export function HealthInfoForm({
       }
 
       if (height !== initialHeight) {
-        const heightInCm = Math.round(parseFloat(height.replace(/[^\d.]/g, "")) * 100);
+        const heightInCm = Math.round(
+          parseFloat(height.replace(/[^\d.]/g, "")) * 100
+        );
         if (!isNaN(heightInCm) && heightInCm > 0) {
           updateData.height = heightInCm;
         }
@@ -186,7 +191,10 @@ export function HealthInfoForm({
       // Recarregar a página para atualizar os dados
       window.location.reload();
     } catch (error: any) {
-      toast.error(error.response?.data?.message || "Erro ao atualizar informações de saúde");
+      toast.error(
+        error.response?.data?.message ||
+          "Erro ao atualizar informações de saúde"
+      );
     } finally {
       setSaving(false);
     }
@@ -279,6 +287,7 @@ export function HealthInfoForm({
             onClick={handleSave}
             disabled={!hasChanges || saving}
             size="lg"
+            className="bg-[#461BFF] hover:brightness-90 text-white rounded-full"
           >
             {saving ? (
               <>
@@ -294,4 +303,3 @@ export function HealthInfoForm({
     </Card>
   );
 }
-

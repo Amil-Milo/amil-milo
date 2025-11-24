@@ -29,25 +29,21 @@ export function ProtectedRoute({
     typeof window !== "undefined" && !!localStorage.getItem("authToken");
 
   useEffect(() => {
-    if (!isAuthenticated || !user || loading) {
+    if (!isAuthenticated || !user || loading || profileLoading) {
       return;
     }
 
     const isAdmin = user.role === "ADMIN";
     const currentPath = location.pathname;
 
-    if (
-      !isAdmin &&
-      user.assignedLineId &&
-      currentPath === "/check-in-periodico"
-    ) {
+    if (!isAdmin && hasAssignedLine && currentPath === "/check-in-periodico") {
       navigate("/agenda", { replace: true });
       return;
     }
 
     if (
       !isAdmin &&
-      !user.assignedLineId &&
+      !hasAssignedLine &&
       (currentPath.startsWith("/agenda") ||
         currentPath.startsWith("/jornada") ||
         currentPath.startsWith("/prontuario") ||
@@ -65,6 +61,8 @@ export function ProtectedRoute({
     isAuthenticated,
     user,
     loading,
+    profileLoading,
+    hasAssignedLine,
     location.pathname,
     navigate,
     requireAssignedLine,

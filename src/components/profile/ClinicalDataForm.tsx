@@ -25,7 +25,10 @@ const formatDateOfBirth = (value: string): string => {
     return `${numbers.slice(0, 2)}/${numbers.slice(2)}`;
   }
   if (numbers.length <= 8) {
-    return `${numbers.slice(0, 2)}/${numbers.slice(2, 4)}/${numbers.slice(4, 8)}`;
+    return `${numbers.slice(0, 2)}/${numbers.slice(2, 4)}/${numbers.slice(
+      4,
+      8
+    )}`;
   }
   return `${numbers.slice(0, 2)}/${numbers.slice(2, 4)}/${numbers.slice(4, 8)}`;
 };
@@ -43,61 +46,61 @@ const formatDateToISO = (value: string): string => {
 
 const formatHeight = (value: string): string => {
   const cleaned = value.replace(/[^\d.]/g, "");
-  
+
   if (cleaned.length <= 2) {
     return cleaned;
   }
-  
+
   if (cleaned.includes(".")) {
     const parts = cleaned.split(".");
     const integerPart = parts[0];
     const decimalPart = parts.slice(1).join("");
-    
+
     if (decimalPart.length > 2) {
       return `${integerPart}.${decimalPart.slice(0, 2)}`;
     }
-    
+
     return `${integerPart}.${decimalPart}`;
   }
-  
+
   if (cleaned.length === 3) {
     return `${cleaned.slice(0, 1)}.${cleaned.slice(1)}`;
   }
-  
+
   if (cleaned.length >= 4) {
     return `${cleaned.slice(0, -2)}.${cleaned.slice(-2)}`;
   }
-  
+
   return cleaned;
 };
 
 const formatWeight = (value: string): string => {
   const cleaned = value.replace(/[^\d.]/g, "");
-  
+
   if (cleaned.length <= 2) {
     return cleaned;
   }
-  
+
   if (cleaned.includes(".")) {
     const parts = cleaned.split(".");
     const integerPart = parts[0];
     const decimalPart = parts.slice(1).join("");
-    
+
     if (decimalPart.length > 1) {
       return `${integerPart}.${decimalPart.slice(0, 1)}`;
     }
-    
+
     return `${integerPart}.${decimalPart}`;
   }
-  
+
   if (cleaned.length === 3) {
     return `${cleaned.slice(0, 2)}.${cleaned.slice(2)}`;
   }
-  
+
   if (cleaned.length >= 4) {
     return `${cleaned.slice(0, -1)}.${cleaned.slice(-1)}`;
   }
-  
+
   return cleaned;
 };
 
@@ -143,7 +146,9 @@ export function ClinicalDataForm({
   const [medications, setMedications] = useState(initialMedications);
   const [familyHistory, setFamilyHistory] = useState(initialFamilyHistory);
   const [allergies, setAllergies] = useState(initialAllergies);
-  const [specialConditions, setSpecialConditions] = useState(initialSpecialConditions);
+  const [specialConditions, setSpecialConditions] = useState(
+    initialSpecialConditions
+  );
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
@@ -197,7 +202,9 @@ export function ClinicalDataForm({
         healthInfoUpdates.bloodType = bloodType || undefined;
       }
       if (height !== initialHeight) {
-        const heightInCm = Math.round(parseFloat(height.replace(/[^\d.]/g, "")) * 100);
+        const heightInCm = Math.round(
+          parseFloat(height.replace(/[^\d.]/g, "")) * 100
+        );
         if (!isNaN(heightInCm) && heightInCm > 0) {
           healthInfoUpdates.height = heightInCm;
         }
@@ -218,8 +225,12 @@ export function ClinicalDataForm({
       if (diseases !== initialDiseases || medications !== initialMedications) {
         promises.push(
           patientProfileApi.updateDiseasesMedications({
-            diseases: diseases !== initialDiseases ? diseases || undefined : undefined,
-            medications: medications !== initialMedications ? medications || undefined : undefined,
+            diseases:
+              diseases !== initialDiseases ? diseases || undefined : undefined,
+            medications:
+              medications !== initialMedications
+                ? medications || undefined
+                : undefined,
           })
         );
       }
@@ -227,7 +238,10 @@ export function ClinicalDataForm({
       if (familyHistory !== initialFamilyHistory) {
         promises.push(
           patientProfileApi.updateFamilyHistory({
-            familyHistory: familyHistory !== initialFamilyHistory ? familyHistory || undefined : undefined,
+            familyHistory:
+              familyHistory !== initialFamilyHistory
+                ? familyHistory || undefined
+                : undefined,
           })
         );
       }
@@ -235,7 +249,10 @@ export function ClinicalDataForm({
       if (allergies !== initialAllergies) {
         promises.push(
           patientProfileApi.updateAllergies({
-            allergies: allergies !== initialAllergies ? allergies || undefined : undefined,
+            allergies:
+              allergies !== initialAllergies
+                ? allergies || undefined
+                : undefined,
           })
         );
       }
@@ -243,7 +260,10 @@ export function ClinicalDataForm({
       if (specialConditions !== initialSpecialConditions) {
         promises.push(
           patientProfileApi.updateSpecialConditions({
-            specialConditions: specialConditions !== initialSpecialConditions ? specialConditions || undefined : undefined,
+            specialConditions:
+              specialConditions !== initialSpecialConditions
+                ? specialConditions || undefined
+                : undefined,
           })
         );
       }
@@ -252,7 +272,9 @@ export function ClinicalDataForm({
       toast.success("Dados clínicos atualizados com sucesso!");
       window.location.reload();
     } catch (error: any) {
-      toast.error(error.response?.data?.message || "Erro ao atualizar dados clínicos");
+      toast.error(
+        error.response?.data?.message || "Erro ao atualizar dados clínicos"
+      );
     } finally {
       setSaving(false);
     }
@@ -265,7 +287,9 @@ export function ClinicalDataForm({
       </CardHeader>
       <CardContent className="space-y-6">
         <div className="space-y-4">
-          <h3 className="text-lg font-semibold text-foreground">Informações de Saúde</h3>
+          <h3 className="text-lg font-semibold text-foreground">
+            Informações de Saúde
+          </h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label htmlFor="dateOfBirth">Data de Nascimento</Label>
@@ -340,7 +364,9 @@ export function ClinicalDataForm({
         </div>
 
         <div className="space-y-4">
-          <h3 className="text-lg font-semibold text-foreground">Doenças/Medicamentos</h3>
+          <h3 className="text-lg font-semibold text-foreground">
+            Doenças/Medicamentos
+          </h3>
           <div className="space-y-2">
             <Label htmlFor="diseases">Doenças/Diagnósticos</Label>
             <Textarea
@@ -364,7 +390,9 @@ export function ClinicalDataForm({
         </div>
 
         <div className="space-y-4">
-          <h3 className="text-lg font-semibold text-foreground">Histórico Familiar</h3>
+          <h3 className="text-lg font-semibold text-foreground">
+            Histórico Familiar
+          </h3>
           <div className="space-y-2">
             <Label htmlFor="familyHistory">Histórico Familiar</Label>
             <Textarea
@@ -392,7 +420,9 @@ export function ClinicalDataForm({
         </div>
 
         <div className="space-y-4">
-          <h3 className="text-lg font-semibold text-foreground">Observações Adicionais</h3>
+          <h3 className="text-lg font-semibold text-foreground">
+            Observações Adicionais
+          </h3>
           <div className="space-y-2">
             <Label htmlFor="specialConditions">Observações Adicionais</Label>
             <Textarea
@@ -411,6 +441,7 @@ export function ClinicalDataForm({
             onClick={handleSave}
             disabled={!hasChanges || saving}
             size="lg"
+            className="bg-[#461BFF] hover:brightness-90 text-white rounded-full"
           >
             {saving ? (
               <>
@@ -426,4 +457,3 @@ export function ClinicalDataForm({
     </Card>
   );
 }
-

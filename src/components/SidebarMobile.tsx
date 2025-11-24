@@ -12,8 +12,11 @@ import {
 } from "lucide-react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
+import { useUserProfile } from "@/hooks/useUserProfile";
 
-const generalNavItems = [
+const generalNavItems = [{ to: "/perfil", label: "Perfil", icon: UserCircle }];
+
+const generalNavItemsWithNotifications = [
   { to: "/perfil", label: "Perfil", icon: UserCircle },
   { to: "/notificacoes", label: "Notificações", icon: Bell },
 ];
@@ -30,15 +33,21 @@ export const SidebarMobile = () => {
   const { user, logout } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
+  const { profileData } = useUserProfile();
 
   const isAdmin = user?.role === "ADMIN";
-  const hasAssignedLine = !!user?.assignedLineId;
+  const hasAssignedLine = !!profileData?.profile?.assignedLineId;
+
+  const baseNavItems =
+    hasAssignedLine || isAdmin
+      ? generalNavItemsWithNotifications
+      : generalNavItems;
 
   const allNavItems = isAdmin
-    ? [...generalNavItems, ...programNavItems]
+    ? [...baseNavItems, ...programNavItems]
     : hasAssignedLine
-    ? [...generalNavItems, ...programNavItems]
-    : generalNavItems;
+    ? [...baseNavItems, ...programNavItems]
+    : baseNavItems;
 
   const handleLogout = () => {
     logout();
@@ -74,12 +83,12 @@ export const SidebarMobile = () => {
             className="flex flex-col items-center justify-center gap-1 px-3 py-2 rounded-lg transition-all duration-200 min-w-[80px] shrink-0 text-muted-foreground hover:text-destructive hover:bg-destructive/10"
           >
             <LogOut className="h-5 w-5" />
-            <span className="text-[10px] font-medium leading-tight whitespace-nowrap">Sair</span>
+            <span className="text-[10px] font-medium leading-tight whitespace-nowrap">
+              Sair
+            </span>
           </button>
         </div>
       </div>
     </nav>
   );
 };
-
-

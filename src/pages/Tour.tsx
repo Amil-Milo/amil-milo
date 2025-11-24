@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Heart, Calendar, BookOpen, Award, TrendingUp } from "lucide-react";
-import miloFront from "@/assets/milo-front.jpg";
+import miloFront from "@/assets/milo-front.png";
 
 const tourSteps = [
   {
@@ -26,7 +26,7 @@ const tourSteps = [
   },
   {
     icon: Award,
-    title: "Conquistas e Gamificação",
+    title: "Conquistas",
     description:
       "Cada passo importa! Você vai ganhar selos, manter sequências de dias ativos e subir de nível. É uma forma divertida de acompanhar seu progresso.",
   },
@@ -58,21 +58,21 @@ export default function Tour() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-health flex items-center justify-center p-4">
-      <Card className="w-full max-w-2xl p-8">
+    <div className="min-h-screen bg-gradient-to-br from-[#003B71] to-[#00AEEF] flex items-center justify-center p-4">
+      <Card className="w-full max-w-2xl p-6 md:p-8 bg-white shadow-sm border border-gray-200 rounded-xl hover:border-[#461BFF] hover:shadow-md transition-all">
         <div className="text-center mb-8">
           <img
             src={miloFront}
             alt="Milo"
-            className="w-32 h-32 mx-auto mb-6"
+            className="w-32 h-32 md:w-40 md:h-40 mx-auto mb-6 object-contain"
           />
-          <div className="w-20 h-20 bg-primary-light rounded-full flex items-center justify-center mx-auto mb-4">
-            <CurrentIcon className="h-10 w-10 text-primary" />
+          <div className="w-20 h-20 md:w-24 md:h-24 bg-[#461BFF] rounded-full flex items-center justify-center mx-auto mb-4">
+            <CurrentIcon className="h-10 w-10 md:h-12 md:w-12 text-white" />
           </div>
-          <h1 className="text-2xl font-bold text-foreground mb-4">
+          <h1 className="text-2xl font-bold text-[#003B71] mb-4">
             {tourSteps[currentStep].title}
           </h1>
-          <p className="text-lg text-muted-foreground leading-relaxed">
+          <p className="text-base text-[#333333] leading-relaxed">
             {tourSteps[currentStep].description}
           </p>
         </div>
@@ -82,32 +82,30 @@ export default function Tour() {
             <div
               key={index}
               className={`h-2 rounded-full transition-all ${
-                index === currentStep
-                  ? "w-8 bg-primary"
-                  : "w-2 bg-muted"
+                index === currentStep ? "w-8 bg-[#461BFF]" : "w-2 bg-gray-300"
               }`}
             />
           ))}
         </div>
 
-        <div className="flex gap-4">
+        <div className="flex flex-col sm:flex-row gap-4">
           <Button
-            variant="outline"
+            variant="ghost"
             onClick={handleSkip}
-            className="flex-1"
+            className="flex-1 text-[#003B71] hover:bg-gray-50"
           >
             Pular Tour
           </Button>
           <Button
             onClick={handleNext}
-            className="flex-1 bg-gradient-primary text-white"
+            className="flex-1 bg-[#461BFF] hover:brightness-90 text-white rounded-full"
           >
             {currentStep < tourSteps.length - 1 ? "Próximo" : "Começar!"}
           </Button>
         </div>
 
         <div className="mt-6 text-center">
-          <p className="text-sm text-muted-foreground">
+          <p className="text-sm text-gray-600">
             Passo {currentStep + 1} de {tourSteps.length}
           </p>
         </div>

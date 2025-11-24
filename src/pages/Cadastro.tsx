@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card } from "@/components/ui/card";
 import { Heart, Eye, EyeOff } from "lucide-react";
-import miloFront from "@/assets/milo-front.jpg";
+import miloFront from "@/assets/milo-front.png";
 import { toast } from "sonner";
 import { useAuth } from "@/contexts/AuthContext";
 import api from "@/lib/api";
@@ -13,7 +13,7 @@ import api from "@/lib/api";
 // Função para validar CPF
 const validateCPF = (cpf: string): boolean => {
   const cleanCPF = cpf.replace(/\D/g, "");
-  
+
   if (cleanCPF.length !== 11) return false;
   if (/^(\d)\1+$/.test(cleanCPF)) return false;
 
@@ -39,47 +39,61 @@ const validateCPF = (cpf: string): boolean => {
 // Função para formatar CPF - formata enquanto digita
 const formatCPF = (value: string): string => {
   const numbers = value.replace(/\D/g, "");
-  
+
   if (numbers.length <= 3) {
     return numbers;
   }
-  
+
   if (numbers.length <= 6) {
     return `${numbers.slice(0, 3)}.${numbers.slice(3)}`;
   }
-  
+
   if (numbers.length <= 9) {
     return `${numbers.slice(0, 3)}.${numbers.slice(3, 6)}.${numbers.slice(6)}`;
   }
-  
+
   if (numbers.length <= 11) {
-    return `${numbers.slice(0, 3)}.${numbers.slice(3, 6)}.${numbers.slice(6, 9)}-${numbers.slice(9, 11)}`;
+    return `${numbers.slice(0, 3)}.${numbers.slice(3, 6)}.${numbers.slice(
+      6,
+      9
+    )}-${numbers.slice(9, 11)}`;
   }
-  
-  return `${numbers.slice(0, 3)}.${numbers.slice(3, 6)}.${numbers.slice(6, 9)}-${numbers.slice(9, 11)}`;
+
+  return `${numbers.slice(0, 3)}.${numbers.slice(3, 6)}.${numbers.slice(
+    6,
+    9
+  )}-${numbers.slice(9, 11)}`;
 };
 
 // Função para formatar telefone - formata enquanto digita
 const formatPhone = (value: string): string => {
   const numbers = value.replace(/\D/g, "");
-  
+
   if (numbers.length <= 2) {
     return numbers;
   }
-  
+
   if (numbers.length <= 6) {
     return `(${numbers.slice(0, 2)}) ${numbers.slice(2)}`;
   }
-  
+
   if (numbers.length <= 10) {
-    return `(${numbers.slice(0, 2)}) ${numbers.slice(2, 6)}-${numbers.slice(6)}`;
+    return `(${numbers.slice(0, 2)}) ${numbers.slice(2, 6)}-${numbers.slice(
+      6
+    )}`;
   }
-  
+
   if (numbers.length <= 11) {
-    return `(${numbers.slice(0, 2)}) ${numbers.slice(2, 7)}-${numbers.slice(7, 11)}`;
+    return `(${numbers.slice(0, 2)}) ${numbers.slice(2, 7)}-${numbers.slice(
+      7,
+      11
+    )}`;
   }
-  
-  return `(${numbers.slice(0, 2)}) ${numbers.slice(2, 7)}-${numbers.slice(7, 11)}`;
+
+  return `(${numbers.slice(0, 2)}) ${numbers.slice(2, 7)}-${numbers.slice(
+    7,
+    11
+  )}`;
 };
 
 export default function Cadastro() {
@@ -111,9 +125,12 @@ export default function Cadastro() {
 
     // Validate password strength (min 8 chars, at least one uppercase, lowercase, number and symbol)
     // Aceita qualquer símbolo, não apenas @$!%*?&
-    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^a-zA-Z\d]).{8,}$/;
+    const passwordRegex =
+      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^a-zA-Z\d]).{8,}$/;
     if (!passwordRegex.test(formData.password)) {
-      toast.error("A senha precisa ter pelo menos 8 caracteres, incluindo letra maiúscula, minúscula, número e símbolo");
+      toast.error(
+        "A senha precisa ter pelo menos 8 caracteres, incluindo letra maiúscula, minúscula, número e símbolo"
+      );
       return;
     }
 
@@ -128,7 +145,10 @@ export default function Cadastro() {
       });
 
       if (!registerResult.success) {
-        toast.error(registerResult.error || "Não foi possível criar sua conta. Tente novamente.");
+        toast.error(
+          registerResult.error ||
+            "Não foi possível criar sua conta. Tente novamente."
+        );
         return;
       }
 
@@ -138,7 +158,7 @@ export default function Cadastro() {
           const phoneNumbers = formData.telefone.replace(/\D/g, "");
           const areaCode = phoneNumbers.substring(0, 2);
           const number = phoneNumbers.substring(2);
-          
+
           await api.post("/patient-profile/me/phones", {
             countryCode: "55",
             areaCode: areaCode,
@@ -169,11 +189,7 @@ export default function Cadastro() {
             <Heart className="h-8 w-8 text-primary fill-primary" />
             <span className="text-2xl font-bold text-primary">amil</span>
           </Link>
-          <img
-            src={miloFront}
-            alt="Milo"
-            className="w-20 h-20 mx-auto mb-4"
-          />
+          <img src={miloFront} alt="Milo" className="w-20 h-20 mx-auto mb-4" />
           <h1 className="text-2xl font-bold text-foreground mb-2">
             Criar sua conta
           </h1>
@@ -226,9 +242,7 @@ export default function Cadastro() {
                   maxLength={14}
                   required
                 />
-                {cpfError && (
-                  <p className="text-sm text-red-500">{cpfError}</p>
-                )}
+                {cpfError && <p className="text-sm text-red-500">{cpfError}</p>}
               </div>
 
               <div className="space-y-2">
@@ -276,12 +290,17 @@ export default function Cadastro() {
                 </button>
               </div>
               <p className="text-xs text-muted-foreground">
-                A senha deve ter no mínimo 8 caracteres, incluindo maiúscula, minúscula, número e símbolo
+                A senha deve ter no mínimo 8 caracteres, incluindo maiúscula,
+                minúscula, número e símbolo
               </p>
             </div>
           </div>
 
-          <Button type="submit" className="w-full bg-gradient-primary text-white" loading={loading}>
+          <Button
+            type="submit"
+            className="w-full bg-[#461BFF] hover:brightness-90 text-white rounded-full"
+            loading={loading}
+          >
             {loading ? "Cadastrando..." : "Cadastrar"}
           </Button>
         </form>
@@ -289,7 +308,10 @@ export default function Cadastro() {
         <div className="mt-6 text-center">
           <p className="text-sm text-muted-foreground">
             Já tem conta?{" "}
-            <Link to="/login" className="text-primary font-medium hover:underline">
+            <Link
+              to="/login"
+              className="text-primary font-medium hover:underline"
+            >
               Fazer login
             </Link>
           </p>

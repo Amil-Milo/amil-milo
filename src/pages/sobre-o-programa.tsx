@@ -15,7 +15,7 @@ import {
   HelpCircle,
   MapPin,
 } from "lucide-react";
-import miloFront from "@/assets/milo-front.jpg";
+import miloFront from "@/assets/milo-front.png";
 
 export default function SobrePrograma() {
   return (
@@ -86,8 +86,8 @@ export default function SobrePrograma() {
                 </div>
                 <p className="text-muted-foreground">
                   O sistema identifica automaticamente situações que requerem
-                  intervenção, como atrasos em consultas, mudanças nos
-                  sintomas, ou necessidade de ajustes no tratamento.
+                  intervenção, como atrasos em consultas, mudanças nos sintomas,
+                  ou necessidade de ajustes no tratamento.
                 </p>
               </Card>
             </div>
@@ -177,8 +177,8 @@ export default function SobrePrograma() {
                   Respostas às FAQs
                 </h4>
                 <p className="text-sm text-muted-foreground">
-                  Tire suas dúvidas sobre o programa, funcionalidades e
-                  cuidados de saúde
+                  Tire suas dúvidas sobre o programa, funcionalidades e cuidados
+                  de saúde
                 </p>
               </Card>
 
@@ -186,12 +186,10 @@ export default function SobrePrograma() {
                 <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-4">
                   <MapPin className="h-8 w-8 text-primary" />
                 </div>
-                <h4 className="font-bold text-foreground mb-2">
-                  Tour Inicial
-                </h4>
+                <h4 className="font-bold text-foreground mb-2">Tour Inicial</h4>
                 <p className="text-sm text-muted-foreground">
-                  Guia você em um tour completo pela plataforma, mostrando
-                  todas as funcionalidades
+                  Guia você em um tour completo pela plataforma, mostrando todas
+                  as funcionalidades
                 </p>
               </Card>
             </div>
@@ -309,8 +307,8 @@ export default function SobrePrograma() {
                   Triagem
                 </h3>
                 <p className="text-muted-foreground">
-                  Identificamos pacientes que se beneficiariam do programa através
-                  de análise de dados e questionários iniciais.
+                  Identificamos pacientes que se beneficiariam do programa
+                  através de análise de dados e questionários iniciais.
                 </p>
               </div>
               <div>
@@ -344,4 +342,3 @@ export default function SobrePrograma() {
     </div>
   );
 }
-

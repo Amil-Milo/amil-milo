@@ -32,14 +32,21 @@ export function DiseasesMedicationsForm({
     try {
       setSaving(true);
       await patientProfileApi.updateDiseasesMedications({
-        diseases: diseases !== initialDiseases ? diseases || undefined : undefined,
-        medications: medications !== initialMedications ? medications || undefined : undefined,
+        diseases:
+          diseases !== initialDiseases ? diseases || undefined : undefined,
+        medications:
+          medications !== initialMedications
+            ? medications || undefined
+            : undefined,
       });
       toast.success("Doenças e medicamentos atualizados com sucesso!");
       // Recarregar a página para atualizar os dados
       window.location.reload();
     } catch (error: any) {
-      toast.error(error.response?.data?.message || "Erro ao atualizar doenças e medicamentos");
+      toast.error(
+        error.response?.data?.message ||
+          "Erro ao atualizar doenças e medicamentos"
+      );
     } finally {
       setSaving(false);
     }
@@ -77,6 +84,7 @@ export function DiseasesMedicationsForm({
             onClick={handleSave}
             disabled={!hasChanges || saving}
             size="lg"
+            className="bg-[#461BFF] hover:brightness-90 text-white rounded-full"
           >
             {saving ? (
               <>
@@ -92,4 +100,3 @@ export function DiseasesMedicationsForm({
     </Card>
   );
 }
-

@@ -1,16 +1,28 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { CheckinModal } from "@/components/modals/CheckinModal";
-import miloFront from "@/assets/milo-front.jpg";
+import { useAuth } from "@/contexts/AuthContext";
+import { useUserProfile } from "@/hooks/useUserProfile";
+import miloFront from "@/assets/milo-front.png";
 import { Clipboard, Stethoscope, Target } from "lucide-react";
 
 export default function CheckinPeriodico() {
   const [checkinOpen, setCheckinOpen] = useState(false);
+  const { user } = useAuth();
+  const { profileData } = useUserProfile();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (user && user.role !== "ADMIN" && profileData?.profile?.assignedLineId) {
+      navigate("/agenda", { replace: true });
+    }
+  }, [user, profileData, navigate]);
 
   return (
-    <div className="min-h-screen bg-gradient-subtle p-6">
-      <div className="max-w-4xl mx-auto space-y-8">
+    <div className="min-h-screen bg-[#F8F9FA] p-6">
+      <div className="max-w-2xl mx-auto space-y-8">
         {/* Welcome */}
         <div className="text-center space-y-4">
           <img
@@ -18,16 +30,15 @@ export default function CheckinPeriodico() {
             alt="Milo"
             className="w-48 h-48 mx-auto object-contain animate-bounce-slow"
           />
-          <h1 className="text-4xl font-bold text-foreground">
-            Bem-vindo ao Cuidadosmil!
+          <h1 className="text-4xl font-bold text-[#003B71]">
+            Bem-vindo à Amil
           </h1>
           <p className="text-xl text-muted-foreground">
             Estamos felizes em ter você aqui
           </p>
         </div>
 
-        {/* Main message */}
-        <Card className="p-6 shadow-soft border-primary/20">
+        <Card className="p-6 shadow-lg border-t-4 border-[#003B71]">
           <div className="space-y-3 text-foreground">
             <p>
               Olá! Eu sou o <strong>Milo</strong>, sua coruja médica
@@ -51,14 +62,14 @@ export default function CheckinPeriodico() {
               Próximo Passo: Check-in Periódico
             </h2>
             <p className="text-muted-foreground">
-              Um questionário rápido que me ajuda a entender suas necessidades de
-              saúde. Leva apenas 5 minutos!
+              Um questionário rápido que me ajuda a entender suas necessidades
+              de saúde. Leva apenas 5 minutos!
             </p>
           </div>
 
           <Button
             size="lg"
-            className="bg-gradient-primary text-white text-lg px-8"
+            className="bg-[#461BFF] hover:brightness-90 text-white text-lg px-8 rounded-full"
             onClick={() => setCheckinOpen(true)}
           >
             Fazer Check-in Agora
@@ -72,9 +83,9 @@ export default function CheckinPeriodico() {
 
         {/* Info cards */}
         <div className="grid md:grid-cols-3 gap-6">
-          <Card className="p-6 text-center">
-            <div className="w-12 h-12 mx-auto mb-3 rounded-full bg-primary/10 flex items-center justify-center">
-              <Clipboard className="h-6 w-6 text-primary" />
+          <Card className="p-6 text-center border border-gray-200 rounded-xl hover:border-[#461BFF] hover:shadow-md transition-all">
+            <div className="w-12 h-12 mx-auto mb-3 rounded-full bg-[#461BFF] flex items-center justify-center">
+              <Clipboard className="h-6 w-6 text-white" />
             </div>
             <h3 className="font-semibold mb-2">Check-in Regular</h3>
             <p className="text-sm text-muted-foreground">
@@ -82,9 +93,9 @@ export default function CheckinPeriodico() {
             </p>
           </Card>
 
-          <Card className="p-6 text-center">
-            <div className="w-12 h-12 mx-auto mb-3 rounded-full bg-primary/10 flex items-center justify-center">
-              <Stethoscope className="h-6 w-6 text-primary" />
+          <Card className="p-6 text-center border border-gray-200 rounded-xl hover:border-[#461BFF] hover:shadow-md transition-all">
+            <div className="w-12 h-12 mx-auto mb-3 rounded-full bg-[#461BFF] flex items-center justify-center">
+              <Stethoscope className="h-6 w-6 text-white" />
             </div>
             <h3 className="font-semibold mb-2">Avaliação Médica</h3>
             <p className="text-sm text-muted-foreground">
@@ -92,9 +103,9 @@ export default function CheckinPeriodico() {
             </p>
           </Card>
 
-          <Card className="p-6 text-center">
-            <div className="w-12 h-12 mx-auto mb-3 rounded-full bg-primary/10 flex items-center justify-center">
-              <Target className="h-6 w-6 text-primary" />
+          <Card className="p-6 text-center border border-gray-200 rounded-xl hover:border-[#461BFF] hover:shadow-md transition-all">
+            <div className="w-12 h-12 mx-auto mb-3 rounded-full bg-[#461BFF] flex items-center justify-center">
+              <Target className="h-6 w-6 text-white" />
             </div>
             <h3 className="font-semibold mb-2">Programa Personalizado</h3>
             <p className="text-sm text-muted-foreground">

@@ -12,7 +12,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Heart } from "lucide-react";
-import miloFront from "@/assets/milo-front.jpg";
+import miloFront from "@/assets/milo-front.png";
 import { toast } from "sonner";
 import { patientProfileApi } from "@/lib/api";
 import { useAuth } from "@/contexts/AuthContext";
@@ -33,7 +33,10 @@ const formatDateOfBirth = (value: string): string => {
     return `${numbers.slice(0, 2)}/${numbers.slice(2)}`;
   }
   if (numbers.length <= 8) {
-    return `${numbers.slice(0, 2)}/${numbers.slice(2, 4)}/${numbers.slice(4, 8)}`;
+    return `${numbers.slice(0, 2)}/${numbers.slice(2, 4)}/${numbers.slice(
+      4,
+      8
+    )}`;
   }
   return `${numbers.slice(0, 2)}/${numbers.slice(2, 4)}/${numbers.slice(4, 8)}`;
 };
@@ -53,31 +56,31 @@ const formatDateToISO = (value: string): string => {
 // Função para formatar altura em metros (ex: 1.75) - formata enquanto digita
 const formatHeight = (value: string): string => {
   const cleaned = value.replace(/[^\d.]/g, "");
-  
+
   if (cleaned.length <= 2) {
     return cleaned;
   }
-  
+
   if (cleaned.includes(".")) {
     const parts = cleaned.split(".");
     const integerPart = parts[0];
     const decimalPart = parts.slice(1).join("");
-    
+
     if (decimalPart.length > 2) {
       return `${integerPart}.${decimalPart.slice(0, 2)}`;
     }
-    
+
     return `${integerPart}.${decimalPart}`;
   }
-  
+
   if (cleaned.length === 3) {
     return `${cleaned.slice(0, 1)}.${cleaned.slice(1)}`;
   }
-  
+
   if (cleaned.length >= 4) {
     return `${cleaned.slice(0, -2)}.${cleaned.slice(-2)}`;
   }
-  
+
   return cleaned;
 };
 
@@ -91,31 +94,31 @@ const metersToCentimeters = (value: string): number => {
 // Função para formatar peso com decimais (ex: 70.5) - formata enquanto digita, máximo 1 decimal
 const formatWeight = (value: string): string => {
   const cleaned = value.replace(/[^\d.]/g, "");
-  
+
   if (cleaned.length <= 2) {
     return cleaned;
   }
-  
+
   if (cleaned.includes(".")) {
     const parts = cleaned.split(".");
     const integerPart = parts[0];
     const decimalPart = parts.slice(1).join("");
-    
+
     if (decimalPart.length > 1) {
       return `${integerPart}.${decimalPart.slice(0, 1)}`;
     }
-    
+
     return `${integerPart}.${decimalPart}`;
   }
-  
+
   if (cleaned.length === 3) {
     return `${cleaned.slice(0, 2)}.${cleaned.slice(2)}`;
   }
-  
+
   if (cleaned.length >= 4) {
     return `${cleaned.slice(0, -1)}.${cleaned.slice(-1)}`;
   }
-  
+
   return cleaned;
 };
 
@@ -154,14 +157,24 @@ export default function CompletarPerfil() {
       try {
         const profile = await patientProfileApi.getProfile();
         if (profile) {
-          const birthDate = profile.dateOfBirth ? new Date(profile.dateOfBirth) : null;
-          const formattedDate = birthDate 
-            ? `${String(birthDate.getDate()).padStart(2, '0')}/${String(birthDate.getMonth() + 1).padStart(2, '0')}/${birthDate.getFullYear()}`
+          const birthDate = profile.dateOfBirth
+            ? new Date(profile.dateOfBirth)
+            : null;
+          const formattedDate = birthDate
+            ? `${String(birthDate.getDate()).padStart(2, "0")}/${String(
+                birthDate.getMonth() + 1
+              ).padStart(2, "0")}/${birthDate.getFullYear()}`
             : "";
-          const dateISO = birthDate ? birthDate.toISOString().split('T')[0] : "";
-          
-          const heightInMeters = profile.height ? (profile.height / 100).toFixed(2) : "";
-          const weightFormatted = profile.weight ? profile.weight.toString() : "";
+          const dateISO = birthDate
+            ? birthDate.toISOString().split("T")[0]
+            : "";
+
+          const heightInMeters = profile.height
+            ? (profile.height / 100).toFixed(2)
+            : "";
+          const weightFormatted = profile.weight
+            ? profile.weight.toString()
+            : "";
 
           setFormData({
             dataNascimento: formattedDate,
@@ -189,7 +202,12 @@ export default function CompletarPerfil() {
     setLoading(true);
 
     try {
-      if (!formData.dataNascimento || !formData.altura || !formData.peso || !formData.tipoSanguineo) {
+      if (
+        !formData.dataNascimento ||
+        !formData.altura ||
+        !formData.peso ||
+        !formData.tipoSanguineo
+      ) {
         toast.error("Preencha todos os campos obrigatórios para continuar");
         setLoading(false);
         return;
@@ -239,11 +257,15 @@ export default function CompletarPerfil() {
         },
       });
 
-      toast.success("Perfil atualizado! Agora você tem acesso completo ao programa.");
+      toast.success(
+        "Perfil atualizado! Agora você tem acesso completo ao programa."
+      );
       navigate("/agenda");
     } catch (error: any) {
       console.error("Error updating profile:", error);
-      const errorMessage = error.response?.data?.message || "Não foi possível salvar seus dados. Tente novamente.";
+      const errorMessage =
+        error.response?.data?.message ||
+        "Não foi possível salvar seus dados. Tente novamente.";
       toast.error(errorMessage);
     } finally {
       setLoading(false);
@@ -258,11 +280,7 @@ export default function CompletarPerfil() {
             <Heart className="h-8 w-8 text-primary fill-primary" />
             <span className="text-2xl font-bold text-primary">amil</span>
           </Link>
-          <img
-            src={miloFront}
-            alt="Milo"
-            className="w-20 h-20 mx-auto mb-4"
-          />
+          <img src={miloFront} alt="Milo" className="w-20 h-20 mx-auto mb-4" />
           <h1 className="text-2xl font-bold text-foreground mb-2">
             Complete seu perfil
           </h1>
@@ -418,9 +436,7 @@ export default function CompletarPerfil() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="alergias">
-                Alergias
-              </Label>
+              <Label htmlFor="alergias">Alergias</Label>
               <Input
                 id="alergias"
                 type="text"
@@ -436,9 +452,7 @@ export default function CompletarPerfil() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="condicaoEspecial">
-                Observações Adicionais
-              </Label>
+              <Label htmlFor="condicaoEspecial">Observações Adicionais</Label>
               <Input
                 id="condicaoEspecial"
                 type="text"
@@ -454,9 +468,9 @@ export default function CompletarPerfil() {
             </div>
           </div>
 
-          <Button 
-            type="submit" 
-            className="w-full bg-gradient-primary text-white"
+          <Button
+            type="submit"
+            className="w-full bg-[#461BFF] hover:brightness-90 text-white rounded-full"
             loading={loading}
           >
             {loading ? "Salvando..." : "Completar Perfil"}
@@ -466,4 +480,3 @@ export default function CompletarPerfil() {
     </div>
   );
 }
-

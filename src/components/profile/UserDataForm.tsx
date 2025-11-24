@@ -10,24 +10,30 @@ import { Loader2 } from "lucide-react";
 // Função para formatar CPF
 const formatCPF = (value: string): string => {
   const numbers = value.replace(/\D/g, "");
-  
+
   if (numbers.length <= 3) {
     return numbers;
   }
-  
+
   if (numbers.length <= 6) {
     return `${numbers.slice(0, 3)}.${numbers.slice(3)}`;
   }
-  
+
   if (numbers.length <= 9) {
     return `${numbers.slice(0, 3)}.${numbers.slice(3, 6)}.${numbers.slice(6)}`;
   }
-  
+
   if (numbers.length <= 11) {
-    return `${numbers.slice(0, 3)}.${numbers.slice(3, 6)}.${numbers.slice(6, 9)}-${numbers.slice(9, 11)}`;
+    return `${numbers.slice(0, 3)}.${numbers.slice(3, 6)}.${numbers.slice(
+      6,
+      9
+    )}-${numbers.slice(9, 11)}`;
   }
-  
-  return `${numbers.slice(0, 3)}.${numbers.slice(3, 6)}.${numbers.slice(6, 9)}-${numbers.slice(9, 11)}`;
+
+  return `${numbers.slice(0, 3)}.${numbers.slice(3, 6)}.${numbers.slice(
+    6,
+    9
+  )}-${numbers.slice(9, 11)}`;
 };
 
 interface UserDataFormProps {
@@ -63,7 +69,9 @@ export function UserDataForm({
       // Recarregar a página para atualizar os dados
       window.location.reload();
     } catch (error: any) {
-      toast.error(error.response?.data?.message || "Erro ao atualizar dados pessoais");
+      toast.error(
+        error.response?.data?.message || "Erro ao atualizar dados pessoais"
+      );
     } finally {
       setSaving(false);
     }
@@ -101,8 +109,8 @@ export function UserDataForm({
           <Input
             id="cpf"
             value={formattedCPF}
-            disabled
-            className="bg-muted cursor-not-allowed"
+            readOnly
+            className="bg-gray-100 cursor-not-allowed"
             placeholder="000.000.000-00"
           />
         </div>
@@ -112,6 +120,7 @@ export function UserDataForm({
             onClick={handleSave}
             disabled={!hasChanges || saving}
             size="lg"
+            className="bg-[#461BFF] hover:brightness-90 text-white rounded-full px-6"
           >
             {saving ? (
               <>
@@ -119,7 +128,7 @@ export function UserDataForm({
                 Salvando...
               </>
             ) : (
-              "Salvar Alterações"
+              "Salvar"
             )}
           </Button>
         </div>
@@ -127,4 +136,3 @@ export function UserDataForm({
     </Card>
   );
 }
-

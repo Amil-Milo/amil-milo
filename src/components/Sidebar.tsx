@@ -23,6 +23,10 @@ import { Button } from "@/components/ui/button";
 
 const generalNavItems = [
   { to: "/perfil", label: "Meu Perfil", icon: UserCircle },
+];
+
+const generalNavItemsWithNotifications = [
+  { to: "/perfil", label: "Meu Perfil", icon: UserCircle },
   { to: "/notificacoes", label: "Notificações", icon: Bell },
 ];
 
@@ -302,24 +306,24 @@ export const Sidebar = () => {
   const [isCollapsed, setIsCollapsed] = useState(true);
 
   const isAdmin = user?.role === "ADMIN";
-  const hasAssignedLine = !!user?.assignedLineId;
+  const hasAssignedLine = !!profileData?.profile?.assignedLineId;
   const assignedLineName =
     profileData?.profile?.assignedLine?.name || user?.careLine || "";
 
-  // Verifica se a rota atual pertence ao Grupo 2 (Programa)
   const isInProgramGroup = programNavItems.some(
     (item) => location.pathname === item.to
   );
 
-  // Se estamos no Grupo 2, o Grupo 1 deve ser marcado como completamente percorrido
   const shouldMarkGeneralAsCompleted =
     !isAdmin && hasAssignedLine && isInProgramGroup;
+
+  const shouldShowProgramNav = isAdmin || hasAssignedLine;
 
   return (
     <aside
       className={cn(
-        "hidden md:flex flex-shrink-0 h-screen bg-gradient-to-b from-background via-background to-muted/20 border-r border-border flex-col shadow-soft z-50 overflow-hidden will-change-transform transition-all duration-300",
-        isCollapsed ? "w-[72px]" : "w-64"
+        "hidden md:flex flex-shrink-0 h-screen bg-gradient-to-b from-background via-background to-muted/20 border-r border-border flex-col shadow-soft z-50 overflow-hidden will-change-transform transition-[width] duration-300 ease-in-out",
+        isCollapsed ? "w-20" : "w-64"
       )}
     >
       <div
@@ -362,20 +366,26 @@ export const Sidebar = () => {
           {!isAdmin && (
             <SidebarSection
               title="Conta"
-              items={generalNavItems}
+              items={
+                hasAssignedLine
+                  ? generalNavItemsWithNotifications
+                  : generalNavItems
+              }
               location={location}
               markAllAsCompleted={shouldMarkGeneralAsCompleted}
               isCollapsed={isCollapsed}
             />
           )}
 
-          <SidebarSection
-            title="Programa Cuidadomil"
-            subtitle={assignedLineName || (isAdmin ? "Cardiologia" : "")}
-            items={programNavItems}
-            location={location}
-            isCollapsed={isCollapsed}
-          />
+          {shouldShowProgramNav && (
+            <SidebarSection
+              title="Programa Cuidadosmil"
+              subtitle={assignedLineName || (isAdmin ? "Cardiologia" : "")}
+              items={programNavItems}
+              location={location}
+              isCollapsed={isCollapsed}
+            />
+          )}
 
           {isAdmin && (
             <SidebarSection
@@ -389,7 +399,10 @@ export const Sidebar = () => {
       </nav>
 
       <div
-        className={cn("border-t border-border/50", isCollapsed ? "p-1.5" : "p-4")}
+        className={cn(
+          "border-t border-border/50",
+          isCollapsed ? "p-1.5" : "p-4"
+        )}
       >
         <button
           onClick={logout}

@@ -11,9 +11,7 @@ interface AllergiesFormProps {
   initialAllergies: string;
 }
 
-export function AllergiesForm({
-  initialAllergies,
-}: AllergiesFormProps) {
+export function AllergiesForm({ initialAllergies }: AllergiesFormProps) {
   const [allergies, setAllergies] = useState(initialAllergies);
   const [saving, setSaving] = useState(false);
 
@@ -27,13 +25,16 @@ export function AllergiesForm({
     try {
       setSaving(true);
       await patientProfileApi.updateAllergies({
-        allergies: allergies !== initialAllergies ? allergies || undefined : undefined,
+        allergies:
+          allergies !== initialAllergies ? allergies || undefined : undefined,
       });
       toast.success("Alergias atualizadas com sucesso!");
       // Recarregar a página para atualizar os dados
       window.location.reload();
     } catch (error: any) {
-      toast.error(error.response?.data?.message || "Erro ao atualizar alergias");
+      toast.error(
+        error.response?.data?.message || "Erro ao atualizar alergias"
+      );
     } finally {
       setSaving(false);
     }
@@ -61,6 +62,7 @@ export function AllergiesForm({
             onClick={handleSave}
             disabled={!hasChanges || saving}
             size="lg"
+            className="bg-[#461BFF] hover:brightness-90 text-white rounded-full"
           >
             {saving ? (
               <>
@@ -76,4 +78,3 @@ export function AllergiesForm({
     </Card>
   );
 }
-

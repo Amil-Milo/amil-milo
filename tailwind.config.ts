@@ -2,7 +2,12 @@ import type { Config } from "tailwindcss";
 
 export default {
   darkMode: ["class"],
-  content: ["./pages/**/*.{ts,tsx}", "./components/**/*.{ts,tsx}", "./app/**/*.{ts,tsx}", "./src/**/*.{ts,tsx}"],
+  content: [
+    "./pages/**/*.{ts,tsx}",
+    "./components/**/*.{ts,tsx}",
+    "./app/**/*.{ts,tsx}",
+    "./src/**/*.{ts,tsx}",
+  ],
   prefix: "",
   theme: {
     container: {
@@ -13,6 +18,16 @@ export default {
       },
     },
     extend: {
+      fontFamily: {
+        amil: [
+          '"Amil Typeface Regular"',
+          "Inter",
+          "-apple-system",
+          "BlinkMacSystemFont",
+          '"Segoe UI"',
+          "sans-serif",
+        ],
+      },
       colors: {
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
@@ -20,15 +35,19 @@ export default {
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
         primary: {
-          DEFAULT: "hsl(var(--primary))",
-          foreground: "hsl(var(--primary-foreground))",
-          light: "hsl(var(--primary-light))",
-          dark: "hsl(var(--primary-dark))",
+          DEFAULT: "#003B71",
+          foreground: "#FFFFFF",
+          light: "#0056A3",
+          dark: "#002A4F",
         },
         secondary: {
-          DEFAULT: "hsl(var(--secondary))",
-          foreground: "hsl(var(--secondary-foreground))",
-          light: "hsl(var(--secondary-light))",
+          DEFAULT: "#00AEEF",
+          foreground: "#FFFFFF",
+          light: "#33C1F5",
+        },
+        accent: {
+          DEFAULT: "#461BFF",
+          foreground: "#FFFFFF",
         },
         success: {
           DEFAULT: "hsl(var(--success))",
@@ -46,32 +65,29 @@ export default {
           DEFAULT: "hsl(var(--muted))",
           foreground: "hsl(var(--muted-foreground))",
         },
-        accent: {
-          DEFAULT: "hsl(var(--accent))",
-          foreground: "hsl(var(--accent-foreground))",
-        },
         popover: {
           DEFAULT: "hsl(var(--popover))",
           foreground: "hsl(var(--popover-foreground))",
         },
         card: {
-          DEFAULT: "hsl(var(--card))",
-          foreground: "hsl(var(--card-foreground))",
+          DEFAULT: "#FFFFFF",
+          foreground: "#333333",
         },
+        surface: "#FFFFFF",
       },
       backgroundImage: {
-        'gradient-primary': 'var(--gradient-primary)',
-        'gradient-health': 'var(--gradient-health)',
-        'gradient-subtle': 'var(--gradient-subtle)',
+        "gradient-primary": "var(--gradient-primary)",
+        "gradient-health": "var(--gradient-health)",
+        "gradient-subtle": "var(--gradient-subtle)",
       },
       boxShadow: {
-        'soft': 'var(--shadow-soft)',
-        'medium': 'var(--shadow-medium)',
-        'strong': 'var(--shadow-strong)',
+        soft: "var(--shadow-soft)",
+        medium: "var(--shadow-medium)",
+        strong: "var(--shadow-strong)",
       },
       transitionTimingFunction: {
-        'smooth': 'cubic-bezier(0.4, 0, 0.2, 1)',
-        'bounce': 'cubic-bezier(0.68, -0.55, 0.265, 1.55)',
+        smooth: "cubic-bezier(0.4, 0, 0.2, 1)",
+        bounce: "cubic-bezier(0.68, -0.55, 0.265, 1.55)",
       },
       borderRadius: {
         lg: "var(--radius)",
@@ -95,7 +111,7 @@ export default {
             height: "0",
           },
         },
-        "shimmer": {
+        shimmer: {
           "0%": {
             transform: "translateY(-100%)",
             opacity: "0",
@@ -136,7 +152,7 @@ export default {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
         "bounce-slow": "bounce-slow 3s ease-in-out infinite",
-        "shimmer": "shimmer 3s ease-in-out infinite",
+        shimmer: "shimmer 3s ease-in-out infinite",
         "pulse-wave": "pulse-wave 2s ease-in-out infinite",
         "light-travel": "light-travel 2.5s ease-in-out infinite",
       },

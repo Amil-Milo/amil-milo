@@ -1,7 +1,7 @@
 import axios, { AxiosInstance, AxiosError } from "axios";
 
 // API base URL - can be overridden by environment variable
-const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
+const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:3001";
 
 // Create axios instance
 const api: AxiosInstance = axios.create({
@@ -83,13 +83,17 @@ api.interceptors.response.use(
 
     if (error.response?.status === 404) {
       const url = error.config?.url || "";
-      // Não rejeita erros 404 para endpoints que podem não existir para ADMINs
-      // O frontend já trata esses casos
       if (
         url.includes("/patient-profile/me") &&
         error.config?.method === "get"
       ) {
-        return Promise.reject(error);
+        return Promise.resolve({
+          data: null,
+          status: 404,
+          statusText: "Not Found",
+          headers: {},
+          config: error.config,
+        });
       }
     }
 
@@ -193,8 +197,15 @@ export const medicalRecordApi = {
 // Patient Profile API
 export const patientProfileApi = {
   getProfile: async () => {
-    const response = await api.get("/patient-profile/me");
-    return response.data;
+    try {
+      const response = await api.get("/patient-profile/me");
+      return response.data;
+    } catch (error: any) {
+      if (error.response?.status === 404) {
+        return null;
+      }
+      throw error;
+    }
   },
 
   createProfile: async (data: any) => {
@@ -404,7 +415,7 @@ export const calendarApi = {
     return response.data;
   },
   connectGoogle: () => {
-    const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:3000";
+    const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:3001";
     window.location.href = `${apiUrl}/google-calendar/auth`;
   },
   disconnectGoogle: async () => {

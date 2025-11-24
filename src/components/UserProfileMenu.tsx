@@ -1,4 +1,12 @@
-import { User, LogOut, LayoutDashboard, UserCircle, Calendar, ClipboardList, Bell } from "lucide-react";
+import {
+  User,
+  LogOut,
+  LayoutDashboard,
+  UserCircle,
+  Calendar,
+  ClipboardList,
+  Bell,
+} from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -9,11 +17,13 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
+import { useUserProfile } from "@/hooks/useUserProfile";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 
 export function UserProfileMenu() {
   const { user, logout } = useAuth();
+  const { profileData } = useUserProfile();
   const navigate = useNavigate();
 
   const handleLogout = () => {
@@ -47,8 +57,9 @@ export function UserProfileMenu() {
   }
 
   const isAdmin = user.role === "ADMIN";
-  const isPatientWithLine = user.role === "PATIENT" && user.assignedLineId;
-  const isPatientWithoutLine = user.role === "PATIENT" && !user.assignedLineId;
+  const hasAssignedLine = !!profileData?.profile?.assignedLineId;
+  const isPatientWithLine = user.role === "PATIENT" && hasAssignedLine;
+  const isPatientWithoutLine = user.role === "PATIENT" && !hasAssignedLine;
 
   return (
     <DropdownMenu>
@@ -70,31 +81,46 @@ export function UserProfileMenu() {
 
         {isAdmin && (
           <>
-            <DropdownMenuItem onClick={handleProfile} className="cursor-pointer">
+            <DropdownMenuItem
+              onClick={handleProfile}
+              className="cursor-pointer"
+            >
               <UserCircle className="mr-2 h-4 w-4" />
               <span>Meu Perfil</span>
             </DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={handleProgram} className="cursor-pointer">
+            <DropdownMenuItem
+              onClick={handleProgram}
+              className="cursor-pointer"
+            >
               <Calendar className="mr-2 h-4 w-4" />
               <span>Programa Cuidadomil</span>
             </DropdownMenuItem>
-            <DropdownMenuItem onClick={handleCheckin} className="cursor-pointer">
+            <DropdownMenuItem
+              onClick={handleCheckin}
+              className="cursor-pointer"
+            >
               <ClipboardList className="mr-2 h-4 w-4" />
               <span>Check-In Periódico</span>
             </DropdownMenuItem>
-            <DropdownMenuItem onClick={handleNotifications} className="cursor-pointer">
+            <DropdownMenuItem
+              onClick={handleNotifications}
+              className="cursor-pointer"
+            >
               <Bell className="mr-2 h-4 w-4" />
               <span>Notificações</span>
             </DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={handleAdminPanel} className="cursor-pointer">
+            <DropdownMenuItem
+              onClick={handleAdminPanel}
+              className="cursor-pointer"
+            >
               <LayoutDashboard className="mr-2 h-4 w-4" />
               <span>Painel Administrativo</span>
             </DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem 
-              onClick={handleLogout} 
+            <DropdownMenuItem
+              onClick={handleLogout}
               className="cursor-pointer text-destructive focus:text-destructive focus:!bg-destructive/10 hover:!bg-destructive/10 hover:!text-destructive"
             >
               <LogOut className="mr-2 h-4 w-4" />
@@ -105,21 +131,30 @@ export function UserProfileMenu() {
 
         {isPatientWithLine && (
           <>
-            <DropdownMenuItem onClick={handleProfile} className="cursor-pointer">
+            <DropdownMenuItem
+              onClick={handleProfile}
+              className="cursor-pointer"
+            >
               <UserCircle className="mr-2 h-4 w-4" />
               <span>Meu Perfil</span>
             </DropdownMenuItem>
-            <DropdownMenuItem onClick={handleProgram} className="cursor-pointer">
+            <DropdownMenuItem
+              onClick={handleProgram}
+              className="cursor-pointer"
+            >
               <Calendar className="mr-2 h-4 w-4" />
               <span>Programa Cuidadomil</span>
             </DropdownMenuItem>
-            <DropdownMenuItem onClick={handleNotifications} className="cursor-pointer">
+            <DropdownMenuItem
+              onClick={handleNotifications}
+              className="cursor-pointer"
+            >
               <Bell className="mr-2 h-4 w-4" />
               <span>Notificações</span>
             </DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem 
-              onClick={handleLogout} 
+            <DropdownMenuItem
+              onClick={handleLogout}
               className="cursor-pointer text-destructive focus:text-destructive focus:!bg-destructive/10 hover:!bg-destructive/10 hover:!text-destructive"
             >
               <LogOut className="mr-2 h-4 w-4" />
@@ -130,17 +165,16 @@ export function UserProfileMenu() {
 
         {isPatientWithoutLine && (
           <>
-            <DropdownMenuItem onClick={handleCheckin} className="cursor-pointer">
+            <DropdownMenuItem
+              onClick={handleCheckin}
+              className="cursor-pointer"
+            >
               <ClipboardList className="mr-2 h-4 w-4" />
               <span>Check-In Periódico</span>
             </DropdownMenuItem>
-            <DropdownMenuItem onClick={handleNotifications} className="cursor-pointer">
-              <Bell className="mr-2 h-4 w-4" />
-              <span>Notificações</span>
-            </DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem 
-              onClick={handleLogout} 
+            <DropdownMenuItem
+              onClick={handleLogout}
               className="cursor-pointer text-destructive focus:text-destructive focus:!bg-destructive/10 hover:!bg-destructive/10 hover:!text-destructive"
             >
               <LogOut className="mr-2 h-4 w-4" />
@@ -152,4 +186,3 @@ export function UserProfileMenu() {
     </DropdownMenu>
   );
 }
-

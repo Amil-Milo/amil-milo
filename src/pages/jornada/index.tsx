@@ -28,7 +28,7 @@ export default function Jornada() {
     if (data && data.milestones.length > previousMilestonesCount) {
       const latestMilestone = data.milestones[0];
       const dismissedMilestones = JSON.parse(
-        localStorage.getItem('dismissed-milestones') || '[]'
+        localStorage.getItem("dismissed-milestones") || "[]"
       ) as number[];
 
       if (!dismissedMilestones.includes(latestMilestone.id)) {
@@ -48,9 +48,9 @@ export default function Jornada() {
   if (isLoading) {
     return (
       <Layout>
-        <div className="flex items-center justify-center py-12 px-4 md:px-8 pt-4 md:pt-8 pb-20 md:pb-8">
-            <Loader2 className="h-8 w-8 animate-spin text-primary" />
-          </div>
+        <div className="w-full max-w-7xl mx-auto p-4 md:p-8 pb-20 md:pb-8 flex items-center justify-center py-12">
+          <Loader2 className="h-8 w-8 animate-spin text-primary" />
+        </div>
       </Layout>
     );
   }
@@ -58,16 +58,16 @@ export default function Jornada() {
   if (!data) {
     return (
       <Layout>
-        <div className="text-center py-12 px-4 md:px-8 pt-4 md:pt-8 pb-20 md:pb-8">
-            <p className="text-muted-foreground">Erro ao carregar jornada.</p>
-          </div>
+        <div className="w-full max-w-7xl mx-auto p-4 md:p-8 pb-20 md:pb-8 text-center py-12">
+          <p className="text-muted-foreground">Erro ao carregar jornada.</p>
+        </div>
       </Layout>
     );
   }
 
   return (
     <Layout backgroundClass="bg-gradient-subtle">
-      <div className="px-4 md:px-8 pt-4 md:pt-8 pb-20 md:pb-8">
+      <div className="w-full max-w-7xl mx-auto p-4 md:p-8 pb-20 md:pb-8">
         <Card className="p-4 md:p-6 mb-4 md:mb-6 border-2 border-primary/20 shadow-lg rounded-xl">
           <h1 className="text-2xl md:text-3xl font-bold text-foreground mb-3 md:mb-4 flex items-center gap-2 md:gap-3">
             <Activity className="h-6 w-6 md:h-8 md:w-8 text-primary" />
@@ -176,4 +176,3 @@ export default function Jornada() {
     </Layout>
   );
 }
-

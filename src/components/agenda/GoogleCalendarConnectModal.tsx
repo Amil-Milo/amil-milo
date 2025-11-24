@@ -22,12 +22,12 @@ export function GoogleCalendarConnectModal({
   const handleConnect = () => {
     onConnect();
     onOpenChange(false);
-    localStorage.removeItem('dismissed-google-calendar-prompt');
+    localStorage.removeItem("dismissed-google-calendar-prompt");
   };
 
   const handleClose = (open: boolean) => {
     if (!open) {
-      localStorage.setItem('dismissed-google-calendar-prompt', 'true');
+      localStorage.setItem("dismissed-google-calendar-prompt", "true");
     }
     onOpenChange(open);
   };
@@ -41,7 +41,9 @@ export function GoogleCalendarConnectModal({
               <Calendar className="h-5 w-5 text-primary" />
             </div>
             <div>
-              <DialogTitle className="text-xl">Conectar Google Calendar</DialogTitle>
+              <DialogTitle className="text-xl">
+                Conectar Google Calendar
+              </DialogTitle>
               <DialogDescription className="mt-1">
                 Sincronize seus compromissos automaticamente
               </DialogDescription>
@@ -54,14 +56,15 @@ export function GoogleCalendarConnectModal({
             <div className="flex items-start gap-2">
               <Info className="h-4 w-4 text-primary mt-0.5 flex-shrink-0" />
               <p className="text-sm text-muted-foreground">
-                Ao conectar, suas consultas e medicações serão sincronizadas automaticamente com seu Google Calendar.
+                Ao conectar, suas consultas e medicações serão sincronizadas
+                automaticamente com seu Google Calendar.
               </p>
             </div>
           </div>
 
           <Button
             onClick={handleConnect}
-            className="w-full rounded-lg bg-gradient-primary text-white h-11"
+            className="w-full rounded-full bg-[#461BFF] hover:brightness-90 text-white h-11"
             size="lg"
           >
             <svg className="w-5 h-5 mr-2" viewBox="0 0 24 24">
@@ -89,4 +92,3 @@ export function GoogleCalendarConnectModal({
     </Dialog>
   );
 }
-

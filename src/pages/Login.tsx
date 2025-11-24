@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card } from "@/components/ui/card";
 import { Heart, Eye, EyeOff } from "lucide-react";
-import miloFront from "@/assets/milo-front.jpg";
+import miloFront from "@/assets/milo-front.png";
 import { toast } from "sonner";
 import { useAuth } from "@/contexts/AuthContext";
 
@@ -21,7 +21,7 @@ export default function Login() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (formData.email && formData.password) {
       setLoading(true);
       try {
@@ -30,10 +30,15 @@ export default function Login() {
           toast.success("Login realizado com sucesso!");
           navigate(result.redirectTo || "/agenda");
         } else {
-          toast.error(result.error || "E-mail ou senha incorretos. Verifique e tente novamente.");
+          toast.error(
+            result.error ||
+              "E-mail ou senha incorretos. Verifique e tente novamente."
+          );
         }
       } catch (error: any) {
-        const errorMessage = error.response?.data?.message || "Erro ao fazer login. Tente novamente.";
+        const errorMessage =
+          error.response?.data?.message ||
+          "Erro ao fazer login. Tente novamente.";
         toast.error(errorMessage);
       } finally {
         setLoading(false);
@@ -51,11 +56,7 @@ export default function Login() {
             <Heart className="h-8 w-8 text-primary fill-primary" />
             <span className="text-2xl font-bold text-primary">amil</span>
           </Link>
-          <img
-            src={miloFront}
-            alt="Milo"
-            className="w-24 h-24 mx-auto mb-4"
-          />
+          <img src={miloFront} alt="Milo" className="w-24 h-24 mx-auto mb-4" />
           <h1 className="text-2xl font-bold text-foreground mb-2">
             Bem-vindo de volta!
           </h1>
@@ -108,7 +109,11 @@ export default function Login() {
             </div>
           </div>
 
-          <Button type="submit" className="w-full bg-gradient-primary text-white" loading={loading}>
+          <Button
+            type="submit"
+            className="w-full bg-[#461BFF] hover:brightness-90 text-white rounded-full"
+            loading={loading}
+          >
             {loading ? "Entrando..." : "Entrar"}
           </Button>
         </form>
@@ -116,7 +121,10 @@ export default function Login() {
         <div className="mt-6 text-center">
           <p className="text-sm text-muted-foreground">
             Ainda não tem conta?{" "}
-            <Link to="/cadastro" className="text-primary font-medium hover:underline">
+            <Link
+              to="/cadastro"
+              className="text-primary font-medium hover:underline"
+            >
               Cadastre-se agora
             </Link>
           </p>

@@ -7,15 +7,17 @@ interface LayoutProps {
   backgroundClass?: string;
 }
 
-export function Layout({ children, backgroundClass = "bg-background" }: LayoutProps) {
+export function Layout({
+  children,
+  backgroundClass = "bg-background",
+}: LayoutProps) {
   return (
     <div className={`flex h-screen w-full ${backgroundClass} overflow-hidden`}>
       <Sidebar />
       <SidebarMobile />
-      <main className="flex-1 min-w-0 overflow-y-auto overflow-x-hidden">
+      <main className="flex-1 min-w-0 overflow-y-auto overflow-x-hidden pb-16 md:pb-0">
         {children}
       </main>
     </div>
   );
 }
-

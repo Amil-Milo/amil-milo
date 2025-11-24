@@ -23,6 +23,7 @@ import NotFound from "./pages/NotFound";
 import SobrePrograma from "./pages/sobre-o-programa";
 import NossosPlanos from "./pages/nossos-planos";
 import Contato from "./pages/contato";
+import Cuidadosmil from "./pages/programas/cuidadosmil";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 
 const queryClient = new QueryClient();
@@ -46,73 +47,74 @@ const App = () => (
             <Route path="/tour" element={<Tour />} />
             <Route path="/check-in-periodico" element={<CheckinPeriodico />} />
             <Route path="/completar-perfil" element={<CompletarPerfil />} />
-            <Route 
-              path="/jornada" 
+            <Route
+              path="/jornada"
               element={
                 <ProtectedRoute requireAssignedLine={true}>
                   <Jornada />
                 </ProtectedRoute>
-              } 
+              }
             />
-            <Route 
-              path="/agenda" 
+            <Route
+              path="/agenda"
               element={
                 <ProtectedRoute requireAssignedLine={true}>
                   <Agenda />
                 </ProtectedRoute>
-              } 
+              }
             />
-            <Route 
-              path="/diario" 
+            <Route
+              path="/diario"
               element={
                 <ProtectedRoute requireAssignedLine={true}>
                   <Diario />
                 </ProtectedRoute>
-              } 
+              }
             />
-            <Route 
-              path="/conteudos" 
+            <Route
+              path="/conteudos"
               element={
                 <ProtectedRoute requireAssignedLine={true}>
                   <Conteudos />
                 </ProtectedRoute>
-              } 
+              }
             />
-            <Route 
-              path="/prontuario" 
+            <Route
+              path="/prontuario"
               element={
                 <ProtectedRoute requirePatientProfile={true}>
                   <Prontuario />
                 </ProtectedRoute>
-              } 
+              }
             />
-            <Route 
-              path="/perfil" 
+            <Route
+              path="/perfil"
               element={
                 <ProtectedRoute requirePatientProfile={true}>
                   <Perfil />
                 </ProtectedRoute>
-              } 
+              }
             />
-            <Route 
-              path="/notificacoes" 
+            <Route
+              path="/notificacoes"
               element={
                 <ProtectedRoute>
                   <Notificacoes />
                 </ProtectedRoute>
-              } 
+              }
             />
-            <Route 
-              path="/admin" 
+            <Route
+              path="/admin"
               element={
                 <ProtectedRoute requireAdmin={true}>
                   <AdminPanel />
                 </ProtectedRoute>
-              } 
+              }
             />
             <Route path="/sobre-o-programa" element={<SobrePrograma />} />
             <Route path="/nossos-planos" element={<NossosPlanos />} />
             <Route path="/contato" element={<Contato />} />
+            <Route path="/programas/cuidadosmil" element={<Cuidadosmil />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>

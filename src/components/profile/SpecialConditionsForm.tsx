@@ -14,7 +14,9 @@ interface SpecialConditionsFormProps {
 export function SpecialConditionsForm({
   initialSpecialConditions,
 }: SpecialConditionsFormProps) {
-  const [specialConditions, setSpecialConditions] = useState(initialSpecialConditions);
+  const [specialConditions, setSpecialConditions] = useState(
+    initialSpecialConditions
+  );
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
@@ -27,13 +29,19 @@ export function SpecialConditionsForm({
     try {
       setSaving(true);
       await patientProfileApi.updateSpecialConditions({
-        specialConditions: specialConditions !== initialSpecialConditions ? specialConditions || undefined : undefined,
+        specialConditions:
+          specialConditions !== initialSpecialConditions
+            ? specialConditions || undefined
+            : undefined,
       });
       toast.success("Observações adicionais atualizadas com sucesso!");
       // Recarregar a página para atualizar os dados
       window.location.reload();
     } catch (error: any) {
-      toast.error(error.response?.data?.message || "Erro ao atualizar observações adicionais");
+      toast.error(
+        error.response?.data?.message ||
+          "Erro ao atualizar observações adicionais"
+      );
     } finally {
       setSaving(false);
     }
@@ -61,6 +69,7 @@ export function SpecialConditionsForm({
             onClick={handleSave}
             disabled={!hasChanges || saving}
             size="lg"
+            className="bg-[#461BFF] hover:brightness-90 text-white rounded-full"
           >
             {saving ? (
               <>
@@ -76,4 +85,3 @@ export function SpecialConditionsForm({
     </Card>
   );
 }
-

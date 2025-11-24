@@ -7,7 +7,12 @@ import { Slider } from "@/components/ui/slider";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { BookOpen, Loader2 } from "lucide-react";
 import { toast } from "sonner";
-import { useCreateDiaryEntry, useUpdateDiaryEntry, useTodayEntry, type DiaryEntry } from "@/hooks/useDiaryEntries";
+import {
+  useCreateDiaryEntry,
+  useUpdateDiaryEntry,
+  useTodayEntry,
+  type DiaryEntry,
+} from "@/hooks/useDiaryEntries";
 
 interface DiaryEntryFormProps {
   onSuccess?: () => void;
@@ -17,7 +22,7 @@ export function DiaryEntryForm({ onSuccess }: DiaryEntryFormProps) {
   const { data: todayData, refetch: refetchToday } = useTodayEntry();
   const createMutation = useCreateDiaryEntry();
   const updateMutation = useUpdateDiaryEntry();
-  
+
   const existingEntry = todayData?.entry;
   const isEditing = !!existingEntry;
 
@@ -41,7 +46,7 @@ export function DiaryEntryForm({ onSuccess }: DiaryEntryFormProps) {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     const submitData = {
       moodRating: formData.moodRating[0],
       motivationRating: formData.motivationRating[0],
@@ -54,14 +59,19 @@ export function DiaryEntryForm({ onSuccess }: DiaryEntryFormProps) {
         { id: existingEntry.id, data: submitData },
         {
           onSuccess: () => {
-            toast.success("Registro atualizado! Obrigado por compartilhar como você está se sentindo.");
+            toast.success(
+              "Registro atualizado! Obrigado por compartilhar como você está se sentindo."
+            );
             refetchToday();
             if (onSuccess) {
               onSuccess();
             }
           },
           onError: (error: any) => {
-            const errorMessage = error.response?.data?.message || error.response?.data?.description || "Erro ao atualizar registro. Tente novamente.";
+            const errorMessage =
+              error.response?.data?.message ||
+              error.response?.data?.description ||
+              "Erro ao atualizar registro. Tente novamente.";
             toast.error(errorMessage);
           },
         }
@@ -69,14 +79,19 @@ export function DiaryEntryForm({ onSuccess }: DiaryEntryFormProps) {
     } else {
       createMutation.mutate(submitData, {
         onSuccess: (newEntry) => {
-          toast.success("Registro salvo! Obrigado por compartilhar como você está se sentindo.");
+          toast.success(
+            "Registro salvo! Obrigado por compartilhar como você está se sentindo."
+          );
           refetchToday();
           if (onSuccess) {
             onSuccess();
           }
         },
         onError: (error: any) => {
-          const errorMessage = error.response?.data?.message || error.response?.data?.description || "Erro ao salvar registro. Tente novamente.";
+          const errorMessage =
+            error.response?.data?.message ||
+            error.response?.data?.description ||
+            "Erro ao salvar registro. Tente novamente.";
           toast.error(errorMessage);
         },
       });
@@ -109,9 +124,7 @@ export function DiaryEntryForm({ onSuccess }: DiaryEntryFormProps) {
       <form onSubmit={handleSubmit} className="space-y-6">
         <div className="space-y-4">
           <div>
-            <Label className="mb-3 block">
-              Como me sinto hoje?
-            </Label>
+            <Label className="mb-3 block">Como me sinto hoje?</Label>
             <div className="flex items-center gap-4">
               <span className="text-sm text-muted-foreground">Ruim</span>
               <Slider
@@ -154,11 +167,15 @@ export function DiaryEntryForm({ onSuccess }: DiaryEntryFormProps) {
         </div>
 
         <div className="space-y-2">
-          <Label>
-            Bati minhas metas da semana?
-          </Label>
+          <Label>Bati minhas metas da semana?</Label>
           <RadioGroup
-            value={formData.goalsMet === undefined ? "" : formData.goalsMet ? "true" : "false"}
+            value={
+              formData.goalsMet === undefined
+                ? ""
+                : formData.goalsMet
+                ? "true"
+                : "false"
+            }
             onValueChange={(value) => {
               if (value === "true") {
                 setFormData({ ...formData, goalsMet: true });
@@ -201,7 +218,7 @@ export function DiaryEntryForm({ onSuccess }: DiaryEntryFormProps) {
 
         <Button
           type="submit"
-          className="w-full bg-gradient-primary text-white"
+          className="w-full bg-[#461BFF] hover:brightness-90 text-white rounded-full"
           disabled={isLoading}
         >
           {isLoading ? (
@@ -209,12 +226,13 @@ export function DiaryEntryForm({ onSuccess }: DiaryEntryFormProps) {
               <Loader2 className="h-4 w-4 mr-2 animate-spin" />
               Salvando...
             </>
+          ) : isEditing ? (
+            "Atualizar Registro"
           ) : (
-            isEditing ? "Atualizar Registro" : "Salvar Registro"
+            "Salvar Registro"
           )}
         </Button>
       </form>
     </Card>
   );
 }
-

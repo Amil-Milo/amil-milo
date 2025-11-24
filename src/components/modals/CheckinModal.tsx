@@ -1,5 +1,11 @@
 import { useState, useEffect } from "react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
@@ -43,8 +49,11 @@ interface CheckinNotAvailable {
 type CheckinResponse = Questionnaire | CheckinNotAvailable;
 
 export const CheckinModal = ({ open, onOpenChange }: CheckinModalProps) => {
-  const [questionnaire, setQuestionnaire] = useState<Questionnaire | null>(null);
-  const [checkinStatus, setCheckinStatus] = useState<CheckinNotAvailable | null>(null);
+  const [questionnaire, setQuestionnaire] = useState<Questionnaire | null>(
+    null
+  );
+  const [checkinStatus, setCheckinStatus] =
+    useState<CheckinNotAvailable | null>(null);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [answers, setAnswers] = useState<Record<number, number>>({}); // questionId -> chosenAnswerId
   const [loading, setLoading] = useState(false);
@@ -65,19 +74,22 @@ export const CheckinModal = ({ open, onOpenChange }: CheckinModalProps) => {
     setLoadingQuestionnaire(true);
     try {
       const data = await checkinApi.getNextCheckin();
-      
+
       if (data.eligible === false) {
         setCheckinStatus(data as CheckinNotAvailable);
         setQuestionnaire(null);
       } else {
         setQuestionnaire(data as Questionnaire);
         setCheckinStatus(null);
-      setCurrentQuestionIndex(0);
-      setAnswers({});
+        setCurrentQuestionIndex(0);
+        setAnswers({});
       }
     } catch (error: any) {
       console.error("Error loading questionnaire:", error);
-      const errorMessage = error.response?.data?.message || error.response?.data?.description || "Não foi possível carregar o questionário. Tente novamente.";
+      const errorMessage =
+        error.response?.data?.message ||
+        error.response?.data?.description ||
+        "Não foi possível carregar o questionário. Tente novamente.";
       toast.error(errorMessage);
       onOpenChange(false);
     } finally {
@@ -86,8 +98,8 @@ export const CheckinModal = ({ open, onOpenChange }: CheckinModalProps) => {
   };
 
   const currentQuestion = questionnaire?.questions[currentQuestionIndex];
-  const progress = questionnaire 
-    ? ((currentQuestionIndex + 1) / questionnaire.questions.length) * 100 
+  const progress = questionnaire
+    ? ((currentQuestionIndex + 1) / questionnaire.questions.length) * 100
     : 0;
 
   const handleAnswer = (answerOptionId: string) => {
@@ -118,10 +130,12 @@ export const CheckinModal = ({ open, onOpenChange }: CheckinModalProps) => {
     setLoading(true);
     try {
       // Mapear respostas para o formato esperado pelo backend
-      const formattedAnswers = Object.entries(answers).map(([questionId, chosenAnswerId]) => ({
-        questionId: parseInt(questionId, 10),
-        chosenAnswerId: chosenAnswerId,
-      }));
+      const formattedAnswers = Object.entries(answers).map(
+        ([questionId, chosenAnswerId]) => ({
+          questionId: parseInt(questionId, 10),
+          chosenAnswerId: chosenAnswerId,
+        })
+      );
 
       await checkinApi.submitCheckin({
         questionnaireId: questionnaire.id,
@@ -130,14 +144,17 @@ export const CheckinModal = ({ open, onOpenChange }: CheckinModalProps) => {
 
       toast.success("Check-in concluído! Suas respostas foram registradas.");
       onOpenChange(false);
-      
+
       // Reset
       setCurrentQuestionIndex(0);
       setAnswers({});
       setQuestionnaire(null);
     } catch (error: any) {
       console.error("Error submitting check-in:", error);
-      const errorMessage = error.response?.data?.message || error.response?.data?.description || "Erro ao salvar check-in. Tente novamente.";
+      const errorMessage =
+        error.response?.data?.message ||
+        error.response?.data?.description ||
+        "Erro ao salvar check-in. Tente novamente.";
       toast.error(errorMessage);
     } finally {
       setLoading(false);
@@ -185,15 +202,14 @@ export const CheckinModal = ({ open, onOpenChange }: CheckinModalProps) => {
             <DialogTitle className="text-2xl">Check-in Periódico</DialogTitle>
             <DialogDescription>
               {checkinStatus.nextCheckinAvailableOn
-                ? `Próximo check-in disponível em ${formatDate(checkinStatus.nextCheckinAvailableOn)}`
+                ? `Próximo check-in disponível em ${formatDate(
+                    checkinStatus.nextCheckinAvailableOn
+                  )}`
                 : "Você completou todos os check-ins disponíveis"}
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-4 py-8">
-            <MiloAssistant
-              message={checkinStatus.message}
-              size="sm"
-            />
+            <MiloAssistant message={checkinStatus.message} size="sm" />
             {checkinStatus.nextCheckinAvailableOn && (
               <div className="bg-primary/10 border border-primary/20 rounded-lg p-4">
                 <p className="text-sm text-muted-foreground text-center">
@@ -216,10 +232,14 @@ export const CheckinModal = ({ open, onOpenChange }: CheckinModalProps) => {
         <DialogContent className="max-w-2xl">
           <DialogHeader>
             <DialogTitle className="text-2xl">Check-in Periódico</DialogTitle>
-            <DialogDescription>Nenhum questionário disponível no momento.</DialogDescription>
+            <DialogDescription>
+              Nenhum questionário disponível no momento.
+            </DialogDescription>
           </DialogHeader>
           <div className="flex items-center justify-center py-8">
-            <p className="text-muted-foreground">Nenhum questionário disponível no momento.</p>
+            <p className="text-muted-foreground">
+              Nenhum questionário disponível no momento.
+            </p>
           </div>
         </DialogContent>
       </Dialog>
@@ -242,13 +262,20 @@ export const CheckinModal = ({ open, onOpenChange }: CheckinModalProps) => {
         />
 
         <div className="space-y-6">
-          {/* Progress */}
           <div>
-            <div className="flex justify-between text-sm text-muted-foreground mb-2">
-              <span>Pergunta {currentQuestionIndex + 1} de {questionnaire.questions.length}</span>
+            <div className="flex justify-between text-sm text-gray-600 mb-2">
+              <span>
+                Pergunta {currentQuestionIndex + 1} de{" "}
+                {questionnaire.questions.length}
+              </span>
               <span>{Math.round(progress)}%</span>
             </div>
-            <Progress value={progress} />
+            <div className="w-full bg-gray-200 rounded-full h-2.5">
+              <div
+                className="bg-[#00AEEF] h-2.5 rounded-full transition-all duration-300"
+                style={{ width: `${progress}%` }}
+              />
+            </div>
           </div>
 
           {/* Question */}
@@ -264,16 +291,22 @@ export const CheckinModal = ({ open, onOpenChange }: CheckinModalProps) => {
               {currentQuestion.answerOptions.map((option) => {
                 const isSelected = answers[currentQuestion.id] === option.id;
                 return (
-                  <div 
-                    key={option.id} 
+                  <div
+                    key={option.id}
                     className={`flex items-center space-x-2 p-3 rounded-lg transition-colors ${
-                      isSelected 
-                        ? 'bg-primary/10 border border-primary/20' 
-                        : 'hover:bg-primary/10'
+                      isSelected
+                        ? "bg-primary/10 border border-primary/20"
+                        : "hover:bg-primary/10"
                     }`}
                   >
-                    <RadioGroupItem value={option.id.toString()} id={`option-${option.id}`} />
-                    <Label htmlFor={`option-${option.id}`} className="flex-1 cursor-pointer">
+                    <RadioGroupItem
+                      value={option.id.toString()}
+                      id={`option-${option.id}`}
+                    />
+                    <Label
+                      htmlFor={`option-${option.id}`}
+                      className="flex-1 cursor-pointer"
+                    >
                       {option.text}
                     </Label>
                   </div>
@@ -291,12 +324,16 @@ export const CheckinModal = ({ open, onOpenChange }: CheckinModalProps) => {
             >
               Anterior
             </Button>
-            <Button onClick={handleNext} className="bg-gradient-primary text-white" loading={loading}>
-              {loading 
-                ? "Salvando..." 
-                : currentQuestionIndex === questionnaire.questions.length - 1 
-                  ? "Finalizar" 
-                  : "Próxima"}
+            <Button
+              onClick={handleNext}
+              className="bg-[#461BFF] hover:brightness-90 text-white rounded-full"
+              loading={loading}
+            >
+              {loading
+                ? "Salvando..."
+                : currentQuestionIndex === questionnaire.questions.length - 1
+                ? "Finalizar"
+                : "Próxima"}
             </Button>
           </div>
         </div>
