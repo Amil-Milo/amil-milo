@@ -539,7 +539,11 @@ export const questionnaireApi = {
 
   updateQuestion: async (
     questionId: number,
-    data: { text?: string; order?: number }
+    data: {
+      text?: string;
+      order?: number;
+      type?: "SELECTION" | "TEXT" | "BOOLEAN";
+    }
   ) => {
     const response = await api.patch(
       `/questionnaires/questions/${questionId}`,

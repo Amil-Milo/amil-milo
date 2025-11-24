@@ -24,12 +24,51 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
-import { Users, TrendingUp, Activity, AlertCircle, Filter, Edit, Plus, Trash2, Save, X } from "lucide-react";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
+import {
+  Users,
+  TrendingUp,
+  Activity,
+  AlertCircle,
+  Filter,
+  Edit,
+  Plus,
+  Trash2,
+  Save,
+  X,
+} from "lucide-react";
 import { toast } from "sonner";
-import { adminApi, specialtyApi, patientProfileAdminApi, questionnaireApi } from "@/lib/api";
+import {
+  adminApi,
+  specialtyApi,
+  patientProfileAdminApi,
+  questionnaireApi,
+} from "@/lib/api";
 import { UserProfileMenu } from "@/components/UserProfileMenu";
 import { Textarea } from "@/components/ui/textarea";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 
 interface Patient {
   id: number;
@@ -102,7 +141,7 @@ interface Question {
   id: number;
   text: string;
   order: number;
-  type: 'SELECTION' | 'TEXT' | 'BOOLEAN';
+  type: "SELECTION" | "TEXT" | "BOOLEAN";
   answerOptions: Array<{
     id: number;
     text: string;
@@ -119,17 +158,34 @@ export default function AdminPanel() {
   const [editingQuestion, setEditingQuestion] = useState<number | null>(null);
   const [editingOption, setEditingOption] = useState<number | null>(null);
   const [editingQuestionText, setEditingQuestionText] = useState<string>("");
-  const [editingQuestionType, setEditingQuestionType] = useState<'SELECTION' | 'TEXT' | 'BOOLEAN'>('SELECTION');
-  const [editingOptionData, setEditingOptionData] = useState<{ text: string; value: number } | null>(null);
+  const [editingQuestionType, setEditingQuestionType] = useState<
+    "SELECTION" | "TEXT" | "BOOLEAN"
+  >("SELECTION");
+  const [editingOptionData, setEditingOptionData] = useState<{
+    text: string;
+    value: number;
+  } | null>(null);
   const [loading, setLoading] = useState(true);
   const [loadingCheckins, setLoadingCheckins] = useState(false);
   const [loadingQuestionnaires, setLoadingQuestionnaires] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [filter, setFilter] = useState<FilterType>("all");
   const [activeTab, setActiveTab] = useState("manage");
-  const [selectedSpecialtyId, setSelectedSpecialtyId] = useState<number | null>(null);
-  const [selectedQuestionnaireId, setSelectedQuestionnaireId] = useState<number | null>(null);
+  const [selectedSpecialtyId, setSelectedSpecialtyId] = useState<number | null>(
+    null
+  );
+  const [selectedQuestionnaireId, setSelectedQuestionnaireId] = useState<
+    number | null
+  >(null);
   const [filterPopoverOpen, setFilterPopoverOpen] = useState(false);
+  const [deleteQuestionId, setDeleteQuestionId] = useState<number | null>(null);
+  const [deleteOptionId, setDeleteOptionId] = useState<number | null>(null);
+  const [isAddOptionModalOpen, setIsAddOptionModalOpen] = useState(false);
+  const [newOptionText, setNewOptionText] = useState("");
+  const [newOptionValue, setNewOptionValue] = useState<string>("");
+  const [currentQuestionIdForOption, setCurrentQuestionIdForOption] = useState<
+    number | null
+  >(null);
 
   useEffect(() => {
     loadData();
@@ -216,8 +272,9 @@ export default function AdminPanel() {
   };
 
   const filteredPatients = useMemo(() => {
-    return patients.filter(p => {
-      const matchesSearch = p.fullName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    return patients.filter((p) => {
+      const matchesSearch =
+        p.fullName.toLowerCase().includes(searchTerm.toLowerCase()) ||
         p.cpf.includes(searchTerm);
 
       if (!matchesSearch) {
@@ -246,7 +303,7 @@ export default function AdminPanel() {
 
   const checkinsBySpecialty = useMemo(() => {
     const grouped: Record<number, CheckinDetails[]> = {};
-    
+
     allCheckins.forEach((checkin) => {
       const specialtyId = checkin.questionnaire.specialty.id;
       if (!grouped[specialtyId]) {
@@ -259,8 +316,10 @@ export default function AdminPanel() {
   }, [allCheckins]);
 
   const availableSpecialties = useMemo(() => {
-    const specialtyIds = new Set(allCheckins.map(c => c.questionnaire.specialty.id));
-    return specialties.filter(s => specialtyIds.has(s.id));
+    const specialtyIds = new Set(
+      allCheckins.map((c) => c.questionnaire.specialty.id)
+    );
+    return specialties.filter((s) => specialtyIds.has(s.id));
   }, [specialties, allCheckins]);
 
   const currentCheckins = useMemo(() => {
@@ -270,79 +329,95 @@ export default function AdminPanel() {
     return checkinsBySpecialty[selectedSpecialtyId] || [];
   }, [selectedSpecialtyId, checkinsBySpecialty]);
 
-  const handleAssignCareLine = async (patientId: number, specialtyId: string) => {
-    if (!specialtyId || specialtyId === "none" || specialtyId === "remove") return;
-    
-    const patientIndex = patients.findIndex(p => p.id === patientId);
+  const handleAssignCareLine = async (
+    patientId: number,
+    specialtyId: string
+  ) => {
+    if (!specialtyId || specialtyId === "none" || specialtyId === "remove")
+      return;
+
+    const patientIndex = patients.findIndex((p) => p.id === patientId);
     if (patientIndex === -1) return;
 
     const previousPatient = patients[patientIndex];
-    const specialty = specialties.find(s => s.id === parseInt(specialtyId));
-    
-    setPatients(prev => prev.map(p => 
-      p.id === patientId 
-        ? {
-            ...p,
-            patientProfile: {
-              ...p.patientProfile!,
-              assignedLineId: parseInt(specialtyId),
-              assignedLine: specialty ? { id: specialty.id, name: specialty.name } : null,
+    const specialty = specialties.find((s) => s.id === parseInt(specialtyId));
+
+    setPatients((prev) =>
+      prev.map((p) =>
+        p.id === patientId
+          ? {
+              ...p,
+              patientProfile: {
+                ...p.patientProfile!,
+                assignedLineId: parseInt(specialtyId),
+                assignedLine: specialty
+                  ? { id: specialty.id, name: specialty.name }
+                  : null,
+              },
             }
-          }
-        : p
-    ));
-    
+          : p
+      )
+    );
+
     try {
       await patientProfileAdminApi.assignLine(patientId, parseInt(specialtyId));
       toast.success("Linha de cuidado atribuída com sucesso!");
       loadData();
     } catch (error: any) {
-      setPatients(prev => prev.map(p => 
-        p.id === patientId ? previousPatient : p
-      ));
+      setPatients((prev) =>
+        prev.map((p) => (p.id === patientId ? previousPatient : p))
+      );
       console.error("Error assigning care line:", error);
-      const errorMessage = error.response?.data?.message || error.response?.data?.description || "Erro ao atribuir linha de cuidado. Tente novamente.";
+      const errorMessage =
+        error.response?.data?.message ||
+        error.response?.data?.description ||
+        "Erro ao atribuir linha de cuidado. Tente novamente.";
       toast.error(errorMessage);
     }
   };
 
   const handleRemoveCareLine = async (patientId: number) => {
-    const patientIndex = patients.findIndex(p => p.id === patientId);
+    const patientIndex = patients.findIndex((p) => p.id === patientId);
     if (patientIndex === -1) return;
 
     const previousPatient = patients[patientIndex];
-    
-    setPatients(prev => prev.map(p => 
-      p.id === patientId 
-        ? {
-            ...p,
-            patientProfile: {
-              ...p.patientProfile!,
-              assignedLineId: null,
-              assignedLine: null,
+
+    setPatients((prev) =>
+      prev.map((p) =>
+        p.id === patientId
+          ? {
+              ...p,
+              patientProfile: {
+                ...p.patientProfile!,
+                assignedLineId: null,
+                assignedLine: null,
+              },
             }
-          }
-        : p
-    ));
-    
+          : p
+      )
+    );
+
     try {
       await patientProfileAdminApi.removeLine(patientId);
       toast.success("Linha de cuidado removida com sucesso!");
       loadData();
     } catch (error: any) {
-      setPatients(prev => prev.map(p => 
-        p.id === patientId ? previousPatient : p
-      ));
+      setPatients((prev) =>
+        prev.map((p) => (p.id === patientId ? previousPatient : p))
+      );
       console.error("Error removing care line:", error);
-      const errorMessage = error.response?.data?.message || error.response?.data?.description || "Erro ao remover linha de cuidado. Tente novamente.";
+      const errorMessage =
+        error.response?.data?.message ||
+        error.response?.data?.description ||
+        "Erro ao remover linha de cuidado. Tente novamente.";
       toast.error(errorMessage);
     }
   };
 
   const stats = {
     total: patients.length,
-    inLine: patients.filter(p => p.patientProfile?.assignedLineId).length,
-    pending: patients.filter(p => !p.patientProfile?.assignedLineId).length,
+    inLine: patients.filter((p) => p.patientProfile?.assignedLineId).length,
+    pending: patients.filter((p) => !p.patientProfile?.assignedLineId).length,
     recentCheckins: allCheckins.length,
   };
 
@@ -422,12 +497,32 @@ export default function AdminPanel() {
           </Card>
         </div>
 
-        <Tabs defaultValue="manage" value={activeTab} onValueChange={setActiveTab} className="space-y-4">
+        <Tabs
+          defaultValue="manage"
+          value={activeTab}
+          onValueChange={setActiveTab}
+          className="space-y-4"
+        >
           <div className="overflow-x-auto">
             <TabsList className="flex flex-nowrap gap-2 min-w-max">
-              <TabsTrigger value="manage" className="whitespace-nowrap shrink-0">Gerenciar Pacientes</TabsTrigger>
-              <TabsTrigger value="checkins" className="whitespace-nowrap shrink-0">Visualizar Check-ins</TabsTrigger>
-              <TabsTrigger value="questionnaires" className="whitespace-nowrap shrink-0">Gerenciar Questionários</TabsTrigger>
+              <TabsTrigger
+                value="manage"
+                className="whitespace-nowrap shrink-0"
+              >
+                Gerenciar Pacientes
+              </TabsTrigger>
+              <TabsTrigger
+                value="checkins"
+                className="whitespace-nowrap shrink-0"
+              >
+                Visualizar Check-ins
+              </TabsTrigger>
+              <TabsTrigger
+                value="questionnaires"
+                className="whitespace-nowrap shrink-0"
+              >
+                Gerenciar Questionários
+              </TabsTrigger>
             </TabsList>
           </div>
 
@@ -444,17 +539,25 @@ export default function AdminPanel() {
                     onChange={(e) => setSearchTerm(e.target.value)}
                     className="flex-1 w-full"
                   />
-                  <Popover open={filterPopoverOpen} onOpenChange={setFilterPopoverOpen}>
+                  <Popover
+                    open={filterPopoverOpen}
+                    onOpenChange={setFilterPopoverOpen}
+                  >
                     <PopoverTrigger asChild>
-                      <Button variant="outline" className="flex items-center gap-2 whitespace-nowrap">
-                        <span className="text-sm text-muted-foreground">Filtrar por:</span>
+                      <Button
+                        variant="outline"
+                        className="flex items-center gap-2 whitespace-nowrap"
+                      >
+                        <span className="text-sm text-muted-foreground">
+                          Filtrar por:
+                        </span>
                         <Filter className="h-4 w-4 text-muted-foreground" />
                       </Button>
                     </PopoverTrigger>
-                    <PopoverContent 
-                      className="w-56 p-2" 
-                      align="end" 
-                      side="bottom" 
+                    <PopoverContent
+                      className="w-56 p-2"
+                      align="end"
+                      side="bottom"
                       sideOffset={8}
                       collisionPadding={20}
                     >
@@ -537,16 +640,21 @@ export default function AdminPanel() {
                     <TableBody>
                       {filteredPatients.length === 0 ? (
                         <TableRow>
-                          <TableCell colSpan={5} className="text-center text-muted-foreground py-8">
-                            {patients.length === 0 
-                              ? "Nenhum paciente encontrado" 
+                          <TableCell
+                            colSpan={5}
+                            className="text-center text-muted-foreground py-8"
+                          >
+                            {patients.length === 0
+                              ? "Nenhum paciente encontrado"
                               : "Nenhum paciente corresponde à busca"}
                           </TableCell>
                         </TableRow>
                       ) : (
                         filteredPatients.map((patient) => (
                           <TableRow key={patient.id}>
-                            <TableCell className="font-medium">{patient.fullName}</TableCell>
+                            <TableCell className="font-medium">
+                              {patient.fullName}
+                            </TableCell>
                             <TableCell>{patient.cpf}</TableCell>
                             <TableCell>
                               {patient.patientProfile?.assignedLineId ? (
@@ -557,9 +665,13 @@ export default function AdminPanel() {
                             </TableCell>
                             <TableCell>
                               {patient.patientProfile?.assignedLine ? (
-                                <Badge>{patient.patientProfile.assignedLine.name}</Badge>
+                                <Badge>
+                                  {patient.patientProfile.assignedLine.name}
+                                </Badge>
                               ) : (
-                                <span className="text-muted-foreground text-sm">-</span>
+                                <span className="text-muted-foreground text-sm">
+                                  -
+                                </span>
                               )}
                             </TableCell>
                             <TableCell>
@@ -572,18 +684,28 @@ export default function AdminPanel() {
                                       handleAssignCareLine(patient.id, value);
                                     }
                                   }}
-                                  value={patient.patientProfile?.assignedLineId?.toString() || "none"}
+                                  value={
+                                    patient.patientProfile?.assignedLineId?.toString() ||
+                                    "none"
+                                  }
                                 >
                                   <SelectTrigger className="w-[180px]">
                                     <SelectValue placeholder="Selecione..." />
                                   </SelectTrigger>
                                   <SelectContent>
-                                    <SelectItem value="none">Nenhuma</SelectItem>
+                                    <SelectItem value="none">
+                                      Nenhuma
+                                    </SelectItem>
                                     {patient.patientProfile?.assignedLineId && (
-                                      <SelectItem value="remove">Remover Linha</SelectItem>
+                                      <SelectItem value="remove">
+                                        Remover Linha
+                                      </SelectItem>
                                     )}
                                     {specialties.map((specialty) => (
-                                      <SelectItem key={specialty.id} value={specialty.id.toString()}>
+                                      <SelectItem
+                                        key={specialty.id}
+                                        value={specialty.id.toString()}
+                                      >
                                         {specialty.name}
                                       </SelectItem>
                                     ))}
@@ -600,8 +722,8 @@ export default function AdminPanel() {
                 <div className="md:hidden space-y-3">
                   {filteredPatients.length === 0 ? (
                     <div className="text-center text-muted-foreground py-8">
-                      {patients.length === 0 
-                        ? "Nenhum paciente encontrado" 
+                      {patients.length === 0
+                        ? "Nenhum paciente encontrado"
                         : "Nenhum paciente corresponde à busca"}
                     </div>
                   ) : (
@@ -610,24 +732,35 @@ export default function AdminPanel() {
                         <CardContent className="p-4 space-y-3">
                           <div className="space-y-2">
                             <div className="flex items-start justify-between gap-2">
-                              <p className="font-semibold text-foreground text-sm">{patient.fullName}</p>
+                              <p className="font-semibold text-foreground text-sm">
+                                {patient.fullName}
+                              </p>
                               {patient.patientProfile?.assignedLineId ? (
-                                <Badge variant="secondary" className="text-xs">Com Linha</Badge>
+                                <Badge variant="secondary" className="text-xs">
+                                  Com Linha
+                                </Badge>
                               ) : (
-                                <Badge variant="outline" className="text-xs">Sem Linha</Badge>
+                                <Badge variant="outline" className="text-xs">
+                                  Sem Linha
+                                </Badge>
                               )}
                             </div>
                             <div className="flex flex-col gap-1 text-sm">
                               <span className="text-muted-foreground">
-                                <span className="font-medium">CPF:</span> {patient.cpf}
+                                <span className="font-medium">CPF:</span>{" "}
+                                {patient.cpf}
                               </span>
                               {patient.patientProfile?.assignedLine ? (
                                 <span className="text-muted-foreground">
                                   <span className="font-medium">Linha:</span>{" "}
-                                  <Badge variant="default" className="ml-1">{patient.patientProfile.assignedLine.name}</Badge>
+                                  <Badge variant="default" className="ml-1">
+                                    {patient.patientProfile.assignedLine.name}
+                                  </Badge>
                                 </span>
                               ) : (
-                                <span className="text-muted-foreground text-xs">Sem linha atribuída</span>
+                                <span className="text-muted-foreground text-xs">
+                                  Sem linha atribuída
+                                </span>
                               )}
                             </div>
                           </div>
@@ -640,7 +773,10 @@ export default function AdminPanel() {
                                   handleAssignCareLine(patient.id, value);
                                 }
                               }}
-                              value={patient.patientProfile?.assignedLineId?.toString() || "none"}
+                              value={
+                                patient.patientProfile?.assignedLineId?.toString() ||
+                                "none"
+                              }
                             >
                               <SelectTrigger className="w-full">
                                 <SelectValue placeholder="Atribuir linha..." />
@@ -648,10 +784,15 @@ export default function AdminPanel() {
                               <SelectContent>
                                 <SelectItem value="none">Nenhuma</SelectItem>
                                 {patient.patientProfile?.assignedLineId && (
-                                  <SelectItem value="remove">Remover Linha</SelectItem>
+                                  <SelectItem value="remove">
+                                    Remover Linha
+                                  </SelectItem>
                                 )}
                                 {specialties.map((specialty) => (
-                                  <SelectItem key={specialty.id} value={specialty.id.toString()}>
+                                  <SelectItem
+                                    key={specialty.id}
+                                    value={specialty.id.toString()}
+                                  >
                                     {specialty.name}
                                   </SelectItem>
                                 ))}
@@ -676,7 +817,9 @@ export default function AdminPanel() {
                 {loadingCheckins ? (
                   <div className="text-center py-8">
                     <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
-                    <p className="mt-2 text-sm text-muted-foreground">Carregando check-ins...</p>
+                    <p className="mt-2 text-sm text-muted-foreground">
+                      Carregando check-ins...
+                    </p>
                   </div>
                 ) : availableSpecialties.length === 0 ? (
                   <div className="text-center py-8 text-muted-foreground">
@@ -684,91 +827,126 @@ export default function AdminPanel() {
                   </div>
                 ) : (
                   <>
-                    <Tabs value={selectedSpecialtyId?.toString() || ""} onValueChange={(value) => setSelectedSpecialtyId(parseInt(value))}>
+                    <Tabs
+                      value={selectedSpecialtyId?.toString() || ""}
+                      onValueChange={(value) =>
+                        setSelectedSpecialtyId(parseInt(value))
+                      }
+                    >
                       <div className="overflow-x-auto">
-                      <TabsList className="flex flex-nowrap gap-2 min-w-max">
-                        {availableSpecialties.map((specialty) => (
-                          <TabsTrigger 
-                            key={specialty.id} 
-                            value={specialty.id.toString()}
-                            className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground whitespace-nowrap shrink-0"
-                          >
-                            {specialty.name}
-                            <Badge variant="secondary" className="ml-2">
-                              {checkinsBySpecialty[specialty.id]?.length || 0}
-                            </Badge>
-                          </TabsTrigger>
-                        ))}
-                      </TabsList>
-                    </div>
+                        <TabsList className="flex flex-nowrap gap-2 min-w-max">
+                          {availableSpecialties.map((specialty) => (
+                            <TabsTrigger
+                              key={specialty.id}
+                              value={specialty.id.toString()}
+                              className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground whitespace-nowrap shrink-0"
+                            >
+                              {specialty.name}
+                              <Badge variant="secondary" className="ml-2">
+                                {checkinsBySpecialty[specialty.id]?.length || 0}
+                              </Badge>
+                            </TabsTrigger>
+                          ))}
+                        </TabsList>
+                      </div>
 
                       {availableSpecialties.map((specialty) => (
-                        <TabsContent key={specialty.id} value={specialty.id.toString()} className="space-y-4 mt-4">
+                        <TabsContent
+                          key={specialty.id}
+                          value={specialty.id.toString()}
+                          className="space-y-4 mt-4"
+                        >
                           {checkinsBySpecialty[specialty.id]?.length === 0 ? (
                             <div className="text-center py-8 text-muted-foreground">
                               <p>Nenhum check-in encontrado para esta linha</p>
                             </div>
                           ) : (
-                            <Accordion type="single" collapsible className="space-y-4">
-                              {checkinsBySpecialty[specialty.id]?.map((checkin) => (
-                                <AccordionItem key={checkin.id} value={`checkin-${checkin.id}`} className="border border-border/50 rounded-lg px-4">
-                                  <AccordionTrigger className="hover:no-underline py-4">
-                                    <div className="flex flex-col md:flex-row items-start md:items-center justify-between w-full pr-4 gap-3">
-                                      <div className="flex flex-col items-start gap-1 flex-1 min-w-0">
-                                        <CardTitle className="text-base md:text-lg font-semibold text-foreground break-words">
-                                          {checkin.patient.fullName}
-                                        </CardTitle>
-                                        <div className="flex flex-col md:flex-row md:items-center gap-1 md:gap-3 text-xs md:text-sm text-muted-foreground">
-                                          <span className="break-all">{checkin.patient.email}</span>
-                                          <span className="hidden md:inline">•</span>
-                                          <span>{checkin.patient.cpf}</span>
-                                        </div>
-                                        <p className="text-xs text-muted-foreground mt-1 break-words">
-                                          {checkin.questionnaire.name}
-                                        </p>
-                                      </div>
-                                      <div className="flex flex-row md:flex-col items-start md:items-end gap-2 shrink-0">
-                                        <p className="text-xs md:text-sm text-muted-foreground whitespace-nowrap">
-                                          {new Date(checkin.completedAt).toLocaleDateString('pt-BR', {
-                                            day: '2-digit',
-                                            month: '2-digit',
-                                            year: 'numeric',
-                                            hour: '2-digit',
-                                            minute: '2-digit'
-                                          })}
-                                        </p>
-                                        {checkin.totalScore !== null && (
-                                          <Badge className="bg-primary/10 text-primary border-primary/20 text-xs">
-                                            {checkin.totalScore} pontos
-                                          </Badge>
-                                        )}
-                                        <Badge variant="outline" className="text-xs whitespace-nowrap">
-                                          {checkin.answers.length} {checkin.answers.length === 1 ? 'resposta' : 'respostas'}
-                                        </Badge>
-                                      </div>
-                                    </div>
-                                  </AccordionTrigger>
-                                  <AccordionContent>
-                                    <div className="space-y-4 pt-2 pb-4 w-full max-w-full">
-                                      {checkin.answers.map((answer) => (
-                                        <div key={answer.id} className="space-y-2 p-3 bg-muted/50 rounded-lg w-full max-w-full">
-                                          <p className="font-medium text-foreground text-sm break-words">
-                                            {answer.question.text}
-                                          </p>
-                                          <div className="flex flex-wrap items-center gap-2">
-                                            <Badge className="bg-primary text-primary-foreground font-normal break-words">
-                                              {answer.chosenAnswer.text}
-                                            </Badge>
-                                            <span className="text-xs text-muted-foreground whitespace-nowrap">
-                                              {answer.chosenAnswer.value} pontos
+                            <Accordion
+                              type="single"
+                              collapsible
+                              className="space-y-4"
+                            >
+                              {checkinsBySpecialty[specialty.id]?.map(
+                                (checkin) => (
+                                  <AccordionItem
+                                    key={checkin.id}
+                                    value={`checkin-${checkin.id}`}
+                                    className="border border-border/50 rounded-lg px-4"
+                                  >
+                                    <AccordionTrigger className="hover:no-underline py-4">
+                                      <div className="flex flex-col md:flex-row items-start md:items-center justify-between w-full pr-4 gap-3">
+                                        <div className="flex flex-col items-start gap-1 flex-1 min-w-0">
+                                          <CardTitle className="text-base md:text-lg font-semibold text-foreground break-words">
+                                            {checkin.patient.fullName}
+                                          </CardTitle>
+                                          <div className="flex flex-col md:flex-row md:items-center gap-1 md:gap-3 text-xs md:text-sm text-muted-foreground">
+                                            <span className="break-all">
+                                              {checkin.patient.email}
                                             </span>
+                                            <span className="hidden md:inline">
+                                              •
+                                            </span>
+                                            <span>{checkin.patient.cpf}</span>
                                           </div>
+                                          <p className="text-xs text-muted-foreground mt-1 break-words">
+                                            {checkin.questionnaire.name}
+                                          </p>
                                         </div>
-                                      ))}
-                                    </div>
-                                  </AccordionContent>
-                                </AccordionItem>
-                              ))}
+                                        <div className="flex flex-row md:flex-col items-start md:items-end gap-2 shrink-0">
+                                          <p className="text-xs md:text-sm text-muted-foreground whitespace-nowrap">
+                                            {new Date(
+                                              checkin.completedAt
+                                            ).toLocaleDateString("pt-BR", {
+                                              day: "2-digit",
+                                              month: "2-digit",
+                                              year: "numeric",
+                                              hour: "2-digit",
+                                              minute: "2-digit",
+                                            })}
+                                          </p>
+                                          {checkin.totalScore !== null && (
+                                            <Badge className="bg-primary/10 text-primary border-primary/20 text-xs">
+                                              {checkin.totalScore} pontos
+                                            </Badge>
+                                          )}
+                                          <Badge
+                                            variant="outline"
+                                            className="text-xs whitespace-nowrap"
+                                          >
+                                            {checkin.answers.length}{" "}
+                                            {checkin.answers.length === 1
+                                              ? "resposta"
+                                              : "respostas"}
+                                          </Badge>
+                                        </div>
+                                      </div>
+                                    </AccordionTrigger>
+                                    <AccordionContent>
+                                      <div className="space-y-4 pt-2 pb-4 w-full max-w-full">
+                                        {checkin.answers.map((answer) => (
+                                          <div
+                                            key={answer.id}
+                                            className="space-y-2 p-3 bg-muted/50 rounded-lg w-full max-w-full"
+                                          >
+                                            <p className="font-medium text-foreground text-sm break-words">
+                                              {answer.question.text}
+                                            </p>
+                                            <div className="flex flex-wrap items-center gap-2">
+                                              <Badge className="bg-primary text-primary-foreground font-normal break-words">
+                                                {answer.chosenAnswer.text}
+                                              </Badge>
+                                              <span className="text-xs text-muted-foreground whitespace-nowrap">
+                                                {answer.chosenAnswer.value}{" "}
+                                                pontos
+                                              </span>
+                                            </div>
+                                          </div>
+                                        ))}
+                                      </div>
+                                    </AccordionContent>
+                                  </AccordionItem>
+                                )
+                              )}
                             </Accordion>
                           )}
                         </TabsContent>
@@ -789,7 +967,9 @@ export default function AdminPanel() {
                 {loadingQuestionnaires ? (
                   <div className="text-center py-8">
                     <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
-                    <p className="mt-2 text-sm text-muted-foreground">Carregando questionários...</p>
+                    <p className="mt-2 text-sm text-muted-foreground">
+                      Carregando questionários...
+                    </p>
                   </div>
                 ) : questionnaires.length === 0 ? (
                   <div className="text-center py-8 text-muted-foreground">
@@ -797,16 +977,22 @@ export default function AdminPanel() {
                   </div>
                 ) : (
                   <>
-                    <Tabs value={selectedQuestionnaireId?.toString() || ""} onValueChange={(value) => setSelectedQuestionnaireId(parseInt(value))}>
+                    <Tabs
+                      value={selectedQuestionnaireId?.toString() || ""}
+                      onValueChange={(value) =>
+                        setSelectedQuestionnaireId(parseInt(value))
+                      }
+                    >
                       <div className="overflow-x-auto">
                         <TabsList className="flex flex-nowrap gap-2 min-w-max">
                           {questionnaires.map((questionnaire) => (
-                            <TabsTrigger 
-                              key={questionnaire.id} 
+                            <TabsTrigger
+                              key={questionnaire.id}
                               value={questionnaire.id.toString()}
                               className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground whitespace-nowrap shrink-0"
                             >
-                              {questionnaire.specialty.name} - {questionnaire.name}
+                              {questionnaire.specialty.name} -{" "}
+                              {questionnaire.name}
                               <Badge variant="secondary" className="ml-2">
                                 {questionnaire.questionsCount}
                               </Badge>
@@ -816,41 +1002,67 @@ export default function AdminPanel() {
                       </div>
 
                       {questionnaires.map((questionnaire) => (
-                        <TabsContent key={questionnaire.id} value={questionnaire.id.toString()} className="space-y-4 mt-4">
+                        <TabsContent
+                          key={questionnaire.id}
+                          value={questionnaire.id.toString()}
+                          className="space-y-4 mt-4"
+                        >
                           {!questions[questionnaire.id] ? (
                             <div className="text-center py-8">
                               <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
-                              <p className="mt-2 text-sm text-muted-foreground">Carregando perguntas...</p>
+                              <p className="mt-2 text-sm text-muted-foreground">
+                                Carregando perguntas...
+                              </p>
                             </div>
                           ) : questions[questionnaire.id].length === 0 ? (
                             <div className="text-center py-8 text-muted-foreground">
-                              <p>Nenhuma pergunta encontrada neste questionário</p>
+                              <p>
+                                Nenhuma pergunta encontrada neste questionário
+                              </p>
                             </div>
                           ) : (
                             <div className="space-y-4">
                               {questions[questionnaire.id].map((question) => (
-                                <Card key={question.id} className="border border-border/50">
+                                <Card
+                                  key={question.id}
+                                  className="border border-border/50"
+                                >
                                   <CardHeader className="pb-3">
                                     <div className="flex flex-col md:flex-row items-start justify-between gap-4">
                                       {editingQuestion === question.id ? (
                                         <div className="flex-1 space-y-3">
                                           <Textarea
                                             value={editingQuestionText}
-                                            onChange={(e) => setEditingQuestionText(e.target.value)}
+                                            onChange={(e) =>
+                                              setEditingQuestionText(
+                                                e.target.value
+                                              )
+                                            }
                                             className="min-h-[80px]"
                                             placeholder="Texto da pergunta"
                                           />
                                           <Select
                                             value={editingQuestionType}
-                                            onValueChange={(value: 'SELECTION' | 'TEXT' | 'BOOLEAN') => setEditingQuestionType(value)}
+                                            onValueChange={(
+                                              value:
+                                                | "SELECTION"
+                                                | "TEXT"
+                                                | "BOOLEAN"
+                                            ) => setEditingQuestionType(value)}
                                           >
                                             <SelectTrigger className="w-full max-w-full">
                                               <SelectValue placeholder="Tipo de resposta" />
                                             </SelectTrigger>
                                             <SelectContent>
-                                              <SelectItem value="SELECTION">Seleção</SelectItem>
-                                              <SelectItem value="TEXT">Texto Livre</SelectItem>
-                                              <SelectItem value="BOOLEAN">Sim/Não</SelectItem>
+                                              <SelectItem value="SELECTION">
+                                                Seleção
+                                              </SelectItem>
+                                              <SelectItem value="TEXT">
+                                                Texto Livre
+                                              </SelectItem>
+                                              <SelectItem value="BOOLEAN">
+                                                Sim/Não
+                                              </SelectItem>
                                             </SelectContent>
                                           </Select>
                                           <div className="flex gap-2">
@@ -858,18 +1070,37 @@ export default function AdminPanel() {
                                               size="sm"
                                               onClick={async () => {
                                                 try {
-                                                  await questionnaireApi.updateQuestion(question.id, {
+                                                  const updateData: {
+                                                    text: string;
+                                                    order: number;
+                                                    type:
+                                                      | "SELECTION"
+                                                      | "TEXT"
+                                                      | "BOOLEAN";
+                                                  } = {
                                                     text: editingQuestionText,
                                                     order: question.order,
                                                     type: editingQuestionType,
-                                                  });
-                                                  toast.success("Pergunta atualizada com sucesso!");
+                                                  };
+                                                  await questionnaireApi.updateQuestion(
+                                                    question.id,
+                                                    updateData
+                                                  );
+                                                  toast.success(
+                                                    "Pergunta atualizada com sucesso!"
+                                                  );
                                                   setEditingQuestion(null);
                                                   setEditingQuestionText("");
-                                                  setEditingQuestionType('SELECTION');
-                                                  loadQuestions(questionnaire.id);
+                                                  setEditingQuestionType(
+                                                    "SELECTION"
+                                                  );
+                                                  loadQuestions(
+                                                    questionnaire.id
+                                                  );
                                                 } catch (error: any) {
-                                                  toast.error("Erro ao atualizar pergunta.");
+                                                  toast.error(
+                                                    "Erro ao atualizar pergunta."
+                                                  );
                                                 }
                                               }}
                                             >
@@ -882,7 +1113,9 @@ export default function AdminPanel() {
                                               onClick={() => {
                                                 setEditingQuestion(null);
                                                 setEditingQuestionText("");
-                                                setEditingQuestionType('SELECTION');
+                                                setEditingQuestionType(
+                                                  "SELECTION"
+                                                );
                                               }}
                                             >
                                               <X className="h-4 w-4 mr-2" />
@@ -893,12 +1126,25 @@ export default function AdminPanel() {
                                       ) : (
                                         <>
                                           <div className="flex-1">
-                                            <p className="font-semibold text-foreground">{question.text}</p>
+                                            <p className="font-semibold text-foreground">
+                                              {question.text}
+                                            </p>
                                             <div className="flex items-center gap-2 mt-1">
-                                              <p className="text-sm text-muted-foreground">Ordem: {question.order}</p>
-                                              <span className="text-muted-foreground">•</span>
-                                              <Badge variant="outline" className="text-xs">
-                                                {question.type === 'SELECTION' ? 'Seleção' : question.type === 'TEXT' ? 'Texto Livre' : 'Sim/Não'}
+                                              <p className="text-sm text-muted-foreground">
+                                                Ordem: {question.order}
+                                              </p>
+                                              <span className="text-muted-foreground">
+                                                •
+                                              </span>
+                                              <Badge
+                                                variant="outline"
+                                                className="text-xs"
+                                              >
+                                                {question.type === "SELECTION"
+                                                  ? "Seleção"
+                                                  : question.type === "TEXT"
+                                                  ? "Texto Livre"
+                                                  : "Sim/Não"}
                                               </Badge>
                                             </div>
                                           </div>
@@ -908,8 +1154,12 @@ export default function AdminPanel() {
                                               variant="outline"
                                               onClick={() => {
                                                 setEditingQuestion(question.id);
-                                                setEditingQuestionText(question.text);
-                                                setEditingQuestionType(question.type);
+                                                setEditingQuestionText(
+                                                  question.text
+                                                );
+                                                setEditingQuestionType(
+                                                  question.type
+                                                );
                                               }}
                                               className="w-full sm:w-auto"
                                             >
@@ -919,17 +1169,9 @@ export default function AdminPanel() {
                                             <Button
                                               size="sm"
                                               variant="destructive"
-                                              onClick={async () => {
-                                                if (confirm("Tem certeza que deseja excluir esta pergunta?")) {
-                                                  try {
-                                                    await questionnaireApi.deleteQuestion(question.id);
-                                                    toast.success("Pergunta excluída com sucesso!");
-                                                    loadQuestions(questionnaire.id);
-                                                  } catch (error: any) {
-                                                    toast.error("Erro ao excluir pergunta.");
-                                                  }
-                                                }
-                                              }}
+                                              onClick={() =>
+                                                setDeleteQuestionId(question.id)
+                                              }
                                               className="w-full sm:w-auto"
                                             >
                                               <Trash2 className="h-4 w-4 mr-2" />
@@ -943,27 +1185,19 @@ export default function AdminPanel() {
                                   <CardContent>
                                     <div className="space-y-3">
                                       <div className="flex items-center justify-between">
-                                        <h4 className="text-sm font-medium text-muted-foreground">Opções de Resposta</h4>
+                                        <h4 className="text-sm font-medium text-muted-foreground">
+                                          Opções de Resposta
+                                        </h4>
                                         <Button
                                           size="sm"
                                           variant="outline"
-                                          onClick={async () => {
-                                            const text = prompt("Texto da opção:");
-                                            if (text) {
-                                              const valueStr = prompt("Valor (pontuação):");
-                                              if (valueStr) {
-                                                try {
-                                                  await questionnaireApi.createAnswerOption(question.id, {
-                                                    text,
-                                                    value: parseInt(valueStr),
-                                                  });
-                                                  toast.success("Opção adicionada com sucesso!");
-                                                  loadQuestions(questionnaire.id);
-                                                } catch (error: any) {
-                                                  toast.error("Erro ao adicionar opção.");
-                                                }
-                                              }
-                                            }
+                                          onClick={() => {
+                                            setCurrentQuestionIdForOption(
+                                              question.id
+                                            );
+                                            setNewOptionText("");
+                                            setNewOptionValue("");
+                                            setIsAddOptionModalOpen(true);
                                           }}
                                         >
                                           <Plus className="h-4 w-4 mr-2" />
@@ -971,103 +1205,145 @@ export default function AdminPanel() {
                                         </Button>
                                       </div>
                                       {question.answerOptions.length === 0 ? (
-                                        <p className="text-sm text-muted-foreground">Nenhuma opção de resposta</p>
+                                        <p className="text-sm text-muted-foreground">
+                                          Nenhuma opção de resposta
+                                        </p>
                                       ) : (
                                         <div className="space-y-2">
-                                          {question.answerOptions.map((option) => (
-                                            <div key={option.id} className="flex items-center justify-between p-3 bg-muted rounded-lg">
-                                              {editingOption === option.id ? (
-                                                <div className="flex-1 flex items-center gap-2">
-                                                  <Input
-                                                    value={editingOptionData?.text || ""}
-                                                    onChange={(e) => {
-                                                      if (editingOptionData) {
-                                                        setEditingOptionData({ ...editingOptionData, text: e.target.value });
+                                          {question.answerOptions.map(
+                                            (option) => (
+                                              <div
+                                                key={option.id}
+                                                className="flex items-center justify-between p-3 bg-muted rounded-lg"
+                                              >
+                                                {editingOption === option.id ? (
+                                                  <div className="flex-1 flex items-center gap-2">
+                                                    <Input
+                                                      value={
+                                                        editingOptionData?.text ||
+                                                        ""
                                                       }
-                                                    }}
-                                                    className="flex-1"
-                                                  />
-                                                  <Input
-                                                    type="number"
-                                                    value={editingOptionData?.value || 0}
-                                                    onChange={(e) => {
-                                                      if (editingOptionData) {
-                                                        setEditingOptionData({ ...editingOptionData, value: parseInt(e.target.value) || 0 });
-                                                      }
-                                                    }}
-                                                    className="w-20"
-                                                  />
-                                                  <Button
-                                                    size="sm"
-                                                    onClick={async () => {
-                                                      if (editingOptionData) {
-                                                        try {
-                                                          await questionnaireApi.updateAnswerOption(option.id, {
-                                                            text: editingOptionData.text,
-                                                            value: editingOptionData.value,
+                                                      onChange={(e) => {
+                                                        if (editingOptionData) {
+                                                          setEditingOptionData({
+                                                            ...editingOptionData,
+                                                            text: e.target
+                                                              .value,
                                                           });
-                                                          toast.success("Opção atualizada com sucesso!");
-                                                          setEditingOption(null);
-                                                          setEditingOptionData(null);
-                                                          loadQuestions(questionnaire.id);
-                                                        } catch (error: any) {
-                                                          toast.error("Erro ao atualizar opção.");
                                                         }
-                                                      }
-                                                    }}
-                                                  >
-                                                    <Save className="h-4 w-4" />
-                                                  </Button>
-                                                  <Button
-                                                    size="sm"
-                                                    variant="outline"
-                                                    onClick={() => {
-                                                      setEditingOption(null);
-                                                      setEditingOptionData(null);
-                                                    }}
-                                                  >
-                                                    <X className="h-4 w-4" />
-                                                  </Button>
-                                                </div>
-                                              ) : (
-                                                <>
-                                                  <div className="flex-1">
-                                                    <p className="font-medium text-foreground">{option.text}</p>
-                                                    <p className="text-sm text-muted-foreground">Valor: {option.value}</p>
-                                                  </div>
-                                                  <div className="flex gap-2">
-                                                    <Button
-                                                      size="sm"
-                                                      variant="outline"
-                                                      onClick={() => {
-                                                        setEditingOption(option.id);
-                                                        setEditingOptionData({ text: option.text, value: option.value });
                                                       }}
-                                                    >
-                                                      <Edit className="h-4 w-4" />
-                                                    </Button>
+                                                      className="flex-1"
+                                                    />
+                                                    <Input
+                                                      type="number"
+                                                      value={
+                                                        editingOptionData?.value ||
+                                                        0
+                                                      }
+                                                      onChange={(e) => {
+                                                        if (editingOptionData) {
+                                                          setEditingOptionData({
+                                                            ...editingOptionData,
+                                                            value:
+                                                              parseInt(
+                                                                e.target.value
+                                                              ) || 0,
+                                                          });
+                                                        }
+                                                      }}
+                                                      className="w-20"
+                                                    />
                                                     <Button
                                                       size="sm"
-                                                      variant="destructive"
                                                       onClick={async () => {
-                                                        if (confirm("Tem certeza que deseja excluir esta opção?")) {
+                                                        if (editingOptionData) {
                                                           try {
-                                                            await questionnaireApi.deleteAnswerOption(option.id);
-                                                            toast.success("Opção excluída com sucesso!");
-                                                            loadQuestions(questionnaire.id);
+                                                            await questionnaireApi.updateAnswerOption(
+                                                              option.id,
+                                                              {
+                                                                text: editingOptionData.text,
+                                                                value:
+                                                                  editingOptionData.value,
+                                                              }
+                                                            );
+                                                            toast.success(
+                                                              "Opção atualizada com sucesso!"
+                                                            );
+                                                            setEditingOption(
+                                                              null
+                                                            );
+                                                            setEditingOptionData(
+                                                              null
+                                                            );
+                                                            loadQuestions(
+                                                              questionnaire.id
+                                                            );
                                                           } catch (error: any) {
-                                                            toast.error("Erro ao excluir opção.");
+                                                            toast.error(
+                                                              "Erro ao atualizar opção."
+                                                            );
                                                           }
                                                         }
                                                       }}
                                                     >
-                                                      <Trash2 className="h-4 w-4" />
+                                                      <Save className="h-4 w-4" />
+                                                    </Button>
+                                                    <Button
+                                                      size="sm"
+                                                      variant="outline"
+                                                      onClick={() => {
+                                                        setEditingOption(null);
+                                                        setEditingOptionData(
+                                                          null
+                                                        );
+                                                      }}
+                                                    >
+                                                      <X className="h-4 w-4" />
                                                     </Button>
                                                   </div>
-                                                </>
-                                              )}
-                                            </div>
-                                          ))}
+                                                ) : (
+                                                  <>
+                                                    <div className="flex-1">
+                                                      <p className="font-medium text-foreground">
+                                                        {option.text}
+                                                      </p>
+                                                      <p className="text-sm text-muted-foreground">
+                                                        Valor: {option.value}
+                                                      </p>
+                                                    </div>
+                                                    <div className="flex gap-2">
+                                                      <Button
+                                                        size="sm"
+                                                        variant="outline"
+                                                        onClick={() => {
+                                                          setEditingOption(
+                                                            option.id
+                                                          );
+                                                          setEditingOptionData({
+                                                            text: option.text,
+                                                            value: option.value,
+                                                          });
+                                                        }}
+                                                      >
+                                                        <Edit className="h-4 w-4" />
+                                                      </Button>
+                                                      <Button
+                                                        size="sm"
+                                                        variant="destructive"
+                                                        onClick={() =>
+                                                          setDeleteOptionId(
+                                                            option.id
+                                                          )
+                                                        }
+                                                      >
+                                                        <Trash2 className="h-4 w-4" />
+                                                      </Button>
+                                                    </div>
+                                                  </>
+                                                )}
+                                              </div>
+                                            )
+                                          )}
                                         </div>
                                       )}
                                     </div>
@@ -1086,6 +1362,189 @@ export default function AdminPanel() {
           </TabsContent>
         </Tabs>
       </div>
+
+      <AlertDialog
+        open={deleteQuestionId !== null}
+        onOpenChange={(open) => {
+          if (!open) setDeleteQuestionId(null);
+        }}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Tem certeza?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Tem certeza que deseja excluir esta pergunta? Essa ação não pode
+              ser desfeita.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogAction
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              onClick={async () => {
+                if (deleteQuestionId && selectedQuestionnaireId) {
+                  try {
+                    await questionnaireApi.deleteQuestion(deleteQuestionId);
+                    toast.success("Pergunta excluída com sucesso!");
+                    setDeleteQuestionId(null);
+                    loadQuestions(selectedQuestionnaireId);
+                  } catch (error: any) {
+                    toast.error("Erro ao excluir pergunta.");
+                  }
+                }
+              }}
+            >
+              Excluir
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      <AlertDialog
+        open={deleteOptionId !== null}
+        onOpenChange={(open) => {
+          if (!open) setDeleteOptionId(null);
+        }}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Tem certeza?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Tem certeza que deseja excluir esta opção? Essa ação não pode ser
+              desfeita.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogAction
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              onClick={async () => {
+                if (deleteOptionId && selectedQuestionnaireId) {
+                  try {
+                    await questionnaireApi.deleteAnswerOption(deleteOptionId);
+                    toast.success("Opção excluída com sucesso!");
+                    setDeleteOptionId(null);
+                    loadQuestions(selectedQuestionnaireId);
+                  } catch (error: any) {
+                    toast.error("Erro ao excluir opção.");
+                  }
+                }
+              }}
+            >
+              Excluir
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      <Dialog
+        open={isAddOptionModalOpen}
+        onOpenChange={setIsAddOptionModalOpen}
+      >
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Adicionar Opção</DialogTitle>
+            <DialogDescription>
+              Preencha os dados da nova opção de resposta.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-foreground">
+                Texto da opção
+              </label>
+              <Input
+                value={newOptionText}
+                onChange={(e) => setNewOptionText(e.target.value)}
+                placeholder="Digite o texto da opção"
+                className="border-gray-300 focus:ring-[#00AEEF]"
+              />
+            </div>
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-foreground">
+                Pontuação/Valor
+              </label>
+              <Input
+                type="number"
+                min="1"
+                value={newOptionValue}
+                onChange={(e) => {
+                  const value = e.target.value;
+                  if (value === "") {
+                    setNewOptionValue("");
+                    return;
+                  }
+                  const numValue = Number(value);
+                  if (!isNaN(numValue) && numValue > 0) {
+                    setNewOptionValue(value);
+                  }
+                }}
+                placeholder="Digite um valor maior que 0"
+                className="border-gray-300 focus:ring-[#00AEEF]"
+              />
+              {newOptionValue !== "" &&
+                (Number(newOptionValue) <= 0 ||
+                  isNaN(Number(newOptionValue))) && (
+                  <p className="text-xs text-destructive">
+                    O valor deve ser maior que 0
+                  </p>
+                )}
+            </div>
+          </div>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => {
+                setIsAddOptionModalOpen(false);
+                setNewOptionText("");
+                setNewOptionValue("");
+                setCurrentQuestionIdForOption(null);
+              }}
+            >
+              Cancelar
+            </Button>
+            <Button
+              className="bg-[#461BFF] hover:bg-[#461BFF]/90 text-white"
+              onClick={async () => {
+                const numericValue = Number(newOptionValue);
+                if (!currentQuestionIdForOption || !newOptionText.trim()) {
+                  toast.error("Preencha o texto da opção.");
+                  return;
+                }
+                if (newOptionValue === "" || isNaN(numericValue)) {
+                  toast.error("O valor da pontuação é obrigatório.");
+                  return;
+                }
+                if (numericValue <= 0) {
+                  toast.error("O valor deve ser maior que 0.");
+                  return;
+                }
+                try {
+                  await questionnaireApi.createAnswerOption(
+                    currentQuestionIdForOption,
+                    {
+                      text: newOptionText,
+                      value: numericValue,
+                    }
+                  );
+                  toast.success("Opção adicionada com sucesso!");
+                  setIsAddOptionModalOpen(false);
+                  setNewOptionText("");
+                  setNewOptionValue("");
+                  setCurrentQuestionIdForOption(null);
+                  if (selectedQuestionnaireId) {
+                    loadQuestions(selectedQuestionnaireId);
+                  }
+                } catch (error: any) {
+                  toast.error("Erro ao adicionar opção.");
+                }
+              }}
+            >
+              Salvar
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
