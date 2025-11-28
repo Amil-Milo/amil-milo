@@ -3,7 +3,7 @@ import { Layout } from "@/components/layout/Layout";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Loader2, Bell, Calendar } from "lucide-react";
-import { useAgenda } from "@/hooks/useAgenda";
+import { useAgenda, type AgendaSummary } from "@/hooks/useAgenda";
 import { AgendaList } from "@/components/agenda/AgendaList";
 import { MedicationCard } from "@/components/agenda/MedicationCard";
 import { GoogleCalendarWrapper } from "@/components/agenda/GoogleCalendarWrapper";
@@ -182,8 +182,10 @@ export default function Agenda() {
     );
   }
 
-  const consultations = agendaData?.upcomingConsultations || [];
-  const medications = agendaData?.medicationReminders || [];
+  const consultations =
+    (agendaData as AgendaSummary | undefined)?.upcomingConsultations || [];
+  const medications =
+    (agendaData as AgendaSummary | undefined)?.medicationReminders || [];
 
   return (
     <Layout>
